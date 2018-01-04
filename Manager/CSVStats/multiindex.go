@@ -4,38 +4,46 @@ import (
 	pcsv "github.com/lpuig/Novagile/Manager/ProcessCSV"
 )
 
-type MultiIndex map[string][]int
+type multiIndex map[string][]int
 
-func NewMultiIdIndex() MultiIndex {
-	return MultiIndex{}
+func newMultiIdIndex() multiIndex {
+	return multiIndex{}
 }
 
-func (i MultiIndex) Add(key string, pos int) {
+func (i multiIndex) Add(key string, pos int) {
 	if !i.Has(key) {
 		i[key] = []int{}
 	}
 	i[key] = append(i[key], pos)
 }
 
-func (i MultiIndex) Has(key string) bool {
+func (i multiIndex) Has(key string) bool {
 	_, found := i[key]
 	return found
 }
 
-func (i MultiIndex) Get(key string) ([]int, bool) {
+func (i multiIndex) Keys() []string {
+	res := []string{}
+	for k, _ := range i {
+		res = append(res, k)
+	}
+	return res
+}
+
+func (i multiIndex) Get(key string) ([]int, bool) {
 	e, found := i[key]
 	return e, found
 }
 
 type index struct {
 	genKey pcsv.RecordSelector
-	index  MultiIndex
+	index  multiIndex
 }
 
 func newIndex(rs pcsv.RecordSelector) *index {
 	return &index{
 		genKey: rs,
-		index:  NewMultiIdIndex(),
+		index:  newMultiIdIndex(),
 	}
 }
 

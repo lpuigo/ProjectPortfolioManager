@@ -43,11 +43,36 @@ func (c *CSVStats) AddHeader(record []string) error {
 	return nil
 }
 
+// Add adds the given record, updating indexes
 func (c *CSVStats) Add(record []string) {
 	num := c.data.Add(record)
 	for _, v := range c.indexes {
 		v.Add(record, num)
 	}
+}
+
+// GetKeys returns all registered keys for given idxname
+func (c *CSVStats) GetKeys(idxname string) []string {
+	if i, found := c.indexes[idxname]; found {
+		return i.index.Keys()
+	}
+	return nil
+}
+
+func (c *CSVStats) GetRecords(idxname, key string) [][]string {
+	i, found := c.indexes[idxname]
+	if !found {
+		return nil
+	}
+	r, found := i.index[key]
+	if !found {
+		return nil
+	}
+	res := [][]string{}
+	for _, pos := range r {
+		res = append(res, c.data.Get(pos))
+	}
+	return res
 }
 
 // AddCSVDataFrom populates the CSVStats with Data from given reader (CSV formated data) (Header and Indexes are populated)

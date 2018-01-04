@@ -3,7 +3,7 @@ package CSVStats
 import "testing"
 
 func TestNewMultiIdIndex(t *testing.T) {
-	i := NewMultiIdIndex()
+	i := newMultiIdIndex()
 	i.Add("a", 0)
 	i.Add("a", 1)
 	i.Add("b", 1)

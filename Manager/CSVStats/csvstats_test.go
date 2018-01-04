@@ -8,6 +8,7 @@ import (
 
 var csvstring string = `A;B;C
 a0;a1;a2
+a0;a11;a21
 b0;b1;b2`
 
 func TestNewCSVStatsFrom(t *testing.T) {
@@ -17,5 +18,11 @@ func TestNewCSVStatsFrom(t *testing.T) {
 		t.Fatal("NewCSVStatsFrom(reader) returns :", err.Error())
 	}
 
+	//TODO make proper tests
 	fmt.Printf("\nHeader :%v\nData: %v", cs, cs.data)
+
+	fmt.Printf("\nKeys :%v\n", cs.GetKeys("A"))
+	fmt.Printf("\nKeys :%v\n", cs.GetKeys("AB"))
+	fmt.Printf("\nRecord :%v\n", cs.GetRecords("A", "a0"))
+	fmt.Printf("\nRecord :%v\n", cs.GetRecords("AB", "a0!a11"))
 }

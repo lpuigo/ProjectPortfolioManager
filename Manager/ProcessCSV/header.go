@@ -2,6 +2,7 @@ package ProcessCSV
 
 import (
 	"fmt"
+	"strings"
 )
 
 type Header struct {
@@ -44,10 +45,10 @@ func (h *Header) NewRecordSelector(colname ...string) (RecordSelector, error) {
 		return nil, err
 	}
 	return func(record []string) string {
-		res := ""
+		res := []string{}
 		for _, n := range colnums {
-			res += record[n]
+			res = append(res, record[n])
 		}
-		return res
+		return strings.Join(res, "!")
 	}, nil
 }
