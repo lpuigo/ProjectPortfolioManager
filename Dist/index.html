@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="/Assets/semantic/semantic.min.css">
+    <style>
+        .main.container{
+            padding-top: 60px;
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+    </style>
+    <title>Prj Portfolio</title>
+    <script
+        src="https://code.jquery.com/jquery-3.1.1.min.js"
+        integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+        crossorigin="anonymous">
+    </script>
+</head>
+
+<body>
+<div id="prj-app">
+    <div class="ui teal inverted fixed menu">
+        <div class="item">
+            <h3>Novagile Portefeuille Projet</h3>
+        </div>
+        <div class="item"></div>
+        <a class="item" @click="GetPtf">
+            <i class="big icons">
+                <i class="cloud icon"></i>
+                <i class="tiny refresh black icon"></i>
+            </i>
+        </a>
+        <a class="item" @click="CreateNewProject">
+            <i class="big icons">
+                <i class="tasks icon"></i>
+                <i class="corner plus black icon"></i>
+            </i>
+        </a>
+        <a class="item" href="/xls">
+            <i class="big file excel outline icon"></i>
+        </a>
+        <div class="right menu">
+            <div class="item">
+                <div class="ui transparent icon input">
+                    <input type="text" placeholder="Filtre..." v-model="textfilter">
+                    <i class="filter icon"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <editproject-modal
+        :statuts="statuts"
+        :types="types"
+        :milestonekeys="milestonekeys"
+        :givenprj.sync="editedprj"
+        @update:givenprj="ProcessEditedPrj"
+        @delete:givenprj="DeleteEditedPrj"
+    ></editproject-modal>
+
+    <div class="ui main fluid container">
+
+        <div v-if="DispPrj">
+            <table class="ui very compact selectable celled striped sortable table">
+                <thead>
+                    <tr>
+                        <th is="col-title" :sortlist.sync="sortlist" class="one wide" title="Client"></th>
+                        <th is="col-title" :sortlist.sync="sortlist" class="two wide" title="Projet"></th>
+                        <th is="col-title" :sortlist.sync="sortlist" class="" title="Information" iclass="sticky note outline icon"></th>
+                        <th is="col-title" :sortlist.sync="sortlist" class="center aligned" title="Kickoff" iclass="checked calendar icon"></th>
+                        <th is="col-title" :sortlist.sync="sortlist" class="center aligned" title="Recette" iclass="checked calendar icon"></th>
+                        <th is="col-title" :sortlist.sync="sortlist" class="center aligned" title="Formation" iclass="checked calendar icon"></th>
+                        <th is="col-title" :sortlist.sync="sortlist" class="center aligned" title="Mep" iclass="checked calendar icon"></th>
+                        <th is="col-title" :sortlist.sync="sortlist" class="one wide center aligned"  title="Charge" iclass="hourglass half icon"></th>
+                        <!--<th is="col-title" :sortlist.sync="sortlist" class="one wide"       title="Développeur" iclass="desktop icon"></th>-->
+                        <th is="col-title-withfilter" :sortlist.sync="sortlist" :colfilter.sync="colfilters" :projects="projects"
+                            class="one wide" title="Développeur" iclass="desktop icon"
+                        >
+                        <!--<th is="col-title" :sortlist.sync="sortlist" class="center aligned" title="Type"></th>-->
+                        <th is="col-title-withfilter" :sortlist.sync="sortlist" :colfilter.sync="colfilters" :projects="projects"
+                            class="center aligned" title="Type"
+                        >
+                        </th>
+                        <!--<th is="col-title" :sortlist.sync="sortlist" class="one wide" title="Statut"></th>-->
+                        <th is="col-title-withfilter" :sortlist.sync="sortlist" :colfilter.sync="colfilters" :projects="projects"
+                            class="one wide" title="Statut"
+                        >
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="prj in sortedProjects" :key="prj.id" @click="EditProject(prj)" v-if="IsDisplayed(prj)">
+                        <td class="collapsing">{{prj.client}}</td>
+                        <td class="collapsing">{{prj.name}}</td>
+                        <td style="white-space: pre-wrap;">{{prj.comment}}</td>
+                        <td is="date-cell" :date="prj.milestones.Kickoff"></td>
+                        <td is="date-cell" :date="prj.milestones.Recette"></td>
+                        <td is="date-cell" :date="prj.milestones.Formation"></td>
+                        <td is="date-cell" :date="prj.milestones.Mep"></td>
+                        <!--<td class="collapsing right aligned">{{prj | ChargeFormat}}</td>-->
+                        <td is="workload-cell" :project="prj"></td>
+                        <td class="collapsing">{{prj.lead_dev}}</td>
+                        <td class="collapsing center aligned">{{prj.type}}</td>
+                        <td class="collapsing">{{prj.status}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+
+<script src="/Assets/semantic/semantic.min.js"></script>
+<script type="text/javascript" src="prjapp.js"></script>
+
+</html>

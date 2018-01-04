@@ -1,0 +1,250 @@
+package Comps
+
+import (
+	"github.com/gopherjs/gopherjs/js"
+	"github.com/gopherjs/jquery"
+	"github.com/lpuig/Novagile/Client/FrontModel"
+	"github.com/oskca/gopherjs-vue"
+)
+
+const (
+	TemplateEditProjectModalComp = `
+        <div class="ui modal" id="EditProjectModalComp">
+            <!--<i class="close icon"></i>-->
+            <div class="header">
+                <!--<h3>Edition du projet : <span style="color: steelblue">{{projecttitle}}</span></h3>-->
+                <h3>Edition du projet : <span style="color: steelblue">{{editedprj.client}} - {{editedprj.name}}</span></h3>
+            </div>
+
+            <!--<div class="content" v-if="project">-->
+            <div class="scrolling content">
+                <form class="ui form">
+                    <!--<h4 class="ui dividing header">Projet</h4>-->
+                    <div class="field">
+                        <div class="two fields">
+                            <div class="field">
+                                <label>Client</label>
+                                <input type="text" placeholder="Nom Client" v-model.trim="editedprj.client">
+                            </div>
+                            <div class="field">
+                                <label>Nom Projet</label>
+                                <input type="text" placeholder="Nom Projet" v-model.trim="editedprj.name">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="three fields">
+                            <div class="field">
+                                <label>Statut</label>
+                                <dropdown-list ref="StatutDD"
+                                	:listvalues="statuts"
+                                	defaulttext="Statut du projet"
+                                	:selected.sync="editedprj.status">
+                                </dropdown-list>
+                            </div>
+                            <div class="field">
+                                <label>Type</label>
+                                <dropdown-list ref="TypeDD"
+                                	:listvalues="types"
+                                	defaulttext="Type du projet"
+                                	:selected.sync="editedprj.type">
+                                </dropdown-list>
+                            </div>
+                            <div class="field">
+                                <label>Développeur principal</label>
+                                <input type="text" v-model.trim="editedprj.lead_dev">
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label>Commentaire</label>
+                            <textarea rows="3" v-model="editedprj.comment"></textarea>
+                        </div>
+                        <div class="field">
+                            <div class="two fields">
+                                <div class="field">
+                                    <label>Charge prévue</label>
+                                    <input type="number" min="0" v-model="editedprj.forecast_wl">
+                                </div>
+                                <div class="field">
+                                    <label>Charge consommée</label>
+                                    <input type="number" min="0" v-model="editedprj.current_wl">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <table class="ui very compact celled table">
+                            <thead>
+                                <tr>
+                                    <th class="one wide center aligned">
+										<div ref="AddMilestoneDD" class="ui dropdown icon item">
+											<i class="big link icons">
+												<i class="calendar outline icon"></i>
+												<i class="corner plus green icon"></i>
+											</i>
+											<div class="menu">
+												<div v-for="k in unusedMilestoneKeys" :key="k" class="item" @click="AddMilestone(k)">{{k}}</div>
+											</div>
+										</div>
+									</th>
+                                    <th class="three wide right aligned">Jalon</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="j in usedMilestoneKeys" :key="j">
+									<td class="center aligned">
+										<i class="big link icons" @click.prevent="DeleteMilestone(j)">
+											<i class="calendar outline icon"></i>
+											<i class="corner remove red icon"></i>
+										</i>
+									</td>
+                                    <td class="right aligned">{{j}} <i class="checked calendar icon"></i></td>
+                                    <td>
+                                    	<div class="ui small input">
+                                    		<input type="date" v-model="editedprj.milestones[j]">
+                                    	</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </form>
+            </div>
+            <div class="actions">
+				<div class="ui red right labeled icon button" v-if="editedprj.id >= 0" @click.prevent="deleteProject">
+					Supprimer
+					<i class="trash outline icon"></i>
+				</div>
+				<div class="ui right labeled icon button" v-if="editedprj.id >= 0" @click.prevent="duplicateProject">
+					Dupliquer
+					<i class="clone icon"></i>
+				</div>
+				<div class="ui black deny button">
+					Annuler
+				</div>
+				<div class="ui positive right labeled icon button">
+					Modifier
+					<i class="checkmark icon"></i>
+				</div>
+            </div>
+        </div>
+`
+)
+
+type EditProjectModalComp struct {
+	*js.Object
+	GiventPrj *FrontModel.Project `js:"givenprj"`
+	EditedPrj *FrontModel.Project `js:"editedprj"`
+}
+
+func NewEditProjectModalComp() *EditProjectModalComp {
+	a := &EditProjectModalComp{Object: js.Global.Get("Object").New()}
+	a.GiventPrj = FrontModel.NewProject()
+	a.EditedPrj = FrontModel.NewProject()
+	return a
+}
+
+// RegisterEditProjectModalComp registers to current vue intance a EditProjectModal component
+// having the following profile
+//  <editproject-modal :statuts="some_[]*ValText" :types="some_[]*ValText" v-model="*Project"></editproject-modal>
+func RegisterEditProjectModalComp() *vue.Component {
+	var jq = jquery.NewJQuery
+
+	o := vue.NewOption()
+	o.Template = TemplateEditProjectModalComp
+	o.Data = NewEditProjectModalComp
+
+	o.AddProp("givenprj", "statuts", "types", "milestonekeys")
+	o.AddSubComponent("dropdown-list", RegisterDropDownListComp())
+
+	o.OnLifeCycleEvent(vue.EvtMounted, func(vm *vue.ViewModel) {
+		// setup approve and deny callback funcs
+		modalOptions := js.M{
+			"observeChanges": true,
+			"closable":       false,
+			"detachable":     true,
+			"offset":         200,
+			"onDeny": func() bool {
+				return true
+			},
+			"onApprove": func() bool {
+				m := &EditProjectModalComp{Object: vm.Object}
+				m.GiventPrj.Copy(m.EditedPrj)
+				vm.Emit("update:givenprj", m.GiventPrj)
+				return true
+			},
+		}
+		jq(vm.El).Call("modal", modalOptions)
+
+		// Prepare dropdownlist for addmilestone
+		addmilestoneDDOption := js.M{
+			"on":        "hover",
+			"direction": "upward",
+		}
+		jq(vm.Refs.Get("AddMilestoneDD")).Call("dropdown", addmilestoneDDOption)
+
+	})
+
+	o.AddMethod("deleteProject", func(vm *vue.ViewModel, args []*js.Object) {
+		m := &EditProjectModalComp{Object: vm.Object}
+		//TODO Add confirmation modal
+		vm.Emit("delete:givenprj", m.GiventPrj)
+		jq(vm.El).Call("modal", "hide")
+	})
+
+	o.AddMethod("duplicateProject", func(vm *vue.ViewModel, args []*js.Object) {
+		m := &EditProjectModalComp{Object: vm.Object}
+		m.GiventPrj = FrontModel.NewProject()
+		m.EditedPrj.Id = -1
+		m.EditedPrj.Name += " (Copie)"
+	})
+
+	o.AddMethod("ShowEditProjectModal", func(vm *vue.ViewModel, args []*js.Object) {
+		m := &EditProjectModalComp{Object: vm.Object}
+		p := &FrontModel.Project{Object: args[0]}
+		m.EditedPrj.Copy(p)
+
+		vm.Refs.Get("StatutDD").Call("changeSelected", m.EditedPrj.Status)
+		vm.Refs.Get("TypeDD").Call("changeSelected", m.EditedPrj.Type)
+		jq(vm.El).Call("modal", "show")
+		jq(vm.El).Call("modal", "refresh")
+	})
+
+	o.AddMethod("DeleteMilestone", func(vm *vue.ViewModel, args []*js.Object) {
+		m := &EditProjectModalComp{Object: vm.Object}
+		m.EditedPrj.RemoveMileStone(args[0].String())
+	})
+
+	o.AddMethod("AddMilestone", func(vm *vue.ViewModel, args []*js.Object) {
+		m := &EditProjectModalComp{Object: vm.Object}
+		jq(vm.Refs.Get("AddMilestoneDD")).Call("dropdown", "hide")
+		m.EditedPrj.AddMileStone(args[0].String())
+	})
+
+	o.AddComputed("unusedMilestoneKeys", func(vm *vue.ViewModel) interface{} {
+		m := &EditProjectModalComp{Object: vm.Object}
+		keyList := []string{}
+		vm.Get("milestonekeys").Call("forEach", func(vt *js.Object) {
+			k := vt.Get("value").String()
+			if _, ok := m.EditedPrj.MileStones[k]; ok == false {
+				keyList = append(keyList, k)
+			}
+		})
+		return keyList
+	})
+
+	o.AddComputed("usedMilestoneKeys", func(vm *vue.ViewModel) interface{} {
+		m := &EditProjectModalComp{Object: vm.Object}
+		keyList := []string{}
+		vm.Get("milestonekeys").Call("forEach", func(vt *js.Object) {
+			k := vt.Get("value").String()
+			if _, ok := m.EditedPrj.MileStones[k]; ok == true {
+				keyList = append(keyList, k)
+			}
+		})
+		return keyList
+	})
+
+	return o.NewComponent().Register("editproject-modal")
+}
