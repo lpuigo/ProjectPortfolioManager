@@ -5,11 +5,6 @@ import (
 	"io"
 )
 
-type IndexDesc struct {
-	Name string
-	Cols []string
-}
-
 type CSVStats struct {
 	header *Header
 	data   [][]string
@@ -37,6 +32,10 @@ func (c *CSVStats) Add(record []string) int {
 
 func (c *CSVStats) Get(num int) []string {
 	return c.data[num]
+}
+
+func (c *CSVStats) Len() int {
+	return len(c.data)
 }
 
 // AddCSVDataFrom populates the CSVStats with Data from given reader (CSV formated data) (Header and Indexes are populated)

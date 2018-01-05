@@ -36,11 +36,11 @@ func (i multiIndex) Get(key string) ([]int, bool) {
 }
 
 type index struct {
-	genKey pcsv.RecordSelector
+	genKey pcsv.KeyGenerator
 	index  multiIndex
 }
 
-func newIndex(rs pcsv.RecordSelector) *index {
+func newIndex(rs pcsv.KeyGenerator) *index {
 	return &index{
 		genKey: rs,
 		index:  newMultiIdIndex(),

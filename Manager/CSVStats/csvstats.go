@@ -34,7 +34,7 @@ func (c *CSVStats) AddHeader(record []string) error {
 	c.data.AddHeader(record)
 	h := c.data.GetHeader()
 	for _, id := range c.indexDescs {
-		rs, err := h.NewRecordSelector(id.cols...)
+		rs, err := h.NewKeyGenerator(id.cols...)
 		if err != nil {
 			return fmt.Errorf("CSVStats Unable to create index '%s' : %s", id.name, err.Error())
 		}
@@ -57,6 +57,14 @@ func (c *CSVStats) GetKeys(idxname string) []string {
 		return i.index.Keys()
 	}
 	return nil
+}
+
+// GetRecordKey returns the idxname related key for given record
+func (c *CSVStats) GetRecordKey(idxname string, record []string) string {
+	if i, found := c.indexes[idxname]; found {
+		return i.genKey(record)
+	}
+	return ""
 }
 
 func (c *CSVStats) GetRecords(idxname, key string) [][]string {
@@ -102,4 +110,25 @@ func (c *CSVStats) AddCSVDataFrom(r io.Reader) error {
 		numline++
 	}
 	return nil
+}
+
+func (c *CSVStats) Max(idxname, key string, compare IndexDesc) []string {
+	comp, err := c.data.GetHeader().NewKeyGenerator(compare.cols...)
+	if err != nil {
+		panic(fmt.Sprintf("CSVStats.Max: %s", err.Error()))
+	}
+	subset := c.GetRecords(idxname, key)
+	if len(subset) == 0 {
+		return nil
+	}
+	if len(subset) == 1 {
+		return subset[0]
+	}
+	max := 0
+	for j := 1; j < len(subset); j++ {
+		if comp(subset[max]) < comp(subset[j]) {
+			max = j
+		}
+	}
+	return subset[max]
 }

@@ -23,6 +23,16 @@ func TestNewCSVStatsFrom(t *testing.T) {
 
 	fmt.Printf("\nKeys :%v\n", cs.GetKeys("A"))
 	fmt.Printf("\nKeys :%v\n", cs.GetKeys("AB"))
-	fmt.Printf("\nRecord :%v\n", cs.GetRecords("A", "a0"))
-	fmt.Printf("\nRecord :%v\n", cs.GetRecords("AB", "a0!a11"))
+	fmt.Printf("\nRecord :%v\n", cs.GetRecords("A", "!a0"))
+	fmt.Printf("\nRecord :%v\n", cs.GetRecords("AB", "!a0!a11"))
+}
+
+func TestCSVStats_Max(t *testing.T) {
+	cs := NewCSVStats(NewIndexDesc("A", "A"), NewIndexDesc("AB", "A", "B"))
+	err := cs.AddCSVDataFrom(strings.NewReader(csvstring))
+	if err != nil {
+		t.Fatal("NewCSVStatsFrom(reader) returns :", err.Error())
+	}
+	max := cs.Max("A", "!a0", NewIndexDesc("", "B"))
+	t.Errorf("CSVStat.Max %v", max)
 }

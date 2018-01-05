@@ -2,7 +2,6 @@ package ProcessCSV
 
 import (
 	"fmt"
-	"strings"
 )
 
 type Header struct {
@@ -10,7 +9,7 @@ type Header struct {
 	index map[string]int
 }
 
-type RecordSelector func([]string) string
+type KeyGenerator func([]string) string
 
 func NewHeader(record []string) *Header {
 	h := &Header{
@@ -39,16 +38,19 @@ func (h *Header) getNums(colname ...string) ([]int, error) {
 	return res, nil
 }
 
-func (h *Header) NewRecordSelector(colname ...string) (RecordSelector, error) {
+func (h *Header) NewKeyGenerator(colname ...string) (KeyGenerator, error) {
 	colnums, err := h.getNums(colname...)
 	if err != nil {
 		return nil, err
 	}
 	return func(record []string) string {
-		res := []string{}
-		for _, n := range colnums {
-			res = append(res, record[n])
+		if len(colnums) == 0 {
+			return "!"
 		}
-		return strings.Join(res, "!")
+		res := ""
+		for _, n := range colnums {
+			res += "!" + record[n]
+		}
+		return res
 	}, nil
 }
