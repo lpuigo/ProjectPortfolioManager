@@ -62,3 +62,12 @@ func (c *CSVStats) AddCSVDataFrom(r io.Reader) error {
 	}
 	return nil
 }
+
+// WriteCSVTo writes all CSVStats records to given writer using CSVFormat (; delimitor, CRLF record separator)
+func (c *CSVStats) WriteCSVTo(w io.Writer) error {
+	csvw := csv.NewWriter(w)
+	csvw.UseCRLF = true
+	csvw.Comma = ';'
+
+	return csvw.WriteAll(c.data)
+}

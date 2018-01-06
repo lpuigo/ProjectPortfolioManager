@@ -7,7 +7,6 @@ import (
 	fm "github.com/lpuig/Novagile/Client/FrontModel"
 	"github.com/lpuig/Novagile/Model"
 	"io"
-	"log"
 )
 
 type Manager struct {
@@ -78,23 +77,23 @@ func (m *Manager) GetProjectsPtfXLS(w io.Writer) {
 }
 
 func (m *Manager) UpdateStatFromCSVFile(csvfile string) error {
-	m.Projects.RLock()
-	m.Stats.WLock()
-	//TODO create new StatsPtf and then, if no error nor warning, append it to actual Manager.Stats
-	num, err, warns := UpdateStatPortfolioFromCSVFile(csvfile, m.Projects.GetProjectsPtf(), m.Stats.GetStatsPtf())
-	m.Projects.RUnlock()
-	if err != nil {
-		m.Stats.WUnlockNoPersist()
-		return err
-	}
-	log.Printf("Statfile %s processed : %d stats added\n", csvfile, num)
-	if warns.HasWarnings() {
-		log.Printf("Warnings :\n%s", warns.Warning(""))
-	}
-	if num == 0 {
-		m.Stats.WUnlockNoPersist()
-	} else {
-		m.Stats.WUnlock()
-	}
+	//m.Projects.RLock()
+	//m.Stats.WLock()
+	////TODO create new StatsPtf and then, if no error nor warning, append it to actual Manager.Stats
+	//num, err, warns := UpdateStatPortfolioFromCSVFile(csvfile, m.Projects.GetProjectsPtf(), m.Stats.GetStatsPtf())
+	//m.Projects.RUnlock()
+	//if err != nil {
+	//	m.Stats.WUnlockNoPersist()
+	//	return err
+	//}
+	//log.Printf("Statfile %s processed : %d stats added\n", csvfile, num)
+	//if warns.HasWarnings() {
+	//	log.Printf("Warnings :\n%s", warns.Warning(""))
+	//}
+	//if num == 0 {
+	//	m.Stats.WUnlockNoPersist()
+	//} else {
+	//	m.Stats.WUnlock()
+	//}
 	return nil
 }

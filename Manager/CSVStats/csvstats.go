@@ -5,6 +5,7 @@ import (
 	"fmt"
 	pcsv "github.com/lpuig/Novagile/Manager/ProcessCSV"
 	"io"
+	"os"
 )
 
 type IndexDesc struct {
@@ -41,6 +42,10 @@ func (c *CSVStats) AddHeader(record []string) error {
 		c.indexes[id.name] = newIndex(rs)
 	}
 	return nil
+}
+
+func (c *CSVStats) Len() int {
+	return c.data.Len()
 }
 
 // Add adds the given record, updating indexes
@@ -112,6 +117,16 @@ func (c *CSVStats) AddCSVDataFrom(r io.Reader) error {
 	return nil
 }
 
+func (c *CSVStats) AddCSVDataFromFile(file string) error {
+	f, err := os.Open(file)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	return c.AddCSVDataFrom(f)
+}
+
+// Max returns the bigger record from (idxname, key) subset according to compare's Cols key(s)
 func (c *CSVStats) Max(idxname, key string, compare IndexDesc) []string {
 	comp, err := c.data.GetHeader().NewKeyGenerator(compare.cols...)
 	if err != nil {
@@ -131,4 +146,18 @@ func (c *CSVStats) Max(idxname, key string, compare IndexDesc) []string {
 		}
 	}
 	return subset[max]
+}
+
+// WriteCSVTo writes all CSVStats records to given writer using CSVFormat (; delimitor, CRLF record separator)
+func (c *CSVStats) WriteCSVTo(w io.Writer) error {
+	return c.data.WriteCSVTo(w)
+}
+
+func (c *CSVStats) WriteCSVToFile(file string) error {
+	f, err := os.Create(file)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	return c.WriteCSVTo(f)
 }
