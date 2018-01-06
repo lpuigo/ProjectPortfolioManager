@@ -2,7 +2,6 @@ package Manager
 
 import (
 	"testing"
-	"time"
 )
 
 const (
@@ -11,14 +10,9 @@ const (
 	csvfile = `C:\Users\Laurent\Golang\src\github.com\lpuig\Novagile\Ressources\export Jira\extract 2018-01-03.csv`
 )
 
-func TestUpdateStatPortfolioFromCSVFile(t *testing.T) {
-	m, err := NewManager(prjfile, StatFile)
+func TestNewManager(t *testing.T) {
+	_, err := NewManager(prjfile, StatFile)
 	if err != nil {
 		t.Fatal("NewManager returned", err.Error())
 	}
-	err = m.UpdateStatFromCSVFile(csvfile)
-	if err != nil {
-		t.Error("UpdateStatFromCSVFile returned", err.Error())
-	}
-	time.Sleep(4 * time.Second)
 }

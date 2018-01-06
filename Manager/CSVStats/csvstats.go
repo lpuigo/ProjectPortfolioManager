@@ -6,6 +6,7 @@ import (
 	pcsv "github.com/lpuig/Novagile/Manager/ProcessCSV"
 	"io"
 	"os"
+	"sort"
 )
 
 type IndexDesc struct {
@@ -31,6 +32,10 @@ func NewCSVStats(indexes ...IndexDesc) *CSVStats {
 	return c
 }
 
+func (c *CSVStats) Len() int {
+	return c.data.Len()
+}
+
 func (c *CSVStats) AddHeader(record []string) error {
 	c.data.AddHeader(record)
 	h := c.data.GetHeader()
@@ -44,35 +49,55 @@ func (c *CSVStats) AddHeader(record []string) error {
 	return nil
 }
 
-func (c *CSVStats) Len() int {
-	return c.data.Len()
-}
-
-// Add adds the given record, updating indexes
-func (c *CSVStats) Add(record []string) {
+// AddRecord adds the given record, updating indexes
+func (c *CSVStats) AddRecord(record []string) {
 	num := c.data.Add(record)
 	for _, v := range c.indexes {
 		v.Add(record, num)
 	}
 }
 
-// GetKeys returns all registered keys for given idxname
-func (c *CSVStats) GetKeys(idxname string) []string {
+// HasIndexKey returns true if idxname index has given key, false otherwise
+func (c *CSVStats) HasIndexKey(idxname, key string) bool {
+	i, found := c.indexes[idxname]
+	if !found {
+		return false
+	}
+	_, found = i.index[key]
+	return found
+}
+
+// GetIndexesNames returns names of active indexes
+func (c *CSVStats) GetIndexesNames() []string {
+	res := []string{}
+	for n, _ := range c.indexes {
+		res = append(res, n)
+	}
+	sort.Strings(res)
+	return res
+}
+
+// GetIndexKeys returns all registered keys for given idxname
+func (c *CSVStats) GetIndexKeys(idxname string) []string {
 	if i, found := c.indexes[idxname]; found {
 		return i.index.Keys()
 	}
 	return nil
 }
 
-// GetRecordKey returns the idxname related key for given record
-func (c *CSVStats) GetRecordKey(idxname string, record []string) string {
+func (c *CSVStats) GetKeyGeneratorByIndexDesc(compare IndexDesc) (pcsv.KeyGenerator, error) {
+	return c.data.GetHeader().NewKeyGenerator(compare.cols...)
+}
+
+// GetRecordKeyByIndex returns key related to given record key using named index
+func (c *CSVStats) GetRecordKeyByIndex(idxname string, record []string) string {
 	if i, found := c.indexes[idxname]; found {
 		return i.genKey(record)
 	}
 	return ""
 }
 
-func (c *CSVStats) GetRecords(idxname, key string) [][]string {
+func (c *CSVStats) GetRecordsByIndexKey(idxname, key string) [][]string {
 	i, found := c.indexes[idxname]
 	if !found {
 		return nil
@@ -86,6 +111,10 @@ func (c *CSVStats) GetRecords(idxname, key string) [][]string {
 		res = append(res, c.data.Get(pos))
 	}
 	return res
+}
+
+func (c *CSVStats) GetRecords() [][]string {
+	return c.data.GetRecords()
 }
 
 // AddCSVDataFrom populates the CSVStats with Data from given reader (CSV formated data) (Header and Indexes are populated)
@@ -109,7 +138,7 @@ func (c *CSVStats) AddCSVDataFrom(r io.Reader) error {
 				return err
 			}
 		} else {
-			c.Add(record)
+			c.AddRecord(record)
 		}
 
 		numline++
@@ -132,7 +161,7 @@ func (c *CSVStats) Max(idxname, key string, compare IndexDesc) []string {
 	if err != nil {
 		panic(fmt.Sprintf("CSVStats.Max: %s", err.Error()))
 	}
-	subset := c.GetRecords(idxname, key)
+	subset := c.GetRecordsByIndexKey(idxname, key)
 	if len(subset) == 0 {
 		return nil
 	}

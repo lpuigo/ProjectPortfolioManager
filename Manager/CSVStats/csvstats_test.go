@@ -21,10 +21,10 @@ func TestNewCSVStatsFrom(t *testing.T) {
 	//TODO make proper tests
 	fmt.Printf("\nHeader :%v\nData: %v", cs, cs.data)
 
-	fmt.Printf("\nKeys :%v\n", cs.GetKeys("A"))
-	fmt.Printf("\nKeys :%v\n", cs.GetKeys("AB"))
-	fmt.Printf("\nRecord :%v\n", cs.GetRecords("A", "!a0"))
-	fmt.Printf("\nRecord :%v\n", cs.GetRecords("AB", "!a0!a11"))
+	fmt.Printf("\nKeys :%v\n", cs.GetIndexKeys("A"))
+	fmt.Printf("\nKeys :%v\n", cs.GetIndexKeys("AB"))
+	fmt.Printf("\nRecord :%v\n", cs.GetRecordsByIndexKey("A", "!a0"))
+	fmt.Printf("\nRecord :%v\n", cs.GetRecordsByIndexKey("AB", "!a0!a11"))
 }
 
 func TestCSVStats_Max(t *testing.T) {

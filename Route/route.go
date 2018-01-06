@@ -64,9 +64,9 @@ func UpdatePrj(mgr *Manager.Manager, w http.ResponseWriter, r *http.Request) {
 		addError(w, &logmsg, "request project Id not found", http.StatusNotFound)
 		return
 	}
-	mgr.UpdateProject(ptfPrj, uprj)
+	hasStat := mgr.UpdateProject(ptfPrj, uprj)
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(fm.CloneBEProject(ptfPrj))
+	json.NewEncoder(w).Encode(fm.CloneBEProject(ptfPrj, hasStat))
 	logmsg += fmt.Sprintf("project Id %d updated (%d)", ptfPrj.Id, http.StatusOK)
 	log.Println(logmsg)
 }
@@ -86,10 +86,10 @@ func CreatePrj(mgr *Manager.Manager, w http.ResponseWriter, r *http.Request) {
 		addError(w, &logmsg, "unable to retrieve request project. "+err.Error(), http.StatusBadRequest)
 		return
 	}
-	ptfPrj := mgr.CreateProject(fm.CloneFEProject(prj))
+	ptfPrj, hasStat := mgr.CreateProject(fm.CloneFEProject(prj))
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(fm.CloneBEProject(ptfPrj))
+	json.NewEncoder(w).Encode(fm.CloneBEProject(ptfPrj, hasStat))
 	logmsg += fmt.Sprintf("New project Id %d added (%d)", ptfPrj.Id, http.StatusCreated)
 	log.Println(logmsg)
 }

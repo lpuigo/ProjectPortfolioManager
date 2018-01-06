@@ -38,6 +38,10 @@ func (c *CSVStats) Len() int {
 	return len(c.data)
 }
 
+func (c *CSVStats) GetRecords() [][]string {
+	return c.data
+}
+
 // AddCSVDataFrom populates the CSVStats with Data from given reader (CSV formated data) (Header and Indexes are populated)
 func (c *CSVStats) AddCSVDataFrom(r io.Reader) error {
 	csvr := csv.NewReader(r)

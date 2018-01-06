@@ -17,23 +17,20 @@ func TestUpdatePortfolioFromXLS(t *testing.T) {
 
 	err := UpdatePortfolioFromXLS(ptf, XLSPlanningFile)
 	if err != nil {
-		t.Error("UpdatePortfolioFromXLS returns error", err.Error())
-		return
+		t.Fatal("UpdatePortfolioFromXLS returns error", err.Error())
 	}
 	log.Println("projects loaded :", len(ptf.Projects))
 	s := ptf.String()
 
 	err = ptf.WriteJsonFile(JSONPlanningFile)
 	if err != nil {
-		t.Error("WriteJsonFile returns error", err.Error())
-		return
+		t.Fatal("WriteJsonFile returns error", err.Error())
 	}
 
 	var ptf2 *PrjPortfolio
 	ptf2, err = NewPrjPortfolioFromJSONFile(JSONPlanningFile)
 	if err != nil {
-		t.Error("NewPrjPortfolioFromJSONFile returns err", err.Error())
-		return
+		t.Fatal("NewPrjPortfolioFromJSONFile returns err", err.Error())
 	}
 	//TODO Fails because of new date compared to ref file JSONPlanningFile : find a way to avoid this
 	if s != ptf2.String() {

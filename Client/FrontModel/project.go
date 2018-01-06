@@ -15,6 +15,7 @@ type Project struct {
 	LeadDev    string            `json:"lead_dev"       js:"lead_dev"`
 	Status     string            `json:"status"         js:"status"`
 	Type       string            `json:"type"           js:"type"`
+	HasStat    bool              `json:"hasStat"        js:"hasStat"`
 	ForecastWL float64           `json:"forecast_wl"    js:"forecast_wl"`
 	CurrentWL  float64           `json:"current_wl"     js:"current_wl"`
 	Comment    string            `json:"comment"        js:"comment"`
@@ -29,6 +30,7 @@ func NewProject() *Project {
 	pf.LeadDev = ""
 	pf.Status = "1 - Prospect"
 	pf.Type = "Legacy"
+	pf.HasStat = false
 	pf.ForecastWL = 0
 	pf.CurrentWL = 0
 	pf.Comment = ""
@@ -49,6 +51,7 @@ func (p *Project) Copy(np *Project) {
 	p.LeadDev = np.LeadDev
 	p.Status = np.Status
 	p.Type = np.Type
+	p.HasStat = np.HasStat
 	p.ForecastWL = np.ForecastWL
 	p.CurrentWL = np.CurrentWL
 	p.Comment = np.Comment
@@ -70,8 +73,9 @@ func (p Project) String() string {
 	add("Client", p.Client)
 	add("Name", p.Name)
 	add("Lead Dev", p.LeadDev)
-	add("Status", string(p.Status))
-	add("Type", string(p.Type))
+	add("Status", p.Status)
+	add("Type", p.Type)
+	add("HasStat", strconv.FormatBool(p.HasStat))
 	add("Forecast WorkLoad", strconv.FormatFloat(p.ForecastWL, 'f', 1, 64))
 	add("Current WorkLoad", strconv.FormatFloat(p.CurrentWL, 'f', 1, 64))
 	add("Comment", p.Comment)
@@ -92,6 +96,7 @@ func DateString(v string) string {
 }
 
 func (p *Project) searchInString() string {
+	// HasStat is skipped on purpose
 	res := p.Client + "\n" + p.Name + "\n" + p.LeadDev + "\n" + p.Status + "\n" + p.Type + "\n" + p.Comment + "\n"
 	for _, v := range p.MileStones {
 		res += DateString(v) + "\n"
@@ -128,7 +133,7 @@ func (p *Project) AddMileStone(msName string) {
 	p.MileStones = nms
 }
 
-func CloneBEProject(p *Model.Project) *Project {
+func CloneBEProject(p *Model.Project, hasStat bool) *Project {
 	np := &Project{}
 	np.Id = p.Id
 	np.Client = p.Client
@@ -136,6 +141,7 @@ func CloneBEProject(p *Model.Project) *Project {
 	np.LeadDev = p.LeadDev
 	np.Status = p.Status
 	np.Type = p.Type
+	np.HasStat = hasStat
 	np.ForecastWL = p.ForecastWL
 	np.CurrentWL = p.CurrentWL
 	np.Comment = p.Comment

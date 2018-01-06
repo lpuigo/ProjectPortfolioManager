@@ -22,7 +22,7 @@ func NewManager(prjfile, statfile string) (*Manager, error) {
 	}
 	m.Projects = pm
 
-	sm, err := NewStatManagerFromPersistFile(statfile)
+	sm, err := NewStatManagerFromFile(statfile)
 	if err != nil {
 		return nil, errors.New(fmt.Sprintf("Unable to retrieve Stat Portfolio Data: %s", err.Error()))
 	}
@@ -33,11 +33,13 @@ func NewManager(prjfile, statfile string) (*Manager, error) {
 
 func (m *Manager) GetPrjPtf(w io.Writer) {
 	prjs := []*fm.Project{}
-	// TODO figure out how to avoid allocating full ptf clone before marshaling
 	m.Projects.RLock() // Ensure PTf is not modified while being cloned
+	m.Stats.RLock()
+	// TODO figure out how to avoid allocating full ptf clone before marshaling
 	for _, p := range m.Projects.GetProjectsPtf().Projects {
-		prjs = append(prjs, fm.CloneBEProject(p))
+		prjs = append(prjs, fm.CloneBEProject(p, m.Stats.HasStatForProject(getProjectKey(p))))
 	}
+	m.Projects.RUnlock()
 	m.Projects.RUnlock()
 	json.NewEncoder(w).Encode(prjs)
 }
@@ -46,17 +48,22 @@ func (m *Manager) GetPrjById(id int) *Model.Project {
 	return m.Projects.GetProjectsPtf().GetPrjById(id)
 }
 
-func (m *Manager) UpdateProject(op, np *Model.Project) {
+func (m *Manager) UpdateProject(op, np *Model.Project) bool {
 	m.Projects.WLock()
 	defer m.Projects.WUnlock()
+	m.Stats.RLock()
+	defer m.Stats.RUnlock()
 	op.Update(np)
+	return m.Stats.HasStatForProject(getProjectKey(np))
 }
 
-func (m *Manager) CreateProject(p *Model.Project) *Model.Project {
+func (m *Manager) CreateProject(p *Model.Project) (*Model.Project, bool) {
 	m.Projects.WLock()
 	defer m.Projects.WUnlock()
 	m.Projects.GetProjectsPtf().AddPrj(p)
-	return p
+	m.Stats.RLock()
+	defer m.Stats.RUnlock()
+	return p, m.Stats.HasStatForProject(getProjectKey(p))
 }
 
 func (m *Manager) DeleteProject(id int) bool {
@@ -76,24 +83,10 @@ func (m *Manager) GetProjectsPtfXLS(w io.Writer) {
 	WritePortfolioToXLS(m.Projects.GetProjectsPtf(), w)
 }
 
-func (m *Manager) UpdateStatFromCSVFile(csvfile string) error {
-	//m.Projects.RLock()
-	//m.Stats.WLock()
-	////TODO create new StatsPtf and then, if no error nor warning, append it to actual Manager.Stats
-	//num, err, warns := UpdateStatPortfolioFromCSVFile(csvfile, m.Projects.GetProjectsPtf(), m.Stats.GetStatsPtf())
-	//m.Projects.RUnlock()
-	//if err != nil {
-	//	m.Stats.WUnlockNoPersist()
-	//	return err
-	//}
-	//log.Printf("Statfile %s processed : %d stats added\n", csvfile, num)
-	//if warns.HasWarnings() {
-	//	log.Printf("Warnings :\n%s", warns.Warning(""))
-	//}
-	//if num == 0 {
-	//	m.Stats.WUnlockNoPersist()
-	//} else {
-	//	m.Stats.WUnlock()
-	//}
-	return nil
+func (m *Manager) UpdateStat(r io.Reader) {
+	m.Stats.UpdateFrom(r)
+}
+
+func getProjectKey(p *Model.Project) (string, string) {
+	return p.Client, p.Name
 }
