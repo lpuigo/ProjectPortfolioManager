@@ -2,7 +2,7 @@ package Manager
 
 import "testing"
 
-const StatFile = `C:\Users\Laurent\Google Drive\Golang\src\github.com\lpuig\Novagile\Ressources\Test Stats Projets Novagile.json`
+const StatFile = `C:\Users\Laurent\Golang\src\github.com\lpuig\Novagile\Ressources\Test Stats Projets Novagile.json`
 
 func TestInitStatManagerPersistFile(t *testing.T) {
 	err := InitStatManagerPersistFile(StatFile)
