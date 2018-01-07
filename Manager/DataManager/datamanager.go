@@ -67,7 +67,7 @@ func (dm *DataManager) persist() {
 	if err := dm.persistFunc(); err != nil {
 		log.Println("Unable to persist Data :", err.Error())
 	} else {
-		log.Println("JSON File saved successfully")
+		log.Println("Data persisted successfully")
 	}
 	dm.saveTimer = nil
 	dm.RUnlock()

@@ -30,7 +30,30 @@ func newStatSetFrom(r io.Reader) (*CSVStats.CSVStats, error) {
 	return cs, nil
 }
 
+func InitStatManagerFile(file string) error {
+	header := "EXTRACT_DATE;PRODUCT;CLIENT!PROJECT;ACTIVITY;ISSUE;INIT_ESTIMATE;TIME_SPENT;REMAIN_TIME"
+	f, err := os.Create(file)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	_, err = f.Write(([]byte)(header))
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func NewStatManagerFromFile(file string) (*StatManager, error) {
+	if _, err := os.Stat(file); err != nil {
+		if os.IsNotExist(err) {
+			err := InitStatManagerFile(file)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
 	f, err := os.Open(file)
 	if err != nil {
 		return nil, fmt.Errorf("File '%s' : %s", file, err.Error())

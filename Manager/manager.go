@@ -39,7 +39,7 @@ func (m *Manager) GetPrjPtf(w io.Writer) {
 	for _, p := range m.Projects.GetProjectsPtf().Projects {
 		prjs = append(prjs, fm.CloneBEProject(p, m.Stats.HasStatsForProject(getProjectKey(p))))
 	}
-	m.Projects.RUnlock()
+	m.Stats.RUnlock()
 	m.Projects.RUnlock()
 	json.NewEncoder(w).Encode(prjs)
 }

@@ -6,6 +6,7 @@ import (
 	"github.com/lpuig/Novagile/Route"
 	"log"
 	"net/http"
+	"os/exec"
 )
 
 //go:generate go build -o ../server.exe
@@ -17,12 +18,12 @@ const (
 
 	ServicePort = ":8080"
 
-	StatJSONFile = `./Ressources/Stats Projets Novagile.json`
-	PrjJSONFile  = `./Ressources/Projets Novagile.xlsx.json`
+	StatCSVFile = `./Ressources/Stats Projets Novagile.csv`
+	PrjJSONFile = `./Ressources/Projets Novagile.xlsx.json`
 )
 
 func main() {
-	manager, err := Manager.NewManager(PrjJSONFile, StatJSONFile)
+	manager, err := Manager.NewManager(PrjJSONFile, StatCSVFile)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -43,11 +44,17 @@ func main() {
 	router.PathPrefix(AssetsRoot).Handler(http.StripPrefix(AssetsRoot, http.FileServer(http.Dir(AssetsDir))))
 	router.PathPrefix("/").Handler(http.FileServer(http.Dir(RootDir)))
 
+	LaunchPageInBrowser()
 	log.Print("Listening on ", ServicePort)
 	log.Fatal(http.ListenAndServe(ServicePort, router))
+}
+
+func LaunchPageInBrowser() error {
+	cmd := exec.Command("cmd", "/c", "start", "http://localhost:8080")
+	return cmd.Start()
 }
 
 // Done Persist JSON repo after each Route request
 // Done Import XLS to JSON
 // Done Export JSON to XLS
-// TODO launch webpage with command("cmd /c start http://localhost:8080") or "explorer "http://localhost:8080""
+// Done launch webpage with command("cmd /c start http://localhost:8080") or "explorer "http://localhost:8080""
