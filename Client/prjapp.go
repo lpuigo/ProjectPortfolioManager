@@ -11,7 +11,7 @@ import (
 	"strconv"
 )
 
-//go:generate gopherjs build -m -o ../Dist/prjapp.js
+//go:generate bash ./makejs.sh
 
 type FrontModel struct {
 	*js.Object
