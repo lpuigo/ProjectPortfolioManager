@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"sort"
 )
 
 type StatManager struct {
@@ -77,6 +78,12 @@ func (sm *StatManager) GetStats() *CSVStats.CSVStats {
 	return sm.stat
 }
 
+func (sm *StatManager) GetProjectStatList() []string {
+	res := sm.stat.GetIndexKeys("PrjKey")
+	sort.Strings(res)
+	return res
+}
+
 func (sm *StatManager) HasStatsForProject(client, name string) bool {
 	pk := "!" + client + "!" + name
 	return sm.stat.HasIndexKey("PrjKey", pk)
@@ -115,9 +122,9 @@ func (sm *StatManager) UpdateFrom(r io.Reader) error {
 		added++
 	}
 	if added == 0 {
-		sm.WUnlockNoPersist()
-	} else {
 		sm.WUnlock()
+	} else {
+		sm.WUnlockWithPersist()
 	}
 	return nil
 }

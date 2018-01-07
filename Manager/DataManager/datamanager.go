@@ -41,7 +41,7 @@ func (dm *DataManager) RLock() {
 }
 
 // WUnlockPtf unlocks the DataManager after Modifications and triggers JSON file persist mechanism with delay (if not already armed)
-func (dm *DataManager) WUnlock() {
+func (dm *DataManager) WUnlockWithPersist() {
 	if dm.saveTimer == nil {
 		dm.saveTimer = time.AfterFunc(SaveDelay*time.Second, dm.persist)
 	}
@@ -49,7 +49,7 @@ func (dm *DataManager) WUnlock() {
 }
 
 // WUnlockPtfNoPersist unlocks the DataManager after Modifications without triggering persist mechanism
-func (dm *DataManager) WUnlockNoPersist() {
+func (dm *DataManager) WUnlock() {
 	dm.mutex.Unlock()
 }
 

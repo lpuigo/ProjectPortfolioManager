@@ -94,3 +94,14 @@ func TestInitActualDataWithProd(t *testing.T) {
 	fmt.Printf("Stats updated : %d record(s) added\n", sm.stat.Len()-nbRecord)
 	time.Sleep(4 * time.Second)
 }
+
+func TestStatManager_GetProjectStatList(t *testing.T) {
+	sm, err := NewStatManagerFromFile(PrdStatFile)
+	if err != nil {
+		t.Fatalf("NewStatManagerFromFile: %s", err.Error())
+	}
+	for i, s := range sm.GetProjectStatList() {
+		//ls := strings.Split(s, "!")
+		fmt.Printf("%2d : %s\n", i, s)
+	}
+}

@@ -48,9 +48,13 @@ func (m *Manager) GetPrjById(id int) *Model.Project {
 	return m.Projects.GetProjectsPtf().GetPrjById(id)
 }
 
+func (m *Manager) GetProjectStatList() {
+
+}
+
 func (m *Manager) UpdateProject(op, np *Model.Project) bool {
 	m.Projects.WLock()
-	defer m.Projects.WUnlock()
+	defer m.Projects.WUnlockWithPersist()
 	m.Stats.RLock()
 	defer m.Stats.RUnlock()
 	op.Update(np)
@@ -59,7 +63,7 @@ func (m *Manager) UpdateProject(op, np *Model.Project) bool {
 
 func (m *Manager) CreateProject(p *Model.Project) (*Model.Project, bool) {
 	m.Projects.WLock()
-	defer m.Projects.WUnlock()
+	defer m.Projects.WUnlockWithPersist()
 	m.Projects.GetProjectsPtf().AddPrj(p)
 	m.Stats.RLock()
 	defer m.Stats.RUnlock()
@@ -70,9 +74,9 @@ func (m *Manager) DeleteProject(id int) bool {
 	m.Projects.WLock()
 	found := m.Projects.GetProjectsPtf().DeletePrj(id)
 	if found {
-		m.Projects.WUnlock()
+		m.Projects.WUnlockWithPersist()
 	} else {
-		m.Projects.WUnlockNoPersist()
+		m.Projects.WUnlock()
 	}
 	return found
 }
