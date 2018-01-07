@@ -1,3 +1,3 @@
 # Novagile
 
-This is a local website server designed to enable project portfolio management
+This is a local website server dedicated to project portfolio management
