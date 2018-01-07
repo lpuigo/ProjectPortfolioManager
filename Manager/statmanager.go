@@ -11,8 +11,7 @@ import (
 
 type StatManager struct {
 	*DataManager.DataManager
-	stat       *CSVStats.CSVStats
-	prjKeyList []string
+	stat *CSVStats.CSVStats
 }
 
 func createCSVStatsIndexDescs() []CSVStats.IndexDesc {
@@ -34,7 +33,7 @@ func newStatSetFrom(r io.Reader) (*CSVStats.CSVStats, error) {
 func NewStatManagerFromFile(file string) (*StatManager, error) {
 	f, err := os.Open(file)
 	if err != nil {
-		return nil, fmt.Errorf("NewStatManagerFromFile %s : %s", file, err.Error())
+		return nil, fmt.Errorf("File '%s' : %s", file, err.Error())
 	}
 	defer f.Close()
 
@@ -44,30 +43,20 @@ func NewStatManagerFromFile(file string) (*StatManager, error) {
 	})
 	cs, err := newStatSetFrom(f)
 	if err != nil {
-		return nil, fmt.Errorf("NewStatManagerFromFile %s : %s", file, err.Error())
+		return nil, fmt.Errorf("File '%s' : %s", file, err.Error())
 	}
 	sm.stat = cs
 	log.Printf("Stats loaded (%d projects, %d records(s))\n", len(sm.stat.GetIndexKeys("PrjKey")), sm.stat.Len())
-	sm.updatePrjKeyList()
 	return sm, nil
-}
-
-func (sm *StatManager) updatePrjKeyList() {
-	sm.prjKeyList = sm.stat.GetIndexKeys("PrjKey")
 }
 
 func (sm *StatManager) GetStats() *CSVStats.CSVStats {
 	return sm.stat
 }
 
-func (sm *StatManager) HasStatForProject(client, name string) bool {
-	pk := client + "!" + name
-	for _, k := range sm.prjKeyList {
-		if pk == k {
-			return true
-		}
-	}
-	return false
+func (sm *StatManager) HasStatsForProject(client, name string) bool {
+	pk := "!" + client + "!" + name
+	return sm.stat.HasIndexKey("PrjKey", pk)
 }
 
 // UpdateFrom updates Stats data with new Stats (CSV Formated) found in r (StatManager is WriteLocked during process)
@@ -105,7 +94,6 @@ func (sm *StatManager) UpdateFrom(r io.Reader) error {
 	if added == 0 {
 		sm.WUnlockNoPersist()
 	} else {
-		sm.updatePrjKeyList()
 		sm.WUnlock()
 	}
 	return nil

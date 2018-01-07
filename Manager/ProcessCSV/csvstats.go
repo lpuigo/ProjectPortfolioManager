@@ -73,5 +73,10 @@ func (c *CSVStats) WriteCSVTo(w io.Writer) error {
 	csvw.UseCRLF = true
 	csvw.Comma = ';'
 
+	err := csvw.Write(c.GetHeader().GetKeys())
+	if err != nil {
+		return err
+	}
+
 	return csvw.WriteAll(c.data)
 }

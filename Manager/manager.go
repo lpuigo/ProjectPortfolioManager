@@ -37,7 +37,7 @@ func (m *Manager) GetPrjPtf(w io.Writer) {
 	m.Stats.RLock()
 	// TODO figure out how to avoid allocating full ptf clone before marshaling
 	for _, p := range m.Projects.GetProjectsPtf().Projects {
-		prjs = append(prjs, fm.CloneBEProject(p, m.Stats.HasStatForProject(getProjectKey(p))))
+		prjs = append(prjs, fm.CloneBEProject(p, m.Stats.HasStatsForProject(getProjectKey(p))))
 	}
 	m.Projects.RUnlock()
 	m.Projects.RUnlock()
@@ -54,7 +54,7 @@ func (m *Manager) UpdateProject(op, np *Model.Project) bool {
 	m.Stats.RLock()
 	defer m.Stats.RUnlock()
 	op.Update(np)
-	return m.Stats.HasStatForProject(getProjectKey(np))
+	return m.Stats.HasStatsForProject(getProjectKey(np))
 }
 
 func (m *Manager) CreateProject(p *Model.Project) (*Model.Project, bool) {
@@ -63,7 +63,7 @@ func (m *Manager) CreateProject(p *Model.Project) (*Model.Project, bool) {
 	m.Projects.GetProjectsPtf().AddPrj(p)
 	m.Stats.RLock()
 	defer m.Stats.RUnlock()
-	return p, m.Stats.HasStatForProject(getProjectKey(p))
+	return p, m.Stats.HasStatsForProject(getProjectKey(p))
 }
 
 func (m *Manager) DeleteProject(id int) bool {
