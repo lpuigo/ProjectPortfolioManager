@@ -1,17 +1,17 @@
-package ProcessCSV
+package RecordSet
 
 import (
 	"fmt"
 )
 
 type Header struct {
-	keys  []string
+	keys  Record
 	index map[string]int
 }
 
-type KeyGenerator func([]string) string
+type KeyGenerator func(Record) string
 
-func NewHeader(record []string) *Header {
+func NewHeader(record Record) *Header {
 	h := &Header{
 		keys:  record,
 		index: map[string]int{},
@@ -43,7 +43,7 @@ func (h *Header) NewKeyGenerator(colname ...string) (KeyGenerator, error) {
 	if err != nil {
 		return nil, err
 	}
-	return func(record []string) string {
+	return func(record Record) string {
 		if len(colnums) == 0 {
 			return "!"
 		}

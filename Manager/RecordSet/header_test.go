@@ -1,4 +1,4 @@
-package ProcessCSV
+package RecordSet
 
 import "testing"
 
@@ -17,7 +17,7 @@ func TestHeader_NewRecordSelector(t *testing.T) {
 	}
 
 	bc := sel_bc(abc)
-	if bc != "be" {
+	if bc != "!b!e" {
 		t.Errorf("KeyGenerator returns %s instead of 'bc'", bc)
 	}
 }

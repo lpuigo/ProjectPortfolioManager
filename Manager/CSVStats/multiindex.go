@@ -1,7 +1,7 @@
 package CSVStats
 
 import (
-	pcsv "github.com/lpuig/Novagile/Manager/ProcessCSV"
+	pcsv "github.com/lpuig/Novagile/Manager/RecordSet"
 )
 
 type multiIndex map[string][]int
