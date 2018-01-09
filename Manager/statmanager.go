@@ -2,8 +2,8 @@ package Manager
 
 import (
 	"fmt"
-	"github.com/lpuig/Novagile/Manager/CSVStats"
 	"github.com/lpuig/Novagile/Manager/DataManager"
+	ris "github.com/lpuig/Novagile/Manager/RecordIndexedSet"
 	"io"
 	"log"
 	"os"
@@ -12,18 +12,18 @@ import (
 
 type StatManager struct {
 	*DataManager.DataManager
-	stat *CSVStats.CSVStats
+	stat *ris.RecordIndexedSet
 }
 
-func createCSVStatsIndexDescs() []CSVStats.IndexDesc {
-	res := []CSVStats.IndexDesc{}
-	res = append(res, CSVStats.NewIndexDesc("PrjKey", "CLIENT!PROJECT"))
-	res = append(res, CSVStats.NewIndexDesc("Issue", "ISSUE"))
+func createCSVStatsIndexDescs() []ris.IndexDesc {
+	res := []ris.IndexDesc{}
+	res = append(res, ris.NewIndexDesc("PrjKey", "CLIENT!PROJECT"))
+	res = append(res, ris.NewIndexDesc("Issue", "ISSUE"))
 	return res
 }
 
-func newStatSetFrom(r io.Reader) (*CSVStats.CSVStats, error) {
-	cs := CSVStats.NewCSVStats(createCSVStatsIndexDescs()...)
+func newStatSetFrom(r io.Reader) (*ris.RecordIndexedSet, error) {
+	cs := ris.NewRecordIndexedSet(createCSVStatsIndexDescs()...)
 	err := cs.AddCSVDataFrom(r)
 	if err != nil {
 		return nil, fmt.Errorf("newStatSetFrom: %s", err.Error())
@@ -74,7 +74,7 @@ func NewStatManagerFromFile(file string) (*StatManager, error) {
 	return sm, nil
 }
 
-func (sm *StatManager) GetStats() *CSVStats.CSVStats {
+func (sm *StatManager) GetStats() *ris.RecordIndexedSet {
 	return sm.stat
 }
 
@@ -85,7 +85,14 @@ func (sm *StatManager) GetProjectStatList() []string {
 }
 
 func (sm *StatManager) HasStatsForProject(client, name string) bool {
-	pk := "!" + client + "!" + name
+	return sm.hasStatsForProject(pjrKey(client, name))
+}
+
+func pjrKey(client, name string) string {
+	return "!" + client + "!" + name
+}
+
+func (sm *StatManager) hasStatsForProject(pk string) bool {
 	return sm.stat.HasIndexKey("PrjKey", pk)
 }
 
@@ -96,8 +103,8 @@ func (sm *StatManager) UpdateFrom(r io.Reader) error {
 		return fmt.Errorf("UpdateFrom: %s", err.Error())
 	}
 
-	SREDesc := CSVStats.NewIndexDesc("SRE", "TIME_SPENT", "REMAIN_TIME", "INIT_ESTIMATE")
-	dateDesc := CSVStats.NewIndexDesc("Date", "EXTRACT_DATE")
+	SREDesc := ris.NewIndexDesc("SRE", "TIME_SPENT", "REMAIN_TIME", "INIT_ESTIMATE")
+	dateDesc := ris.NewIndexDesc("Date", "EXTRACT_DATE")
 	oldStats := sm.GetStats()
 
 	oldStatSREKey, err := oldStats.GetKeyGeneratorByIndexDesc(SREDesc)
@@ -127,4 +134,31 @@ func (sm *StatManager) UpdateFrom(r io.Reader) error {
 		sm.WUnlockWithPersist()
 	}
 	return nil
+}
+
+// GetProjectStatInfo returns list of issues, dates, and timeSpent, timeRemaining, timeEstimated slices for given project client/name
+func (sm *StatManager) GetProjectStatInfo(client, name string) (issues, dates []string, spent, remaining, estimated [][]float64, err error) {
+	pk := pjrKey(client, name)
+	if !sm.hasStatsForProject(pk) {
+		err = fmt.Errorf("No Project Stats for %s/%s", client, name)
+		return
+	}
+	//retrieve all issues associated to prjKey pk
+	ps, err := sm.stat.CreateSubRecordIndexedSet(
+		ris.NewIndexDesc("Issue", "ISSUE"),
+	)
+	for _, r := range sm.stat.GetRecordsByIndexKey("PrjKey", pk) {
+		ps.AddRecord(r)
+	}
+	// For each identified issues,
+	// retrieve all record related to this issue in a new SubRecordSet (with Date Index)
+
+	// On the result RecordSet
+	// Keep Issue list => result issues slice
+	// Keep Date list (chronologically sorted) => result dates slice
+	// create result S, R, E slice with Date List length
+	// For each Date,
+	// store Date, Sum of S, R, E
+	//TODO Implement!!
+	return
 }

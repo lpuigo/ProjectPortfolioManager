@@ -1,4 +1,4 @@
-package CSVStats
+package RecordIndexedSet
 
 import (
 	"fmt"
@@ -12,7 +12,7 @@ a0;a11;a21
 b0;b1;b2`
 
 func TestNewCSVStatsFrom(t *testing.T) {
-	cs := NewCSVStats(NewIndexDesc("A", "A"), NewIndexDesc("AB", "A", "B"))
+	cs := NewRecordIndexedSet(NewIndexDesc("A", "A"), NewIndexDesc("AB", "A", "B"))
 	err := cs.AddCSVDataFrom(strings.NewReader(csvstring))
 	if err != nil {
 		t.Fatal("NewCSVStatsFrom(reader) returns :", err.Error())
@@ -28,7 +28,7 @@ func TestNewCSVStatsFrom(t *testing.T) {
 }
 
 func TestCSVStats_Max(t *testing.T) {
-	cs := NewCSVStats(NewIndexDesc("A", "A"), NewIndexDesc("AB", "A", "B"))
+	cs := NewRecordIndexedSet(NewIndexDesc("A", "A"), NewIndexDesc("AB", "A", "B"))
 	err := cs.AddCSVDataFrom(strings.NewReader(csvstring))
 	if err != nil {
 		t.Fatal("NewCSVStatsFrom(reader) returns :", err.Error())

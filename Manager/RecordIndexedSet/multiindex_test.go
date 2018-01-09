@@ -1,4 +1,4 @@
-package CSVStats
+package RecordIndexedSet
 
 import "testing"
 

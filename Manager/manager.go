@@ -94,3 +94,18 @@ func (m *Manager) UpdateStat(r io.Reader) {
 func getProjectKey(p *Model.Project) (string, string) {
 	return p.Client, p.Name
 }
+
+func (m *Manager) GetProjectStatById(id int, w io.Writer) error {
+	prj := m.Projects.GetProjectsPtf().GetPrjById(id)
+	if prj == nil {
+		return fmt.Errorf("Project id %d not found", id)
+	}
+
+	//Retrieve Project Stat :
+	ps := fm.ProjectStat{}
+	var err error
+	ps.Issues, ps.Dates, ps.TimeSpent, ps.TimeRemaining, ps.TimeEstimated, err = m.Stats.GetProjectStatInfo(getProjectKey(prj))
+
+	//TODO Write ps on w
+	return nil
+}

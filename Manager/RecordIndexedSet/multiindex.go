@@ -1,4 +1,4 @@
-package CSVStats
+package RecordIndexedSet
 
 import (
 	pcsv "github.com/lpuig/Novagile/Manager/RecordSet"

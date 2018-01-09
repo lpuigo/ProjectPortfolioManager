@@ -1,4 +1,4 @@
-package CSVStats
+package RecordIndexedSet
 
 import (
 	"encoding/csv"
@@ -18,31 +18,41 @@ func NewIndexDesc(name string, cols ...string) IndexDesc {
 	return IndexDesc{name: name, cols: cols}
 }
 
-type CSVStats struct {
+type RecordIndexedSet struct {
 	data       *rs.RecordSet
 	indexDescs []IndexDesc
 	indexes    map[string]*index
 }
 
-func NewCSVStats(indexes ...IndexDesc) *CSVStats {
-	c := &CSVStats{}
+func NewRecordIndexedSet(indexes ...IndexDesc) *RecordIndexedSet {
+	c := &RecordIndexedSet{}
 	c.data = rs.NewRecordSet()
 	c.indexDescs = indexes
 	c.indexes = map[string]*index{}
 	return c
 }
 
-func (c *CSVStats) Len() int {
+// CreateSubRecordIndexedSet returns an new empty (no data) RecordIndexedSet using same Header
+func (c *RecordIndexedSet) CreateSubRecordIndexedSet(indexes ...IndexDesc) (*RecordIndexedSet, error) {
+	r := NewRecordIndexedSet(indexes...)
+	err := r.AddHeader(c.data.GetHeader().GetKeys())
+	if err != nil {
+		return nil, err
+	}
+	return r, nil
+}
+
+func (c *RecordIndexedSet) Len() int {
 	return c.data.Len()
 }
 
-func (c *CSVStats) AddHeader(record rs.Record) error {
+func (c *RecordIndexedSet) AddHeader(record rs.Record) error {
 	c.data.AddHeader(record)
 	h := c.data.GetHeader()
 	for _, id := range c.indexDescs {
 		rs, err := h.NewKeyGenerator(id.cols...)
 		if err != nil {
-			return fmt.Errorf("CSVStats Unable to create index '%s' : %s", id.name, err.Error())
+			return fmt.Errorf("RecordIndexedSet Unable to create index '%s' : %s", id.name, err.Error())
 		}
 		c.indexes[id.name] = newIndex(rs)
 	}
@@ -50,7 +60,7 @@ func (c *CSVStats) AddHeader(record rs.Record) error {
 }
 
 // AddRecord adds the given record, updating indexes
-func (c *CSVStats) AddRecord(record rs.Record) {
+func (c *RecordIndexedSet) AddRecord(record rs.Record) {
 	num := c.data.Add(record)
 	for _, v := range c.indexes {
 		v.Add(record, num)
@@ -58,7 +68,7 @@ func (c *CSVStats) AddRecord(record rs.Record) {
 }
 
 // HasIndexKey returns true if idxname index has given key, false otherwise
-func (c *CSVStats) HasIndexKey(idxname, key string) bool {
+func (c *RecordIndexedSet) HasIndexKey(idxname, key string) bool {
 	i, found := c.indexes[idxname]
 	if !found {
 		return false
@@ -68,7 +78,7 @@ func (c *CSVStats) HasIndexKey(idxname, key string) bool {
 }
 
 // GetIndexesNames returns names of active indexes
-func (c *CSVStats) GetIndexesNames() rs.Record {
+func (c *RecordIndexedSet) GetIndexesNames() rs.Record {
 	res := rs.Record{}
 	for n, _ := range c.indexes {
 		res = append(res, n)
@@ -78,26 +88,26 @@ func (c *CSVStats) GetIndexesNames() rs.Record {
 }
 
 // GetIndexKeys returns all registered keys for given idxname
-func (c *CSVStats) GetIndexKeys(idxname string) rs.Record {
+func (c *RecordIndexedSet) GetIndexKeys(idxname string) rs.Record {
 	if i, found := c.indexes[idxname]; found {
 		return i.index.Keys()
 	}
 	return nil
 }
 
-func (c *CSVStats) GetKeyGeneratorByIndexDesc(compare IndexDesc) (rs.KeyGenerator, error) {
+func (c *RecordIndexedSet) GetKeyGeneratorByIndexDesc(compare IndexDesc) (rs.KeyGenerator, error) {
 	return c.data.GetHeader().NewKeyGenerator(compare.cols...)
 }
 
 // GetRecordKeyByIndex returns key related to given record key using named index
-func (c *CSVStats) GetRecordKeyByIndex(idxname string, record rs.Record) string {
+func (c *RecordIndexedSet) GetRecordKeyByIndex(idxname string, record rs.Record) string {
 	if i, found := c.indexes[idxname]; found {
 		return i.genKey(record)
 	}
 	return ""
 }
 
-func (c *CSVStats) GetRecordsByIndexKey(idxname, key string) []rs.Record {
+func (c *RecordIndexedSet) GetRecordsByIndexKey(idxname, key string) []rs.Record {
 	i, found := c.indexes[idxname]
 	if !found {
 		return nil
@@ -113,12 +123,12 @@ func (c *CSVStats) GetRecordsByIndexKey(idxname, key string) []rs.Record {
 	return res
 }
 
-func (c *CSVStats) GetRecords() []rs.Record {
+func (c *RecordIndexedSet) GetRecords() []rs.Record {
 	return c.data.GetRecords()
 }
 
-// AddCSVDataFrom populates the CSVStats with Data from given reader (CSV formated data) (Header and Indexes are populated)
-func (c *CSVStats) AddCSVDataFrom(r io.Reader) error {
+// AddCSVDataFrom populates the RecordIndexedSet with Data from given reader (CSV formated data) (Header and Indexes are populated)
+func (c *RecordIndexedSet) AddCSVDataFrom(r io.Reader) error {
 	csvr := csv.NewReader(r)
 	csvr.Comma = ';'
 	csvr.Comment = '#'
@@ -146,7 +156,7 @@ func (c *CSVStats) AddCSVDataFrom(r io.Reader) error {
 	return nil
 }
 
-func (c *CSVStats) AddCSVDataFromFile(file string) error {
+func (c *RecordIndexedSet) AddCSVDataFromFile(file string) error {
 	f, err := os.Open(file)
 	if err != nil {
 		return err
@@ -156,10 +166,10 @@ func (c *CSVStats) AddCSVDataFromFile(file string) error {
 }
 
 // Max returns the bigger record from (idxname, key) subset according to compare's Cols key(s)
-func (c *CSVStats) Max(idxname, key string, compare IndexDesc) []string {
+func (c *RecordIndexedSet) Max(idxname, key string, compare IndexDesc) []string {
 	comp, err := c.data.GetHeader().NewKeyGenerator(compare.cols...)
 	if err != nil {
-		panic(fmt.Sprintf("CSVStats.Max: %s", err.Error()))
+		panic(fmt.Sprintf("RecordIndexedSet.Max: %s", err.Error()))
 	}
 	subset := c.GetRecordsByIndexKey(idxname, key)
 	if len(subset) == 0 {
@@ -177,12 +187,12 @@ func (c *CSVStats) Max(idxname, key string, compare IndexDesc) []string {
 	return subset[max]
 }
 
-// WriteCSVTo writes all CSVStats records to given writer using CSVFormat (; delimitor, CRLF record separator)
-func (c *CSVStats) WriteCSVTo(w io.Writer) error {
+// WriteCSVTo writes all RecordIndexedSet records to given writer using CSVFormat (; delimitor, CRLF record separator)
+func (c *RecordIndexedSet) WriteCSVTo(w io.Writer) error {
 	return c.data.WriteCSVTo(w)
 }
 
-func (c *CSVStats) WriteCSVToFile(file string) error {
+func (c *RecordIndexedSet) WriteCSVToFile(file string) error {
 	f, err := os.Create(file)
 	if err != nil {
 		return err
