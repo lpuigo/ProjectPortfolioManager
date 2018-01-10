@@ -37,9 +37,10 @@ func main() {
 	router := mux.NewRouter()
 	router.HandleFunc("/ptf", withManager(Route.GetPtf)).Methods("GET")
 	router.HandleFunc("/ptf", withManager(Route.CreatePrj)).Methods("POST")
-	router.HandleFunc("/xls", withManager(Route.GetXLS)).Methods("GET")
 	router.HandleFunc("/ptf/{prjid}", withManager(Route.UpdatePrj)).Methods("PUT")
 	router.HandleFunc("/ptf/{prjid}", withManager(Route.DeletePrj)).Methods("DELETE")
+	router.HandleFunc("/stat/{prjid}", withManager(Route.GetProjectStat)).Methods("GET")
+	router.HandleFunc("/xls", withManager(Route.GetXLS)).Methods("GET")
 
 	router.PathPrefix(AssetsRoot).Handler(http.StripPrefix(AssetsRoot, http.FileServer(http.Dir(AssetsDir))))
 	router.PathPrefix("/").Handler(http.FileServer(http.Dir(RootDir)))

@@ -103,9 +103,15 @@ func (m *Manager) GetProjectStatById(id int, w io.Writer) error {
 
 	//Retrieve Project Stat :
 	ps := fm.ProjectStat{}
+	m.Stats.RLock()
+	m.Projects.RLock()
 	var err error
 	ps.Issues, ps.Dates, ps.TimeSpent, ps.TimeRemaining, ps.TimeEstimated, err = m.Stats.GetProjectStatInfo(getProjectKey(prj))
-
-	//TODO Write ps on w
+	m.Projects.RUnlock()
+	m.Stats.RUnlock()
+	if err != nil {
+		return err
+	}
+	json.NewEncoder(w).Encode(ps)
 	return nil
 }

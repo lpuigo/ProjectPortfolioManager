@@ -2,6 +2,7 @@ package Manager
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"sort"
 	"testing"
@@ -14,7 +15,8 @@ const (
 	StatFile0 = `C:\Users\Laurent\Golang\src\github.com\lpuig\Novagile\Ressources\export Jira\test_extract_init.csv`
 
 	PrdStatFile    = `C:\Users\Laurent\Golang\src\github.com\lpuig\Novagile\Ressources\Stats Projets Novagile.csv`
-	UpdateStatFile = `C:\Users\Laurent\Google Drive\Travail\NOVAGILE\Gouvernance\Stat Jira\Extract SRE\extract 2018-01-04.csv`
+	UpdateStatDir  = `C:\Users\Laurent\Google Drive\Travail\NOVAGILE\Gouvernance\Stat Jira\Extract SRE\`
+	UpdateStatFile = UpdateStatDir + `extract 2018-01-04.csv`
 )
 
 func TestInitStatManagerFile(t *testing.T) {
@@ -74,24 +76,35 @@ func TestStatManager_UpdateFrom(t *testing.T) {
 	time.Sleep(4 * time.Second)
 }
 
-func TestInitActualDataWithProd(t *testing.T) {
+func TestInitActualDataOnProdFile(t *testing.T) {
+	InitStatManagerFile(PrdStatFile)
 	sm, err := NewStatManagerFromFile(PrdStatFile)
 	if err != nil {
 		t.Fatalf("NewStatManagerFromFile: %s", err.Error())
 	}
 
 	nbRecord := sm.stat.Len()
-	fmt.Printf("Stats loaded : %d record(s)\n", nbRecord)
+	fmt.Printf("Persisted Stats loaded : %d record(s)\n", nbRecord)
 
-	f, err := os.Open(UpdateStatFile)
+	files, err := ioutil.ReadDir(UpdateStatDir)
 	if err != nil {
-		t.Fatalf("StatManager_UpdateFrom: %s", err.Error())
+		t.Fatalf("Unable to browse UpdateDir : %s", err.Error())
 	}
-	err = sm.UpdateFrom(f)
-	if err != nil {
-		t.Fatalf("UpdateFrom returns %s", err.Error())
+	for _, file := range files {
+		f, err := os.Open(UpdateStatDir + file.Name())
+		if err != nil {
+			t.Fatalf("StatManager_UpdateFrom: %s", err.Error())
+		}
+		t0 := time.Now()
+		err = sm.UpdateFrom(f)
+		dur := time.Since(t0)
+		if err != nil {
+			t.Fatalf("UpdateFrom returns %s", err.Error())
+		}
+		fmt.Printf("Stats updated from '%s': %d record(s) added (took %v)\n", file.Name(), sm.stat.Len()-nbRecord, dur)
+		nbRecord = sm.stat.Len()
 	}
-	fmt.Printf("Stats updated : %d record(s) added\n", sm.stat.Len()-nbRecord)
+
 	time.Sleep(4 * time.Second)
 }
 

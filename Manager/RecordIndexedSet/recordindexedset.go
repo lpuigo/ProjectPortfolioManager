@@ -47,7 +47,7 @@ func (c *RecordIndexedSet) Len() int {
 }
 
 func (c *RecordIndexedSet) GetRecordColNumByName(colname ...string) ([]int, error) {
-	return c.data.GetRecordColNumByName()
+	return c.data.GetRecordColNumByName(colname...)
 }
 
 func (c *RecordIndexedSet) AddHeader(record rs.Record) error {
