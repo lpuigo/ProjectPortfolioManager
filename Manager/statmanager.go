@@ -8,6 +8,8 @@ import (
 	"log"
 	"os"
 	"sort"
+	"strconv"
+	"strings"
 )
 
 type StatManager struct {
@@ -15,7 +17,7 @@ type StatManager struct {
 	stat *ris.RecordIndexedSet
 }
 
-func createCSVStatsIndexDescs() []ris.IndexDesc {
+func createRISIndexDescs() []ris.IndexDesc {
 	res := []ris.IndexDesc{}
 	res = append(res, ris.NewIndexDesc("PrjKey", "CLIENT!PROJECT"))
 	res = append(res, ris.NewIndexDesc("Issue", "ISSUE"))
@@ -23,7 +25,7 @@ func createCSVStatsIndexDescs() []ris.IndexDesc {
 }
 
 func newStatSetFrom(r io.Reader) (*ris.RecordIndexedSet, error) {
-	cs := ris.NewRecordIndexedSet(createCSVStatsIndexDescs()...)
+	cs := ris.NewRecordIndexedSet(createRISIndexDescs()...)
 	err := cs.AddCSVDataFrom(r)
 	if err != nil {
 		return nil, fmt.Errorf("newStatSetFrom: %s", err.Error())
@@ -136,7 +138,7 @@ func (sm *StatManager) UpdateFrom(r io.Reader) error {
 	return nil
 }
 
-// GetProjectStatInfo returns list of issues, dates, and timeSpent, timeRemaining, timeEstimated slices for given project client/name
+// GetProjectStatInfo returns list of issues, dates slices, and timeSpent, timeRemaining, timeEstimated doubleslices ([#issue][#date]) for given project client/name
 func (sm *StatManager) GetProjectStatInfo(client, name string) (issues, dates []string, spent, remaining, estimated [][]float64, err error) {
 	pk := pjrKey(client, name)
 	if !sm.hasStatsForProject(pk) {
@@ -144,21 +146,72 @@ func (sm *StatManager) GetProjectStatInfo(client, name string) (issues, dates []
 		return
 	}
 	//retrieve all issues associated to prjKey pk
-	ps, err := sm.stat.CreateSubRecordIndexedSet(
+	ps, errss := sm.stat.CreateSubRecordIndexedSet(
 		ris.NewIndexDesc("Issue", "ISSUE"),
 	)
-	for _, r := range sm.stat.GetRecordsByIndexKey("PrjKey", pk) {
-		ps.AddRecord(r)
+	if errss != nil {
+		err = fmt.Errorf("PrjSubSet: %s", errss.Error())
+	}
+	ps.AddRecords(sm.stat.GetRecordsByIndexKey("PrjKey", pk))
+	// Keep Issue list => result issues slice
+	issuesKeys := ps.GetIndexKeys("Issue")
+	sort.Strings(issuesKeys)
+	issues = make([]string, len(issuesKeys))
+	for i, k := range issuesKeys {
+		issues[i] = strings.TrimLeft(k, "!")
+	}
+
+	//retrieve all issues found in ps
+	is, errss := sm.stat.CreateSubRecordIndexedSet(
+		ris.NewIndexDesc("Issue", "ISSUE"),
+		ris.NewIndexDesc("Dates", "EXTRACT_DATE"),
+		ris.NewIndexDesc("IssueDate", "ISSUE", "EXTRACT_DATE"),
+	)
+	if errss != nil {
+		err = fmt.Errorf("IssueSubSet: %s", errss.Error())
 	}
 	// For each identified issues,
-	// retrieve all record related to this issue in a new SubRecordSet (with Date Index)
+	for _, ik := range issuesKeys {
+		// retrieve all record related to this issue in a new SubRecordSet (with Date Index)
+		is.AddRecords(sm.stat.GetRecordsByIndexKey("Issue", ik))
+	}
 
 	// On the result RecordSet
-	// Keep Issue list => result issues slice
 	// Keep Date list (chronologically sorted) => result dates slice
+	dateKeys := is.GetIndexKeys("Dates")
+	sort.Strings(dateKeys)
+	dates = make([]string, len(dateKeys))
+	for i, k := range dateKeys {
+		dates[i] = strings.TrimLeft(k, "!")
+	}
 	// create result S, R, E slice with Date List length
+	initDS := func(ds *[][]float64, len1, len2 int) {
+		*ds = make([][]float64, len1)
+		for i, _ := range *ds {
+			(*ds)[i] = make([]float64, len2)
+		}
+	}
+	initDS(&spent, len(issues), len(dates))
+	initDS(&remaining, len(issues), len(dates))
+	initDS(&estimated, len(issues), len(dates))
+	colpos, _ := is.GetRecordColNumByName("TIME_SPENT", "REMAIN_TIME", "INIT_ESTIMATE")
+	spentPos, remainingPos, estimatedPos := colpos[0], colpos[1], colpos[2]
 	// For each Date,
-	// store Date, Sum of S, R, E
-	//TODO Implement!!
+	for ii, ik := range issuesKeys {
+		for di, dk := range dateKeys {
+			r := is.GetRecordsByIndexKey("IssueDate", ik+dk)
+			if r == nil && di > 0 {
+				spent[ii][di] = spent[ii][di-1]
+				remaining[ii][di] = remaining[ii][di-1]
+				estimated[ii][di] = estimated[ii][di-1]
+			}
+			if r == nil {
+				continue
+			}
+			spent[ii][di], err = strconv.ParseFloat(r[0][spentPos], 64)
+			remaining[ii][di], err = strconv.ParseFloat(r[0][remainingPos], 64)
+			estimated[ii][di], err = strconv.ParseFloat(r[0][estimatedPos], 64)
+		}
+	}
 	return
 }

@@ -46,6 +46,10 @@ func (c *RecordIndexedSet) Len() int {
 	return c.data.Len()
 }
 
+func (c *RecordIndexedSet) GetRecordColNumByName(colname ...string) ([]int, error) {
+	return c.data.GetRecordColNumByName()
+}
+
 func (c *RecordIndexedSet) AddHeader(record rs.Record) error {
 	c.data.AddHeader(record)
 	h := c.data.GetHeader()
@@ -64,6 +68,13 @@ func (c *RecordIndexedSet) AddRecord(record rs.Record) {
 	num := c.data.Add(record)
 	for _, v := range c.indexes {
 		v.Add(record, num)
+	}
+}
+
+// AddRecord adds the given record, updating indexes
+func (c *RecordIndexedSet) AddRecords(records []rs.Record) {
+	for _, r := range records {
+		c.AddRecord(r)
 	}
 }
 
@@ -107,6 +118,7 @@ func (c *RecordIndexedSet) GetRecordKeyByIndex(idxname string, record rs.Record)
 	return ""
 }
 
+// GetRecordsByIndexKey returns all records related to given key on given idxname (nil if idxname or key not found)
 func (c *RecordIndexedSet) GetRecordsByIndexKey(idxname, key string) []rs.Record {
 	i, found := c.indexes[idxname]
 	if !found {
@@ -123,6 +135,7 @@ func (c *RecordIndexedSet) GetRecordsByIndexKey(idxname, key string) []rs.Record
 	return res
 }
 
+// GetRecords returns slice of all RIS records
 func (c *RecordIndexedSet) GetRecords() []rs.Record {
 	return c.data.GetRecords()
 }

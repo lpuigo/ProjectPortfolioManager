@@ -24,6 +24,10 @@ func (c *RecordSet) CreateSubRecordSet() *RecordSet {
 	return r
 }
 
+func (c *RecordSet) GetRecordColNumByName(colname ...string) ([]int, error) {
+	return c.header.getNums(colname...)
+}
+
 func (c *RecordSet) AddHeader(record Record) error {
 	c.header = NewHeader(record)
 	return nil
