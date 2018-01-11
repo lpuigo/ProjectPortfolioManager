@@ -6,6 +6,7 @@ import (
 	"github.com/lpuig/Novagile/Route"
 	"log"
 	"net/http"
+	"os"
 	"os/exec"
 )
 
@@ -20,6 +21,8 @@ const (
 
 	StatCSVFile = `./Ressources/Stats Projets Novagile.csv`
 	PrjJSONFile = `./Ressources/Projets Novagile.xlsx.json`
+
+	NoWebOpening = `./Ressources/NoWebOpening.lock`
 )
 
 func main() {
@@ -45,14 +48,19 @@ func main() {
 	router.PathPrefix(AssetsRoot).Handler(http.StripPrefix(AssetsRoot, http.FileServer(http.Dir(AssetsDir))))
 	router.PathPrefix("/").Handler(http.FileServer(http.Dir(RootDir)))
 
-	LaunchPageInBrowser()
+	LaunchPageInBrowser(NoWebOpening)
 	log.Print("Listening on ", ServicePort)
 	log.Fatal(http.ListenAndServe(ServicePort, router))
 }
 
-func LaunchPageInBrowser() error {
-	cmd := exec.Command("cmd", "/c", "start", "http://localhost:8080")
-	return cmd.Start()
+func LaunchPageInBrowser(lockfile string) error {
+	_, err := os.Stat(lockfile)
+	if err != nil && os.IsNotExist(err) {
+		cmd := exec.Command("cmd", "/c", "start", "http://localhost:8080")
+		return cmd.Start()
+	}
+	log.Printf("No Web Opening Lockfile found")
+	return nil
 }
 
 // Done Persist JSON repo after each Route request
