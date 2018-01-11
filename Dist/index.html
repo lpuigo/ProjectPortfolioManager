@@ -59,6 +59,13 @@
         @delete:givenprj="DeleteEditedPrj"
     ></editproject-modal>
 
+
+    <projectstat-modal
+            :givenprj="editedprj"
+            :projectstat="editedprjstat"
+    ></projectstat-modal>
+    <!--<projectstat-modal></projectstat-modal>-->
+
     <div class="ui main fluid container">
 
         <div v-if="DispPrj">
@@ -90,9 +97,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="prj in sortedProjects" :key="prj.id" @click="EditProject(prj)" v-if="IsDisplayed(prj)">
-                        <td class="collapsing">{{prj.client}}</td>
-                        <td class="collapsing"><i v-if="prj.hasStat" class="area chart icon"></i>{{prj.name}}</td>
+                    <tr v-for="prj in sortedProjects" :key="prj.id" v-if="IsDisplayed(prj)">
+                        <td class="collapsing"><i class="edit link icon" @click="EditProject(prj)"></i>{{prj.client}}</td>
+                        <td class="collapsing"><i v-if="prj.hasStat" class="area chart link icon" @click="ProjectStat(prj)"></i>{{prj.name}}</td>
                         <td style="white-space: pre-wrap;">{{prj.comment}}</td>
                         <td is="date-cell" :date="prj.milestones.Kickoff"></td>
                         <td is="date-cell" :date="prj.milestones.Recette"></td>

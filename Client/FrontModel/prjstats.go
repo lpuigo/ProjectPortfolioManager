@@ -20,3 +20,8 @@ func NewProjectStat() *ProjectStat {
 	ps.TimeEstimated = [][]float64{}
 	return ps
 }
+
+func NewProjectStatFromJS(o *js.Object) *ProjectStat {
+	ps := &ProjectStat{Object: o}
+	return ps
+}

@@ -8,12 +8,16 @@ import (
 )
 
 const (
-	TemplateEditProjectModalComp = `
+	TemplateEditProjectModalComp string = `
         <div class="ui modal" id="EditProjectModalComp">
             <!--<i class="close icon"></i>-->
             <div class="header">
-                <!--<h3>Edition du projet : <span style="color: steelblue">{{projecttitle}}</span></h3>-->
-                <h3>Edition du projet : <span style="color: steelblue">{{editedprj.client}} - {{editedprj.name}}</span></h3>
+                 <h3 class="ui header">
+                	<i class="edit icon"></i>
+                	<div class="content">
+                		Edition du projet : <span style="color: steelblue">{{editedprj.client}} - {{editedprj.name}}</span>
+                	</div>
+                </h3>
             </div>
 
             <!--<div class="content" v-if="project">-->
