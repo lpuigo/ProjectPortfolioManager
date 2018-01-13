@@ -76,6 +76,10 @@ func NewStatManagerFromFile(file string) (*StatManager, error) {
 	return sm, nil
 }
 
+func (sm *StatManager) ClearStats() {
+	sm.stat, _ = sm.stat.CreateSubRecordIndexedSet(createRISIndexDescs()...)
+}
+
 func (sm *StatManager) GetStats() *ris.RecordIndexedSet {
 	return sm.stat
 }
@@ -98,11 +102,11 @@ func (sm *StatManager) hasStatsForProject(pk string) bool {
 	return sm.stat.HasIndexKey("PrjKey", pk)
 }
 
-// UpdateFrom updates Stats data with new Stats (CSV Formated) found in r (StatManager is WriteLocked during process)
-func (sm *StatManager) UpdateFrom(r io.Reader) error {
+// UpdateFrom updates Stats data with new Stats (CSV Formated) found in r
+func (sm *StatManager) UpdateFrom(r io.Reader) (int, error) {
 	newStats, err := newStatSetFrom(r)
 	if err != nil {
-		return fmt.Errorf("UpdateFrom: %s", err.Error())
+		return 0, fmt.Errorf("UpdateFrom: %s", err.Error())
 	}
 
 	SREDesc := ris.NewIndexDesc("SRE", "TIME_SPENT", "REMAIN_TIME", "INIT_ESTIMATE")
@@ -111,15 +115,14 @@ func (sm *StatManager) UpdateFrom(r io.Reader) error {
 
 	oldStatSREKey, err := oldStats.GetKeyGeneratorByIndexDesc(SREDesc)
 	if err != nil {
-		return err
+		return 0, err
 	}
 	newStatSREKey, err := newStats.GetKeyGeneratorByIndexDesc(SREDesc)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	added := 0
-	sm.WLock()
 	for _, record := range newStats.GetRecords() {
 		issueKey := newStats.GetRecordKeyByIndex("Issue", record)
 		if oldStats.HasIndexKey("Issue", issueKey) {
@@ -130,12 +133,45 @@ func (sm *StatManager) UpdateFrom(r io.Reader) error {
 		oldStats.AddRecord(record)
 		added++
 	}
-	if added == 0 {
-		sm.WUnlock()
-	} else {
-		sm.WUnlockWithPersist()
+	return added, nil
+}
+
+// GetProjectSpentWL returns Spent WorkLoad for given project client/name, or error if project, client stat is found
+func (sm *StatManager) GetProjectSpentWL(client, name string) (spent float64, err error) {
+	pk := pjrKey(client, name)
+	if !sm.hasStatsForProject(pk) {
+		err = fmt.Errorf("No Project Stats for %s/%s", client, name)
+		return
 	}
-	return nil
+	//retrieve all issues associated to prjKey pk
+	ps, errss := sm.stat.CreateSubRecordIndexedSet(
+	//ris.NewIndexDesc("IssueDate", "ISSUE", "EXTRACT_DATE"),
+	)
+	if errss != nil {
+		err = fmt.Errorf("PrjSubSet: %s", errss.Error())
+	}
+	ps.AddRecords(sm.stat.GetRecordsByIndexKey("PrjKey", pk))
+
+	colpos, _ := ps.GetRecordColNumByName("ISSUE", "EXTRACT_DATE", "TIME_SPENT")
+	issuePos, datePos, spentPos := colpos[0], colpos[1], colpos[2]
+	issueDate := map[string]string{}
+	issueSpent := map[string]float64{}
+	for _, record := range ps.GetRecords() {
+		curIssue := record[issuePos]
+		curDate := record[datePos]
+		curWL, _ := strconv.ParseFloat(record[spentPos], 64)
+		previousDate, issueFound := issueDate[curIssue]
+		if issueFound && curDate < previousDate {
+			continue
+		}
+		issueDate[curIssue] = curDate
+		issueSpent[curIssue] = curWL
+	}
+	spent = 0
+	for _, wl := range issueSpent {
+		spent += wl
+	}
+	return
 }
 
 // GetProjectStatInfo returns list of issues, dates slices, and timeSpent, timeRemaining, timeEstimated doubleslices ([#issue][#date]) for given project client/name
@@ -156,10 +192,6 @@ func (sm *StatManager) GetProjectStatInfo(client, name string) (issues, dates []
 	// Keep Issue list => result issues slice
 	issuesKeys := ps.GetIndexKeys("Issue")
 	sort.Strings(issuesKeys)
-	issues = make([]string, len(issuesKeys))
-	for i, k := range issuesKeys {
-		issues[i] = strings.TrimLeft(k, "!")
-	}
 
 	//retrieve all issues found in ps
 	is, errss := sm.stat.CreateSubRecordIndexedSet(
@@ -176,6 +208,10 @@ func (sm *StatManager) GetProjectStatInfo(client, name string) (issues, dates []
 		is.AddRecords(sm.stat.GetRecordsByIndexKey("Issue", ik))
 	}
 
+	issues = make([]string, len(issuesKeys))
+	for i, k := range issuesKeys {
+		issues[i] = strings.TrimLeft(k, "!")
+	}
 	// On the result RecordSet
 	// Keep Date list (chronologically sorted) => result dates slice
 	dateKeys := is.GetIndexKeys("Dates")

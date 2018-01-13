@@ -2,21 +2,18 @@ package Manager
 
 import (
 	"fmt"
-	"io/ioutil"
+	"github.com/lpuig/Novagile/Manager/DataManager"
+	"github.com/lpuig/Novagile/Manager/RecordSet"
 	"os"
 	"sort"
+	"strings"
 	"testing"
-	"time"
 )
 
 const (
 	StatFile  = `C:\Users\Laurent\Golang\src\github.com\lpuig\Novagile\Ressources\export Jira\extract 2018-01-03.csv`
 	StatFile2 = `C:\Users\Laurent\Golang\src\github.com\lpuig\Novagile\Ressources\export Jira\extract 2018-01-04.csv`
 	StatFile0 = `C:\Users\Laurent\Golang\src\github.com\lpuig\Novagile\Ressources\export Jira\test_extract_init.csv`
-
-	PrdStatFile    = `C:\Users\Laurent\Golang\src\github.com\lpuig\Novagile\Ressources\Stats Projets Novagile.csv`
-	UpdateStatDir  = `C:\Users\Laurent\Google Drive\Travail\NOVAGILE\Gouvernance\Stat Jira\Extract SRE\`
-	UpdateStatFile = UpdateStatDir + `extract 2018-01-04.csv`
 )
 
 func TestInitStatManagerFile(t *testing.T) {
@@ -59,53 +56,24 @@ func TestStatManager_GetStats(t *testing.T) {
 }
 
 func TestStatManager_UpdateFrom(t *testing.T) {
-	sm, err := NewStatManagerFromFile(StatFile)
+	sm, err := NewStatManagerFromFile(StatFile0)
 	if err != nil {
 		t.Fatalf("NewStatManagerFromFile: %s", err.Error())
 	}
+	sm.ClearStats()
 
-	f, err := os.Open(StatFile2)
+	f, err := os.Open(StatFile)
 	if err != nil {
 		t.Fatalf("StatManager_UpdateFrom: %s", err.Error())
 	}
 	defer f.Close()
-	err = sm.UpdateFrom(f)
+	added, err := sm.UpdateFrom(f)
 	if err != nil {
 		t.Fatalf("UpdateFrom returns %s", err.Error())
 	}
-	time.Sleep(4 * time.Second)
-}
-
-func TestInitActualDataOnProdFile(t *testing.T) {
-	InitStatManagerFile(PrdStatFile)
-	sm, err := NewStatManagerFromFile(PrdStatFile)
-	if err != nil {
-		t.Fatalf("NewStatManagerFromFile: %s", err.Error())
+	if added != 155 {
+		t.Fatalf("UpdateFrom returns %d added rows, 155 expected", added)
 	}
-
-	nbRecord := sm.stat.Len()
-	fmt.Printf("Persisted Stats loaded : %d record(s)\n", nbRecord)
-
-	files, err := ioutil.ReadDir(UpdateStatDir)
-	if err != nil {
-		t.Fatalf("Unable to browse UpdateDir : %s", err.Error())
-	}
-	for _, file := range files {
-		f, err := os.Open(UpdateStatDir + file.Name())
-		if err != nil {
-			t.Fatalf("StatManager_UpdateFrom: %s", err.Error())
-		}
-		t0 := time.Now()
-		err = sm.UpdateFrom(f)
-		dur := time.Since(t0)
-		if err != nil {
-			t.Fatalf("UpdateFrom returns %s", err.Error())
-		}
-		fmt.Printf("Stats updated from '%s': %d record(s) added (took %v)\n", file.Name(), sm.stat.Len()-nbRecord, dur)
-		nbRecord = sm.stat.Len()
-	}
-
-	time.Sleep(4 * time.Second)
 }
 
 func TestStatManager_GetProjectStatList(t *testing.T) {
@@ -116,5 +84,75 @@ func TestStatManager_GetProjectStatList(t *testing.T) {
 	for i, s := range sm.GetProjectStatList() {
 		//ls := strings.Split(s, "!")
 		fmt.Printf("%2d : %s\n", i, s)
+	}
+}
+
+func equals(a, b [][]float64) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i, fs := range a {
+		if len(fs) != len(b[i]) {
+			return false
+		}
+		for j, f := range fs {
+			if f != b[i][j] {
+				return false
+			}
+		}
+	}
+	return true
+}
+
+func createTestSM(t *testing.T) *StatManager {
+	smSource := `EXTRACT_DATE;PRODUCT;CLIENT!PROJECT;ACTIVITY;ISSUE;INIT_ESTIMATE;TIME_SPENT;REMAIN_TIME
+2017-01-01;TestProduct;SomeClient!OtherProject;;Issue0;1.00;0.00;1.00
+2017-01-01;TestProduct;;;Issue1;5.00;0.00;5.00
+2017-01-02;TestProduct;SomeClient!TestProject;;Issue1;5.00;5.00;0.00
+2017-01-02;TestProduct;SomeClient!TESTProject;;Issue2;2.00;1.00;1.00
+2017-01-03;TestProduct;SomeClient!TestProject;;Issue2;2.00;2.00;0.00
+`
+	sm := &StatManager{}
+	sm.DataManager = DataManager.NewDataManager(func() error { return nil })
+	cs, err := newStatSetFrom(strings.NewReader(smSource))
+	if err != nil {
+		t.Fatalf("newStatSetFrom returns %s", err.Error())
+	}
+	sm.stat = cs
+	return sm
+}
+
+func TestStatManager_GetProjectStatInfo(t *testing.T) {
+	sm := createTestSM(t)
+
+	issues, dates, spent, remaining, estimated, err := sm.GetProjectStatInfo("SomeClient", "TestProject")
+	if err != nil {
+		t.Fatalf("GetProjectStatInfo returns %s", err.Error())
+	}
+	if !RecordSet.Record(issues).Equals(RecordSet.Record{"Issue1", "Issue2"}) {
+		t.Errorf("issues: %s", issues)
+	}
+	if !RecordSet.Record(dates).Equals(RecordSet.Record{"2017-01-01", "2017-01-02", "2017-01-03"}) {
+		t.Errorf("dates: %s", dates)
+	}
+	if !equals(spent, [][]float64{[]float64{0.000000, 5.000000, 5.000000}, []float64{0.000000, 1.000000, 2.000000}}) {
+		t.Errorf("spent %f", spent)
+	}
+	if !equals(remaining, [][]float64{[]float64{5.000000, 0.000000, 0.000000}, []float64{0.000000, 1.000000, 0.000000}}) {
+		t.Errorf("remaining %f", remaining)
+	}
+	if !equals(estimated, [][]float64{[]float64{5.000000, 5.000000, 5.000000}, []float64{0.000000, 2.000000, 2.000000}}) {
+		t.Errorf("estimated: %f", estimated)
+	}
+}
+
+func TestStatManager_GetProjectSpentWL(t *testing.T) {
+	sm := createTestSM(t)
+	wl, err := sm.GetProjectSpentWL("SomeClient", "TestProject")
+	if err != nil {
+		t.Fatalf("GetProjectSpentWL returns %s", err.Error())
+	}
+	if wl != 7 {
+		t.Errorf("GetProjectSpentWL returns unespected value %f instead of 7", wl)
 	}
 }

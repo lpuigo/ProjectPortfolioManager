@@ -7,6 +7,10 @@ import (
 	fm "github.com/lpuig/Novagile/Client/FrontModel"
 	"github.com/lpuig/Novagile/Model"
 	"io"
+	"io/ioutil"
+	"log"
+	"os"
+	"time"
 )
 
 type Manager struct {
@@ -48,8 +52,22 @@ func (m *Manager) GetPrjById(id int) *Model.Project {
 	return m.Projects.GetProjectsPtf().GetPrjById(id)
 }
 
-func (m *Manager) GetProjectStatList() {
+func (m *Manager) UpdateProjectsSpentTime() {
+	m.Projects.WLock()
+	defer m.Projects.WUnlockWithPersist()
+	m.Stats.RLock()
+	defer m.Stats.RUnlock()
 
+	for _, p := range m.Projects.GetProjectsPtf().Projects {
+		hasStat := m.Stats.HasStatsForProject(getProjectKey(p))
+		if hasStat {
+			nWL, err := m.Stats.GetProjectSpentWL(getProjectKey(p))
+			if err != nil {
+				panic(err.Error())
+			}
+			p.CurrentWL = nWL
+		}
+	}
 }
 
 func (m *Manager) UpdateProject(op, np *Model.Project) bool {
@@ -58,7 +76,15 @@ func (m *Manager) UpdateProject(op, np *Model.Project) bool {
 	m.Stats.RLock()
 	defer m.Stats.RUnlock()
 	op.Update(np)
-	return m.Stats.HasStatsForProject(getProjectKey(np))
+	hasStat := m.Stats.HasStatsForProject(getProjectKey(op))
+	if hasStat {
+		nWL, err := m.Stats.GetProjectSpentWL(getProjectKey(op))
+		if err != nil {
+			panic(err.Error())
+		}
+		op.CurrentWL = nWL
+	}
+	return hasStat
 }
 
 func (m *Manager) CreateProject(p *Model.Project) (*Model.Project, bool) {
@@ -67,7 +93,15 @@ func (m *Manager) CreateProject(p *Model.Project) (*Model.Project, bool) {
 	m.Projects.GetProjectsPtf().AddPrj(p)
 	m.Stats.RLock()
 	defer m.Stats.RUnlock()
-	return p, m.Stats.HasStatsForProject(getProjectKey(p))
+	hasStat := m.Stats.HasStatsForProject(getProjectKey(p))
+	if hasStat {
+		nWL, err := m.Stats.GetProjectSpentWL(getProjectKey(p))
+		if err != nil {
+			panic(err.Error())
+		}
+		p.CurrentWL = nWL
+	}
+	return p, hasStat
 }
 
 func (m *Manager) DeleteProject(id int) bool {
@@ -87,8 +121,35 @@ func (m *Manager) GetProjectsPtfXLS(w io.Writer) {
 	WritePortfolioToXLS(m.Projects.GetProjectsPtf(), w)
 }
 
-func (m *Manager) UpdateStat(r io.Reader) {
-	m.Stats.UpdateFrom(r)
+func (m *Manager) ReinitStatsFromDir(dir string) error {
+	m.Stats.WLock()
+	m.Stats.ClearStats()
+	files, err := ioutil.ReadDir(dir)
+	if err != nil {
+		return fmt.Errorf("Unable to browse Dir : %s", err.Error())
+	}
+	nbRecord := 0
+	for _, file := range files {
+		f, err := os.Open(dir + file.Name())
+		if err != nil {
+			return err
+		}
+		t0 := time.Now()
+		added, err := m.UpdateStat(f)
+		dur := time.Since(t0)
+		if err != nil {
+			return fmt.Errorf("UpdateStat error %s", err.Error())
+		}
+		log.Printf("Stats updated from '%s': %d record(s) added (took %v)\n", file.Name(), added, dur)
+		nbRecord += added
+	}
+	m.Stats.WUnlockWithPersist()
+	m.UpdateProjectsSpentTime()
+	return nil
+}
+
+func (m *Manager) UpdateStat(r io.Reader) (int, error) {
+	return m.Stats.UpdateFrom(r)
 }
 
 func getProjectKey(p *Model.Project) (string, string) {
