@@ -16,14 +16,16 @@ const (
                 <h3 class="ui header">
                 	<i class="area chart icon"></i>
                 	<div class="content">
-                		Statistiques du projet : <span style="color: steelblue">{{givenprj.client}} - {{givenprj.name}}</span>                	
+                		Statistiques du projet : <span style="color: teal">{{givenprj.client}} - {{givenprj.name}}</span>                	
 					</div>
                 </h3>
             </div>
 
             <!--<div class="content" v-if="project">-->
             <div class="scrolling content">
-            	<issue-chart ref="IssueChart" :projectstat="projectstat"></issue-chart>
+            	<issue-chart :issuestat="sumstat" v-if="sumstat"></issue-chart>
+            	
+            	<issue-chart v-for="istat in issuestats" :issuestat="istat"></issue-chart>
             </div>
             <!--<div class="actions">-->
 				<!--<div class="ui button">-->
@@ -38,13 +40,17 @@ type ProjectStatModalComp struct {
 	*js.Object
 	GiventPrj   *fm.Project     `js:"givenprj"`
 	ProjectStat *fm.ProjectStat `js:"projectstat"`
+	IssueStats  []*fm.IssueStat `js:"issuestats"`
+	SumStat     *fm.IssueStat   `js:"sumstat"`
 }
 
 func NewProjectStatModalComp() *ProjectStatModalComp {
-	a := &ProjectStatModalComp{Object: js.Global.Get("Object").New()}
-	a.GiventPrj = fm.NewProject()
-	a.ProjectStat = fm.NewProjectStat()
-	return a
+	psm := &ProjectStatModalComp{Object: js.Global.Get("Object").New()}
+	psm.GiventPrj = fm.NewProject()
+	psm.ProjectStat = fm.NewProjectStat()
+	psm.IssueStats = []*fm.IssueStat{}
+	psm.SumStat = nil
+	return psm
 }
 
 // RegisterProjectStatModalComp registers to current vue intance a ProjectStatModal component
@@ -79,13 +85,16 @@ func RegisterProjectStatModalComp() *vue.Component {
 
 	o.AddMethod("ShowProjectStatModal", func(vm *vue.ViewModel, args []*js.Object) {
 		m := &ProjectStatModalComp{Object: vm.Object}
-		p := &fm.Project{Object: args[0]}
-		s := &fm.ProjectStat{Object: args[1]}
-		m.GiventPrj = p
-		m.ProjectStat = s
+		project := &fm.Project{Object: args[0]}
+		projectStat := &fm.ProjectStat{Object: args[1]}
+		m.GiventPrj = project
+		m.ProjectStat = projectStat
 
 		jq(vm.El).Call("modal", "show")
-		vm.Refs.Get("IssueChart").Call("RenderChart", m.ProjectStat)
+		m.IssueStats = fm.CreateIssueStatsFromProjectStat(m.ProjectStat)
+		m.SumStat = fm.CreateSumStatFromProjectStat(m.ProjectStat)
+
+		//vm.Refs.Get("IssueChart").Call("RenderChart", m.ProjectStat)
 		jq(vm.El).Call("modal", "refresh")
 	})
 
