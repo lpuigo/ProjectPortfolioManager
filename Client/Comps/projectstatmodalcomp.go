@@ -23,7 +23,7 @@ const (
 
             <!--<div class="content" v-if="project">-->
             <div class="scrolling content">
-            	<pre>{{projectstat}}</pre>
+            	<issue-chart ref="IssueChart" :projectstat="projectstat"></issue-chart>
             </div>
             <!--<div class="actions">-->
 				<!--<div class="ui button">-->
@@ -61,7 +61,7 @@ func RegisterProjectStatModalComp() *vue.Component {
 	o.Data = NewProjectStatModalComp
 
 	o.AddProp("givenprj", "projectstat")
-	//o.AddSubComponent("dropdown-list", RegisterDropDownListComp())
+	o.AddSubComponent("issue-chart", RegisterIssueChartComp())
 
 	o.OnLifeCycleEvent(vue.EvtMounted, func(vm *vue.ViewModel) {
 		// setup approve and deny callback funcs
@@ -81,8 +81,9 @@ func RegisterProjectStatModalComp() *vue.Component {
 		//m := &ProjectStatModalComp{Object: vm.Object}
 		//p := &fm.Project{Object: args[0]}
 		//m.GiventPrj = p
-		jq(vm.El).Call("modal", "show")
+		vm.Refs.Get("IssueChart").Call("Render")
 		jq(vm.El).Call("modal", "refresh")
+		jq(vm.El).Call("modal", "show")
 	})
 
 	return o.NewComponent().Register("projectstat-modal")
