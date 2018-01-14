@@ -84,10 +84,9 @@ func RegisterProjectStatModalComp() *vue.Component {
 		m.GiventPrj = p
 		m.ProjectStat = s
 
-		vm.Refs.Get("IssueChart").Call("RenderChart", m.ProjectStat)
-
-		jq(vm.El).Call("modal", "refresh")
 		jq(vm.El).Call("modal", "show")
+		vm.Refs.Get("IssueChart").Call("RenderChart", m.ProjectStat)
+		jq(vm.El).Call("modal", "refresh")
 	})
 
 	return o.NewComponent().Register("projectstat-modal")
