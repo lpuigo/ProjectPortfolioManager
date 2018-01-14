@@ -94,6 +94,7 @@ func (m *FrontModel) callGetProjectStat() {
 	if req.Status == 200 {
 		m.EditedPrjStat = fm.NewProjectStatFromJS(req.Response)
 	}
+	//TODO Manage Status != 200
 }
 
 func (m *FrontModel) callUpdatePrj(uprj *fm.Project) {
@@ -171,7 +172,7 @@ func (m *FrontModel) EditProject(p *fm.Project) {
 	m.showEditProjectModal(p)
 }
 
-func (m *FrontModel) ProjectStat(p *fm.Project) {
+func (m *FrontModel) ShowProjectStat(p *fm.Project) {
 	m.EditedPrj = p
 	go func() {
 		m.callGetProjectStat()
@@ -194,7 +195,7 @@ func (m *FrontModel) showEditProjectModal(p *fm.Project) {
 }
 
 func (m *FrontModel) showProjectStatModal(p *fm.Project) {
-	jQuery("#ProjectStatModalComp").Get(0).Get("__vue__").Call("ShowProjectStatModal", p)
+	jQuery("#ProjectStatModalComp").Get(0).Get("__vue__").Call("ShowProjectStatModal", p, m.EditedPrjStat)
 }
 
 func (m *FrontModel) IsDisplayed(p *fm.Project) bool {

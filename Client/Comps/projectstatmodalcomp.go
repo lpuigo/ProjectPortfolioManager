@@ -78,10 +78,14 @@ func RegisterProjectStatModalComp() *vue.Component {
 	})
 
 	o.AddMethod("ShowProjectStatModal", func(vm *vue.ViewModel, args []*js.Object) {
-		//m := &ProjectStatModalComp{Object: vm.Object}
-		//p := &fm.Project{Object: args[0]}
-		//m.GiventPrj = p
-		vm.Refs.Get("IssueChart").Call("Render")
+		m := &ProjectStatModalComp{Object: vm.Object}
+		p := &fm.Project{Object: args[0]}
+		s := &fm.ProjectStat{Object: args[1]}
+		m.GiventPrj = p
+		m.ProjectStat = s
+
+		vm.Refs.Get("IssueChart").Call("RenderChart", m.ProjectStat)
+
 		jq(vm.El).Call("modal", "refresh")
 		jq(vm.El).Call("modal", "show")
 	})

@@ -99,7 +99,7 @@
                 <tbody>
                     <tr v-for="prj in sortedProjects" :key="prj.id" v-if="IsDisplayed(prj)">
                         <td class="collapsing" @click="EditProject(prj)"><i class="edit link icon"></i>{{prj.client}}</td>
-                        <td class="collapsing"><i v-if="prj.hasStat" class="area chart link icon" @click="ProjectStat(prj)"></i>{{prj.name}}</td>
+                        <td class="collapsing"><i v-if="prj.hasStat" class="area chart link icon" @click="ShowProjectStat(prj)"></i>{{prj.name}}</td>
                         <td style="white-space: pre-wrap;">{{prj.comment}}</td>
                         <td is="date-cell" :date="prj.milestones.Kickoff"></td>
                         <td is="date-cell" :date="prj.milestones.Recette"></td>
