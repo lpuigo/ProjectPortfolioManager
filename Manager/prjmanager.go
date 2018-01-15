@@ -1,8 +1,6 @@
 package Manager
 
 import (
-	"errors"
-	"fmt"
 	"github.com/lpuig/Novagile/Manager/DataManager"
 	"log"
 )
@@ -20,7 +18,7 @@ func NewPrjManagerFromPersistFile(file string) (*PrjManager, error) {
 	p, err := NewPrjPortfolioFromJSONFile(file)
 	if err != nil {
 		log.Println()
-		return nil, errors.New(fmt.Sprintf("Unable to load PrjPortfolio from file '%s' : %s", file, err.Error()))
+		return nil, err
 	}
 	if p != nil {
 		log.Printf("PrjPortfolio loaded (%d project(s))\n", len(p.Projects))

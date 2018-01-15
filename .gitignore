@@ -1,3 +1,4 @@
 .idea/
 Dist/*.js
 Dist/*.js.map
+Ressources/*
