@@ -47,8 +47,8 @@ type ProjectStatModalComp struct {
 func NewProjectStatModalComp() *ProjectStatModalComp {
 	psm := &ProjectStatModalComp{Object: js.Global.Get("Object").New()}
 	psm.GiventPrj = fm.NewProject()
-	psm.ProjectStat = fm.NewProjectStat()
-	psm.IssueStats = []*fm.IssueStat{}
+	psm.ProjectStat = nil
+	psm.IssueStats = nil
 	psm.SumStat = nil
 	return psm
 }
@@ -70,6 +70,7 @@ func RegisterProjectStatModalComp() *vue.Component {
 	o.AddSubComponent("issue-chart", RegisterIssueChartComp())
 
 	o.OnLifeCycleEvent(vue.EvtMounted, func(vm *vue.ViewModel) {
+		m := &ProjectStatModalComp{Object: vm.Object}
 		// setup approve and deny callback funcs
 		modalOptions := js.M{
 			"observeChanges": true,
@@ -79,12 +80,17 @@ func RegisterProjectStatModalComp() *vue.Component {
 			"onDeny": func() bool {
 				return true
 			},
+			"onHidden": func() {
+				m.IssueStats = nil
+				m.SumStat = nil
+			},
 		}
 		jq(vm.El).Call("modal", modalOptions)
 	})
 
 	o.AddMethod("ShowProjectStatModal", func(vm *vue.ViewModel, args []*js.Object) {
 		m := &ProjectStatModalComp{Object: vm.Object}
+
 		project := &fm.Project{Object: args[0]}
 		projectStat := &fm.ProjectStat{Object: args[1]}
 		m.GiventPrj = project
