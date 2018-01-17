@@ -84,26 +84,34 @@ func CreateSumStatFromProjectStat(ps *ProjectStat) *IssueStat {
 	return sis
 }
 
-type ProjectStatName struct {
+type ProjectStatNames struct {
 	*js.Object
 	Clients  []string `json:"clients"   js:"clients"`
 	Projects []string `json:"projects"  js:"projects"`
 }
 
-func NewProjectStatName() *ProjectStatName {
-	psn := &ProjectStatName{Object: js.Global.Get("Object").New()}
+func (psn *ProjectStatNames) GetProjectStatSignatures() []*ValText {
+	res := []*ValText{}
+	for i, c := range psn.Clients {
+		res = append(res, NewValText(c, psn.Projects[i]))
+	}
+	return res
+}
+
+func NewProjectStatName() *ProjectStatNames {
+	psn := &ProjectStatNames{Object: js.Global.Get("Object").New()}
 	psn.Clients = []string{}
 	psn.Projects = []string{}
 	return psn
 }
 
-func NewProjectStatNameFromJS(o *js.Object) *ProjectStatName {
-	psn := &ProjectStatName{Object: o}
+func NewProjectStatNameFromJS(o *js.Object) *ProjectStatNames {
+	psn := &ProjectStatNames{Object: o}
 	return psn
 }
 
-func NewProjectStatNameFromList(list []string, sep string) *ProjectStatName {
-	psn := &ProjectStatName{}
+func NewProjectStatNameFromList(list []string, sep string) *ProjectStatNames {
+	psn := &ProjectStatNames{}
 	psn.Clients = make([]string, len(list))
 	psn.Projects = make([]string, len(list))
 	for i, s := range list {

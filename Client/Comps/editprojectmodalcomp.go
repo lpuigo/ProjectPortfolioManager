@@ -25,17 +25,28 @@ const (
                 <form class="ui form">
                     <!--<h4 class="ui dividing header">Projet</h4>-->
                     <div class="field">
-                        <div class="two fields">
-                            <div class="field">
-                                <label>Client</label>
-                                <input type="text" placeholder="Nom Client" v-model.trim="editedprj.client">
-                            </div>
-                            <div class="field">
-                                <label>Nom Projet</label>
-                                <input type="text" placeholder="Nom Projet" v-model.trim="editedprj.name">
-                            </div>
-                        </div>
-                    </div>
+						<div class="two fields">
+							<div class="field">
+								<label>Client</label>
+								<input type="text" placeholder="Nom Client" v-model.trim="editedprj.client">
+							</div>
+							<div class="field">
+								<label>Nom Projet</label>
+								<div class="ui left action input">
+									<button class="ui icon button" @click.prevent="">
+										<!--<i class="search icon"></i>-->
+										<div ref="ProjectStatLookUpDD" class="ui dropdown icon item" style="z-index: 1010">
+											<i class="search icon"></i>
+											<div class="menu">
+												<div v-for="p in projectStatSignatures" class="item" @click="SetClientProject(p)">{{p.value}} - {{p.text}}</div>
+											</div>			
+										</div>
+									</button>
+									<input type="text" placeholder="Nom Projet" v-model.trim="editedprj.name">
+								</div>
+							</div>
+						</div>
+					</div>
                     <div class="field">
                         <div class="three fields">
                             <div class="field">
@@ -146,12 +157,18 @@ func NewEditProjectModalComp() *EditProjectModalComp {
 	a := &EditProjectModalComp{Object: js.Global.Get("Object").New()}
 	a.GiventPrj = FrontModel.NewProject()
 	a.EditedPrj = FrontModel.NewProject()
+
 	return a
 }
 
 // RegisterEditProjectModalComp registers to current vue intance a EditProjectModal component
 // having the following profile
-//  <editproject-modal :statuts="some_[]*ValText" :types="some_[]*ValText" v-model="*Project"></editproject-modal>
+//  <editproject-modal
+// 		:statuts="some_[]*ValText"
+// 		:types="some_[]*ValText"
+//		:milestonekeys="some_[]*ValText"
+//		:projectStatSignatures="some_[]*ValText
+// 		v-model="*Project"></editproject-modal>
 func RegisterEditProjectModalComp() *vue.Component {
 	var jq = jquery.NewJQuery
 
@@ -159,7 +176,7 @@ func RegisterEditProjectModalComp() *vue.Component {
 	o.Template = TemplateEditProjectModalComp
 	o.Data = NewEditProjectModalComp
 
-	o.AddProp("givenprj", "statuts", "types", "milestonekeys")
+	o.AddProp("givenprj", "statuts", "types", "milestonekeys", "projectStatSignatures")
 	o.AddSubComponent("dropdown-list", RegisterDropDownListComp())
 
 	o.OnLifeCycleEvent(vue.EvtMounted, func(vm *vue.ViewModel) {
@@ -188,6 +205,11 @@ func RegisterEditProjectModalComp() *vue.Component {
 		}
 		jq(vm.Refs.Get("AddMilestoneDD")).Call("dropdown", addmilestoneDDOption)
 
+		ProjectStatLookUpDDOption := js.M{
+			"on":        "hover",
+			"direction": "auto",
+		}
+		jq(vm.Refs.Get("ProjectStatLookUpDD")).Call("dropdown", ProjectStatLookUpDDOption)
 	})
 
 	o.AddMethod("deleteProject", func(vm *vue.ViewModel, args []*js.Object) {
@@ -211,8 +233,15 @@ func RegisterEditProjectModalComp() *vue.Component {
 
 		vm.Refs.Get("StatutDD").Call("changeSelected", m.EditedPrj.Status)
 		vm.Refs.Get("TypeDD").Call("changeSelected", m.EditedPrj.Type)
-		jq(vm.El).Call("modal", "show")
 		jq(vm.El).Call("modal", "refresh")
+		jq(vm.El).Call("modal", "show")
+	})
+
+	o.AddMethod("SetClientProject", func(vm *vue.ViewModel, args []*js.Object) {
+		m := &EditProjectModalComp{Object: vm.Object}
+		v := &FrontModel.ValText{Object: args[0]}
+		m.EditedPrj.Client = v.Value
+		m.EditedPrj.Name = v.Text
 	})
 
 	o.AddMethod("DeleteMilestone", func(vm *vue.ViewModel, args []*js.Object) {

@@ -15,16 +15,17 @@ import (
 
 type FrontModel struct {
 	*js.Object
-	DispPrj        bool               `js:"DispPrj"`
-	TextFilter     string             `js:"textfilter"`
-	Projects       []*fm.Project      `js:"projects"`
-	SortList       []*fm.SortCol      `js:"sortlist"`
-	ColFilterGroup *fm.ColFilterGroup `js:"colfilters"`
-	EditedPrj      *fm.Project        `js:"editedprj"`
-	EditedPrjStat  *fm.ProjectStat    `js:"editedprjstat"`
-	Statuts        []*fm.ValText      `js:"statuts"`
-	Types          []*fm.ValText      `js:"types"`
-	MilestoneKeys  []*fm.ValText      `js:"milestonekeys"`
+	DispPrj           bool               `js:"DispPrj"`
+	TextFilter        string             `js:"textfilter"`
+	Projects          []*fm.Project      `js:"projects"`
+	SortList          []*fm.SortCol      `js:"sortlist"`
+	ColFilterGroup    *fm.ColFilterGroup `js:"colfilters"`
+	EditedPrj         *fm.Project        `js:"editedprj"`
+	EditedPrjStat     *fm.ProjectStat    `js:"editedprjstat"`
+	PrjStatSignatures []*fm.ValText      `js:"prjstatsignatures"`
+	Statuts           []*fm.ValText      `js:"statuts"`
+	Types             []*fm.ValText      `js:"types"`
+	MilestoneKeys     []*fm.ValText      `js:"milestonekeys"`
 }
 
 func NewFrontModel(msg string) *FrontModel {
@@ -54,6 +55,7 @@ func NewFrontModel(msg string) *FrontModel {
 		})
 	m.EditedPrj = fm.NewProject()
 	m.EditedPrjStat = nil
+	m.PrjStatSignatures = nil
 	m.Statuts = createStatuts()
 	m.Types = createTypes()
 	m.MilestoneKeys = createMilestoneKeys()
@@ -80,6 +82,20 @@ func (m *FrontModel) callGetPtf() {
 	})
 	m.DispPrj = true
 	//js.Global.Set("resp", m.Resp)
+}
+
+func (m *FrontModel) callGetStatPrjList() {
+	req := xhr.NewRequest("GET", "/stat/prjlist")
+	req.Timeout = 2000
+	req.ResponseType = xhr.JSON
+	err := req.Send(nil)
+	if err != nil {
+		println("Req went wrong : ", err, req.Status)
+	}
+	if req.Status == 200 {
+		m.PrjStatSignatures = fm.NewProjectStatNameFromJS(req.Response).GetProjectStatSignatures()
+	}
+	//TODO Manage Status != 200
 }
 
 func (m *FrontModel) callGetProjectStat() {
@@ -191,7 +207,10 @@ func (m *FrontModel) CreateNewProject() {
 }
 
 func (m *FrontModel) showEditProjectModal(p *fm.Project) {
-	jQuery("#EditProjectModalComp").Get(0).Get("__vue__").Call("ShowEditProjectModal", p)
+	go func() {
+		m.callGetStatPrjList()
+		jQuery("#EditProjectModalComp").Get(0).Get("__vue__").Call("ShowEditProjectModal", p)
+	}()
 }
 
 func (m *FrontModel) showProjectStatModal(p *fm.Project) {
