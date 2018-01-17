@@ -32,6 +32,7 @@ func NewManager(prjfile, statfile string) (*Manager, error) {
 	}
 	m.Stats = sm
 
+	m.UpdateProjectsSpentTime()
 	return m, nil
 }
 

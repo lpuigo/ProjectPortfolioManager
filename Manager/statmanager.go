@@ -174,6 +174,7 @@ func (sm *StatManager) GetProjectSpentWL(client, name string) (spent float64, er
 	for _, wl := range issueSpent {
 		spent += wl
 	}
+	spent /= 8.0
 	return
 }
 
@@ -230,6 +231,13 @@ func (sm *StatManager) GetProjectStatInfo(client, name string) (issues, dates []
 			(*ds)[i] = make([]float64, len2)
 		}
 	}
+	convert := func(s string) (float64, error) {
+		f, err := strconv.ParseFloat(s, 64)
+		if err != nil {
+			return 0, err
+		}
+		return f / 8.0, nil
+	}
 	initDS(&spent, len(issues), len(dates))
 	initDS(&remaining, len(issues), len(dates))
 	initDS(&estimated, len(issues), len(dates))
@@ -247,9 +255,9 @@ func (sm *StatManager) GetProjectStatInfo(client, name string) (issues, dates []
 			if r == nil {
 				continue
 			}
-			spent[ii][di], err = strconv.ParseFloat(r[0][spentPos], 64)
-			remaining[ii][di], err = strconv.ParseFloat(r[0][remainingPos], 64)
-			estimated[ii][di], err = strconv.ParseFloat(r[0][estimatedPos], 64)
+			spent[ii][di], err = convert(r[0][spentPos])
+			remaining[ii][di], err = convert(r[0][remainingPos])
+			estimated[ii][di], err = convert(r[0][estimatedPos])
 		}
 	}
 	return
