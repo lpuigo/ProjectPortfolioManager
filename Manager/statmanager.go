@@ -84,13 +84,26 @@ func (sm *StatManager) GetStats() *ris.RecordIndexedSet {
 	return sm.stat
 }
 
-func (sm *StatManager) GetProjectStatList() []string {
+func (sm *StatManager) GetProjectStatList(prjlist map[string]bool) []string {
 	res := sm.stat.GetIndexKeys("PrjKey")
 	for i, s := range res {
+		if _, exist := prjlist[s]; exist {
+			res[i] = ""
+			continue
+		}
 		res[i] = strings.TrimLeft(s, "!")
 	}
 	sort.Strings(res)
-	return res
+	// remove leading "" project signature
+	found := 0
+	for _, s := range res {
+		if s == "" {
+			found++
+		} else {
+			break
+		}
+	}
+	return res[found:]
 }
 
 func (sm *StatManager) HasStatsForProject(client, name string) bool {

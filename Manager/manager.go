@@ -180,8 +180,11 @@ func (m *Manager) GetProjectStatById(id int, w io.Writer) error {
 
 func (m *Manager) GetProjectStatProjectList(w io.Writer) error {
 	//Retrieve Project Stat :
+	m.Projects.RLock()
 	m.Stats.RLock()
-	prjlist := m.Stats.GetProjectStatList()
+	//TODO Remove already synchronised Project
+	prjlist := m.Stats.GetProjectStatList(m.Projects.GetProjectsPtf().GetPrjClientName("!"))
 	m.Stats.RUnlock()
+	m.Projects.RUnlock()
 	return json.NewEncoder(w).Encode(fm.NewProjectStatNameFromList(prjlist, "!"))
 }
