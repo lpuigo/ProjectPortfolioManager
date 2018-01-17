@@ -88,6 +88,15 @@ func GetProjectStat(mgr *mgr.Manager, w http.ResponseWriter, r *http.Request) {
 	logmsg += fmt.Sprintf("ok (%d)", http.StatusOK)
 }
 
+func GetProjectStatProjectList(mgr *mgr.Manager, w http.ResponseWriter, r *http.Request) {
+	logmsg := "Request GetProjectStatProjectList Received from '" + r.Header.Get("Origin") + "' : "
+	defer func(t time.Time) { log.Printf("%s (served in %v)\n", logmsg, time.Since(t)) }(time.Now())
+	defer r.Body.Close()
+	w.Header().Set("Content-Type", "application/json")
+	mgr.GetProjectStatProjectList(w)
+	logmsg += fmt.Sprintf("ok (%d)", http.StatusOK)
+}
+
 func CreatePrj(mgr *mgr.Manager, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	logmsg := "Request CreatePrj Received from '" + r.Header.Get("Origin") + "' : "

@@ -1,6 +1,9 @@
 package FrontModel
 
-import "github.com/gopherjs/gopherjs/js"
+import (
+	"github.com/gopherjs/gopherjs/js"
+	"strings"
+)
 
 type ProjectStat struct {
 	*js.Object
@@ -79,4 +82,37 @@ func CreateSumStatFromProjectStat(ps *ProjectStat) *IssueStat {
 		sis.TimeEstimated = append(sis.TimeEstimated, e)
 	}
 	return sis
+}
+
+type ProjectStatName struct {
+	*js.Object
+	Clients  []string `json:"clients"   js:"clients"`
+	Projects []string `json:"projects"  js:"projects"`
+}
+
+func NewProjectStatName() *ProjectStatName {
+	psn := &ProjectStatName{Object: js.Global.Get("Object").New()}
+	psn.Clients = []string{}
+	psn.Projects = []string{}
+	return psn
+}
+
+func NewProjectStatNameFromJS(o *js.Object) *ProjectStatName {
+	psn := &ProjectStatName{Object: o}
+	return psn
+}
+
+func NewProjectStatNameFromList(list []string, sep string) *ProjectStatName {
+	psn := &ProjectStatName{}
+	psn.Clients = make([]string, len(list))
+	psn.Projects = make([]string, len(list))
+	for i, s := range list {
+		elems := strings.Split(s, sep)
+		if len(elems) != 2 {
+			continue
+		}
+		psn.Clients[i] = elems[0]
+		psn.Projects[i] = elems[1]
+	}
+	return psn
 }

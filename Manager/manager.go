@@ -176,3 +176,11 @@ func (m *Manager) GetProjectStatById(id int, w io.Writer) error {
 	json.NewEncoder(w).Encode(ps)
 	return nil
 }
+
+func (m *Manager) GetProjectStatProjectList(w io.Writer) error {
+	//Retrieve Project Stat :
+	m.Stats.RLock()
+	prjlist := m.Stats.GetProjectStatList()
+	m.Stats.RUnlock()
+	return json.NewEncoder(w).Encode(fm.NewProjectStatNameFromList(prjlist, "!"))
+}

@@ -86,6 +86,9 @@ func (sm *StatManager) GetStats() *ris.RecordIndexedSet {
 
 func (sm *StatManager) GetProjectStatList() []string {
 	res := sm.stat.GetIndexKeys("PrjKey")
+	for i, s := range res {
+		res[i] = strings.TrimLeft(s, "!")
+	}
 	sort.Strings(res)
 	return res
 }

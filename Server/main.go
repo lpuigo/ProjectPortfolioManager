@@ -42,6 +42,7 @@ func main() {
 	router.HandleFunc("/ptf", withManager(Route.CreatePrj)).Methods("POST")
 	router.HandleFunc("/ptf/{prjid}", withManager(Route.UpdatePrj)).Methods("PUT")
 	router.HandleFunc("/ptf/{prjid}", withManager(Route.DeletePrj)).Methods("DELETE")
+	router.HandleFunc("/stat/prjlist", withManager(Route.GetProjectStatProjectList)).Methods("GET")
 	router.HandleFunc("/stat/{prjid}", withManager(Route.GetProjectStat)).Methods("GET")
 	router.HandleFunc("/xls", withManager(Route.GetXLS)).Methods("GET")
 
@@ -67,3 +68,7 @@ func LaunchPageInBrowser(lockfile string) error {
 // Done Import XLS to JSON
 // Done Export JSON to XLS
 // Done launch webpage with command("cmd /c start http://localhost:8080") or "explorer "http://localhost:8080""
+// TODO expose import service (update stat with all csv file found in "Import" Dir, processed file are zipped and moved to "Imported" dir, or "Failed" dir if an error occurered. A file with related error is produced aside from the rejected file
+// TODO Create a log file containing all server activity
+// TODO expose a service to upload the log file
+// TODO expose an admin front end to show server activity / trigger admin operation
