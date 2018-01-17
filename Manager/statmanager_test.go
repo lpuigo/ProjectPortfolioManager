@@ -81,7 +81,7 @@ func TestStatManager_GetProjectStatList(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewStatManagerFromFile: %s", err.Error())
 	}
-	for i, s := range sm.GetProjectStatList() {
+	for i, s := range sm.GetProjectStatList(map[string]bool{"!Bouygues Telecom!DME TVE": true}) {
 		//ls := strings.Split(s, "!")
 		fmt.Printf("%2d : %s\n", i, s)
 	}

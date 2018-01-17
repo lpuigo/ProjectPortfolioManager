@@ -81,6 +81,14 @@ func (pptf *PrjPortfolio) DeletePrj(pId int) bool {
 	//return false
 }
 
+func (pptf *PrjPortfolio) GetPrjClientName(sep string) map[string]bool {
+	res := make(map[string]bool)
+	for _, p := range pptf.Projects {
+		res[sep+p.Client+sep+p.Name] = true
+	}
+	return res
+}
+
 func (pptf *PrjPortfolio) String() string {
 	res := "PrjPortfolio :\n"
 	for _, p := range pptf.Projects {
