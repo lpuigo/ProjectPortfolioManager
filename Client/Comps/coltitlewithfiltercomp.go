@@ -59,8 +59,8 @@ func RegisterColTitleWithFilterComp() *vue.Component {
 				<div v-for="(fi, index) in filterItemList" :key="index" class="item" :data-value="fi.text" @click="changeSelection(fi, $event)">
 					<i v-if="fi.selected" class="checkmark box icon"></i>
 					<i v-else class="square outline icon"></i>
+					<div class="ui mini right pointing label">{{fi.count}}</div>
 					{{fi.text}}
-					<div class="ui mini label">{{fi.count}}</div>
 				</div>
 			</div>
 		</div>

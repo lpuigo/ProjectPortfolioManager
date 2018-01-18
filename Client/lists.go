@@ -6,13 +6,11 @@ func createStatuts() []*fm.ValText {
 	res := []*fm.ValText{}
 	res = append(res, fm.NewValText("1 - Candidat", "Candidat"))
 	res = append(res, fm.NewValText("2 - Cadrage", "Cadrage en cours"))
-	res = append(res, fm.NewValText("3 - Dev", "Développement en cours"))
-	res = append(res, fm.NewValText("4 - Recette", "Recette client en cours"))
-	res = append(res, fm.NewValText("5 - Pilote", "Phase Pilote client en cours"))
-	res = append(res, fm.NewValText("6 - MeService", "Mise en Service"))
-	res = append(res, fm.NewValText("7 - SAV", "Suivi post Mise en Service"))
-	res = append(res, fm.NewValText("8 - Terminé", "Terminé"))
-	res = append(res, fm.NewValText("9 - Candidat Perdu", "Candidat Perdu"))
+	res = append(res, fm.NewValText("3 - En Cours", "Développement en cours"))
+	res = append(res, fm.NewValText("4 - Pilote", "Phase Pilote client en cours"))
+	res = append(res, fm.NewValText("5 - SAV", "Suivi post Mise en Service"))
+	res = append(res, fm.NewValText("6 - Terminé", "Terminé"))
+	res = append(res, fm.NewValText("0 - Candidat Perdu", "Candidat Perdu"))
 	return res
 }
 
@@ -29,8 +27,8 @@ func createTypes() []*fm.ValText {
 
 func createMilestoneKeys() []*fm.ValText {
 	res := []*fm.ValText{}
-	res = append(res, fm.NewValText("Cadrage", "C"))
 	res = append(res, fm.NewValText("Kickoff", "K"))
+	res = append(res, fm.NewValText("Cadrage", "C"))
 	res = append(res, fm.NewValText("Recette", "R"))
 	res = append(res, fm.NewValText("Formation", "F"))
 	res = append(res, fm.NewValText("Pilote", "P"))

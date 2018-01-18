@@ -79,7 +79,7 @@
                         <th is="col-title" :sortlist.sync="sortlist" class="two wide" title="Projet"></th>
                         <th is="col-title" :sortlist.sync="sortlist" class="" title="Information" iclass="sticky note outline icon"></th>
                         <th is="col-title" :sortlist.sync="sortlist" class="center aligned" title="Kickoff" iclass="checked calendar icon"></th>
-                        <th is="col-title" :sortlist.sync="sortlist" class="center aligned" title="Recette" iclass="checked calendar icon"></th>
+                        <th is="col-title" :sortlist.sync="sortlist" class="center aligned" title="Cadrage" iclass="checked calendar icon"></th>
                         <th is="col-title" :sortlist.sync="sortlist" class="center aligned" title="Formation" iclass="checked calendar icon"></th>
                         <th is="col-title" :sortlist.sync="sortlist" class="center aligned" title="Mep" iclass="checked calendar icon"></th>
                         <th is="col-title" :sortlist.sync="sortlist" class="one wide center aligned"  title="Charge" iclass="hourglass half icon"></th>
@@ -105,7 +105,7 @@
                         <td class="collapsing"><i v-if="prj.hasStat" class="area chart link icon" @click="ShowProjectStat(prj)"></i>{{prj.name}}</td>
                         <td style="white-space: pre-wrap;">{{prj.comment}}</td>
                         <td is="date-cell" :date="prj.milestones.Kickoff"></td>
-                        <td is="date-cell" :date="prj.milestones.Recette"></td>
+                        <td is="date-cell" :date="prj.milestones.Cadrage"></td>
                         <td is="date-cell" :date="prj.milestones.Formation"></td>
                         <td is="date-cell" :date="prj.milestones.Mep"></td>
                         <!--<td class="collapsing right aligned">{{prj | ChargeFormat}}</td>-->
