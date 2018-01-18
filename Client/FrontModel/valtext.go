@@ -23,3 +23,12 @@ func IsInValTextList(value string, vtl []*ValText) bool {
 	}
 	return false
 }
+
+func NewValTextList(list *js.Object) []*ValText {
+	res := []*ValText{}
+	objlist := list.Interface().([]interface{})
+	for _, o := range objlist {
+		res = append(res, o.(*ValText))
+	}
+	return res
+}

@@ -35,10 +35,10 @@ const (
 								<div class="ui left action input">
 									<button class="ui icon button" @click.prevent="">
 										<!--<i class="search icon"></i>-->
-										<div ref="ProjectStatLookUpDD" class="ui dropdown icon item" style="z-index: 1010">
+										<div ref="ProjectStatLookUpDD" class="ui dropdown search icon item" style="z-index: 1010">
 											<i class="search icon"></i>
 											<div class="menu">
-												<div v-for="p in projectStatSignatures" class="item" @click="SetClientProject(p)">{{p.value}} - {{p.text}}</div>
+												<div v-for="p in prjstatlist" class="item" @click="SetClientProject(p)">{{p.value}} - {{p.text}}</div>
 											</div>			
 										</div>
 									</button>
@@ -149,14 +149,16 @@ const (
 
 type EditProjectModalComp struct {
 	*js.Object
-	GiventPrj *FrontModel.Project `js:"givenprj"`
-	EditedPrj *FrontModel.Project `js:"editedprj"`
+	GiventPrj   *FrontModel.Project   `js:"givenprj"`
+	EditedPrj   *FrontModel.Project   `js:"editedprj"`
+	PrjStatList []*FrontModel.ValText `js:"prjstatlist"`
 }
 
 func NewEditProjectModalComp() *EditProjectModalComp {
 	a := &EditProjectModalComp{Object: js.Global.Get("Object").New()}
 	a.GiventPrj = FrontModel.NewProject()
 	a.EditedPrj = FrontModel.NewProject()
+	a.PrjStatList = nil
 
 	return a
 }
@@ -167,7 +169,6 @@ func NewEditProjectModalComp() *EditProjectModalComp {
 // 		:statuts="some_[]*ValText"
 // 		:types="some_[]*ValText"
 //		:milestonekeys="some_[]*ValText"
-//		:projectStatSignatures="some_[]*ValText
 // 		v-model="*Project"></editproject-modal>
 func RegisterEditProjectModalComp() *vue.Component {
 	var jq = jquery.NewJQuery
@@ -176,7 +177,7 @@ func RegisterEditProjectModalComp() *vue.Component {
 	o.Template = TemplateEditProjectModalComp
 	o.Data = NewEditProjectModalComp
 
-	o.AddProp("givenprj", "statuts", "types", "milestonekeys", "projectStatSignatures")
+	o.AddProp("givenprj", "statuts", "types", "milestonekeys")
 	o.AddSubComponent("dropdown-list", RegisterDropDownListComp())
 
 	o.OnLifeCycleEvent(vue.EvtMounted, func(vm *vue.ViewModel) {
@@ -231,6 +232,8 @@ func RegisterEditProjectModalComp() *vue.Component {
 		p := &FrontModel.Project{Object: args[0]}
 		m.EditedPrj.Copy(p)
 
+		m.PrjStatList = FrontModel.NewProjectStatNameFromJS(args[1]).GetProjectStatSignatures()
+
 		vm.Refs.Get("StatutDD").Call("changeSelected", m.EditedPrj.Status)
 		vm.Refs.Get("TypeDD").Call("changeSelected", m.EditedPrj.Type)
 		jq(vm.El).Call("modal", "refresh")
@@ -240,6 +243,7 @@ func RegisterEditProjectModalComp() *vue.Component {
 	o.AddMethod("SetClientProject", func(vm *vue.ViewModel, args []*js.Object) {
 		m := &EditProjectModalComp{Object: vm.Object}
 		v := &FrontModel.ValText{Object: args[0]}
+		jq(vm.Refs.Get("ProjectStatLookUpDD")).Call("dropdown", "hide")
 		m.EditedPrj.Client = v.Value
 		m.EditedPrj.Name = v.Text
 	})

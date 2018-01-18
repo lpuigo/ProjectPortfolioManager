@@ -15,17 +15,17 @@ import (
 
 type FrontModel struct {
 	*js.Object
-	DispPrj           bool               `js:"DispPrj"`
-	TextFilter        string             `js:"textfilter"`
-	Projects          []*fm.Project      `js:"projects"`
-	SortList          []*fm.SortCol      `js:"sortlist"`
-	ColFilterGroup    *fm.ColFilterGroup `js:"colfilters"`
-	EditedPrj         *fm.Project        `js:"editedprj"`
-	EditedPrjStat     *fm.ProjectStat    `js:"editedprjstat"`
-	PrjStatSignatures []*fm.ValText      `js:"prjstatsignatures"`
-	Statuts           []*fm.ValText      `js:"statuts"`
-	Types             []*fm.ValText      `js:"types"`
-	MilestoneKeys     []*fm.ValText      `js:"milestonekeys"`
+	DispPrj           bool                 `js:"DispPrj"`
+	TextFilter        string               `js:"textfilter"`
+	Projects          []*fm.Project        `js:"projects"`
+	SortList          []*fm.SortCol        `js:"sortlist"`
+	ColFilterGroup    *fm.ColFilterGroup   `js:"colfilters"`
+	EditedPrj         *fm.Project          `js:"editedprj"`
+	EditedPrjStat     *fm.ProjectStat      `js:"editedprjstat"`
+	PrjStatSignatures *fm.ProjectStatNames `js:"prjstatsignatures"`
+	Statuts           []*fm.ValText        `js:"statuts"`
+	Types             []*fm.ValText        `js:"types"`
+	MilestoneKeys     []*fm.ValText        `js:"milestonekeys"`
 }
 
 func NewFrontModel(msg string) *FrontModel {
@@ -93,7 +93,7 @@ func (m *FrontModel) callGetStatPrjList() {
 		println("Req went wrong : ", err, req.Status)
 	}
 	if req.Status == 200 {
-		m.PrjStatSignatures = fm.NewProjectStatNameFromJS(req.Response).GetProjectStatSignatures()
+		m.PrjStatSignatures = fm.NewProjectStatNameFromJS(req.Response)
 	}
 	//TODO Manage Status != 200
 }
@@ -209,7 +209,7 @@ func (m *FrontModel) CreateNewProject() {
 func (m *FrontModel) showEditProjectModal(p *fm.Project) {
 	go func() {
 		m.callGetStatPrjList()
-		jQuery("#EditProjectModalComp").Get(0).Get("__vue__").Call("ShowEditProjectModal", p)
+		jQuery("#EditProjectModalComp").Get(0).Get("__vue__").Call("ShowEditProjectModal", p, m.PrjStatSignatures)
 	}()
 }
 
