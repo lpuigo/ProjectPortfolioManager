@@ -12,6 +12,10 @@ import (
 	"time"
 )
 
+const (
+	JiraStatDir = `C:\Users\Laurent\Google Drive\Travail\NOVAGILE\Gouvernance\Stat Jira\Extract SRE\`
+)
+
 type MgrHandlerFunc func(*mgr.Manager, http.ResponseWriter, *http.Request)
 
 //var Mgr *Manager.Manager
@@ -97,6 +101,15 @@ func GetProjectStatProjectList(mgr *mgr.Manager, w http.ResponseWriter, r *http.
 	logmsg += fmt.Sprintf("ok (%d)", http.StatusOK)
 }
 
+func GetInitProjectStat(mgr *mgr.Manager, w http.ResponseWriter, r *http.Request) {
+	logmsg := "Request GetInitProjectStat Received from '" + r.Header.Get("Origin") + "' : "
+	defer func(t time.Time) { log.Printf("%s (served in %v)\n", logmsg, time.Since(t)) }(time.Now())
+	defer r.Body.Close()
+	w.Header().Set("Content-Type", "application/json")
+	mgr.ReinitStatsFromDir(JiraStatDir)
+	logmsg += fmt.Sprintf("ok (%d)", http.StatusOK)
+}
+
 func CreatePrj(mgr *mgr.Manager, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	logmsg := "Request CreatePrj Received from '" + r.Header.Get("Origin") + "' : "
@@ -131,7 +144,7 @@ func DeletePrj(mgr *mgr.Manager, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	found := mgr.DeleteProject(prjid)
-	w.WriteHeader(http.StatusOK)
+	//w.WriteHeader(http.StatusOK)
 	logmsg += fmt.Sprintf("Project Id %d deleted (found : %v) (%d)", prjid, found, http.StatusCreated)
 }
 

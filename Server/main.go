@@ -43,6 +43,7 @@ func main() {
 	router.HandleFunc("/ptf/{prjid}", withManager(Route.UpdatePrj)).Methods("PUT")
 	router.HandleFunc("/ptf/{prjid}", withManager(Route.DeletePrj)).Methods("DELETE")
 	router.HandleFunc("/stat/prjlist", withManager(Route.GetProjectStatProjectList)).Methods("GET")
+	router.HandleFunc("/stat/reinit", withManager(Route.GetInitProjectStat)).Methods("GET")
 	router.HandleFunc("/stat/{prjid}", withManager(Route.GetProjectStat)).Methods("GET")
 	router.HandleFunc("/xls", withManager(Route.GetXLS)).Methods("GET")
 
