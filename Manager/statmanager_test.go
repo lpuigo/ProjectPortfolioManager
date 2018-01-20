@@ -81,8 +81,23 @@ func TestStatManager_GetProjectStatList(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewStatManagerFromFile: %s", err.Error())
 	}
-	for i, s := range sm.GetProjectStatList(map[string]bool{"!Bouygues Telecom!DME TVE": true}) {
+	knownProjects := map[string]bool{"!Bouygues Telecom!DME TVE": true}
+	for i, s := range sm.GetProjectStatList(knownProjects) {
 		//ls := strings.Split(s, "!")
+		fmt.Printf("%2d : %s\n", i, s)
+	}
+}
+
+func TestStatManager_GetProjectStatListSortedBySimilarity(t *testing.T) {
+	sm, err := NewStatManagerFromFile(PrdStatFile)
+	if err != nil {
+		t.Fatalf("NewStatManagerFromFile: %s", err.Error())
+	}
+	//knownProjects := map[string]bool{"!Bouygues Telecom!DME TVE": true}
+	knownProjects := map[string]bool{}
+	project := "Bouygues Telecom!DME TVE"
+	statsProjects := sm.GetProjectStatListSortedBySimilarity(project, knownProjects)
+	for i, s := range statsProjects {
 		fmt.Printf("%2d : %s\n", i, s)
 	}
 }

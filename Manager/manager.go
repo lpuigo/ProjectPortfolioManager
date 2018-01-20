@@ -178,13 +178,18 @@ func (m *Manager) GetProjectStatById(id int, w io.Writer) error {
 	return nil
 }
 
-func (m *Manager) GetProjectStatProjectList(w io.Writer) error {
-	//Retrieve Project Stat :
+func (m *Manager) GetProjectStatProjectList(id int, w io.Writer) error {
 	m.Projects.RLock()
+	defer m.Projects.RUnlock()
+	prj := m.Projects.GetProjectsPtf().GetPrjById(id)
+	if prj == nil {
+		return fmt.Errorf("Project id %d not found", id)
+	}
+
 	m.Stats.RLock()
+	defer m.Stats.RUnlock()
 	//TODO Remove already synchronised Project
-	prjlist := m.Stats.GetProjectStatList(m.Projects.GetProjectsPtf().GetPrjClientName("!"))
-	m.Stats.RUnlock()
-	m.Projects.RUnlock()
+	prjlist := m.Stats.GetProjectStatListSortedBySimilarity(prj.Client+"!"+prj.Name, m.Projects.GetProjectsPtf().GetPrjClientName("!"))
+
 	return json.NewEncoder(w).Encode(fm.NewProjectStatNameFromList(prjlist, "!"))
 }

@@ -96,8 +96,18 @@ func GetProjectStatProjectList(mgr *mgr.Manager, w http.ResponseWriter, r *http.
 	logmsg := "Request GetProjectStatProjectList Received from '" + r.Header.Get("Origin") + "' : "
 	defer func(t time.Time) { log.Printf("%s (served in %v)\n", logmsg, time.Since(t)) }(time.Now())
 	defer r.Body.Close()
+	vars := mux.Vars(r)
+	prjid, err := strconv.Atoi(vars["prjid"])
+	if err != nil {
+		addError(w, &logmsg, "misformated project id '"+vars["prjid"]+"'", http.StatusBadRequest)
+		return
+	}
 	w.Header().Set("Content-Type", "application/json")
-	mgr.GetProjectStatProjectList(w)
+	err = mgr.GetProjectStatProjectList(prjid, w)
+	if err != nil {
+		addError(w, &logmsg, err.Error(), http.StatusBadRequest)
+		return
+	}
 	logmsg += fmt.Sprintf("ok (%d)", http.StatusOK)
 }
 

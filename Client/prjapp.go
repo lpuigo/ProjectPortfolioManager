@@ -85,7 +85,7 @@ func (m *FrontModel) callGetPtf() {
 }
 
 func (m *FrontModel) callGetStatPrjList() {
-	req := xhr.NewRequest("GET", "/stat/prjlist")
+	req := xhr.NewRequest("GET", "/stat/prjlist/"+strconv.Itoa(m.EditedPrj.Id))
 	req.Timeout = 2000
 	req.ResponseType = xhr.JSON
 	err := req.Send(nil)
@@ -185,7 +185,7 @@ func (m *FrontModel) DeleteEditedPrj() {
 
 func (m *FrontModel) EditProject(p *fm.Project) {
 	m.EditedPrj = p
-	m.showEditProjectModal(p)
+	m.showEditProjectModal()
 }
 
 func (m *FrontModel) ShowProjectStat(p *fm.Project) {
@@ -203,13 +203,13 @@ func (m *FrontModel) RefreshColFilter() {
 
 func (m *FrontModel) CreateNewProject() {
 	m.EditedPrj = fm.NewProject()
-	m.showEditProjectModal(m.EditedPrj)
+	m.showEditProjectModal()
 }
 
-func (m *FrontModel) showEditProjectModal(p *fm.Project) {
+func (m *FrontModel) showEditProjectModal() {
 	go func() {
 		m.callGetStatPrjList()
-		jQuery("#EditProjectModalComp").Get(0).Get("__vue__").Call("ShowEditProjectModal", p, m.PrjStatSignatures)
+		jQuery("#EditProjectModalComp").Get(0).Get("__vue__").Call("ShowEditProjectModal", m.EditedPrj, m.PrjStatSignatures)
 	}()
 }
 

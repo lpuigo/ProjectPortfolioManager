@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/lpuig/Novagile/Manager/DataManager"
 	ris "github.com/lpuig/Novagile/Manager/RecordIndexedSet"
+	"github.com/xrash/smetrics"
 	"io"
 	"log"
 	"os"
@@ -104,6 +105,40 @@ func (sm *StatManager) GetProjectStatList(prjlist map[string]bool) []string {
 		}
 	}
 	return res[found:]
+}
+
+type slicePair struct {
+	mainSlice []string
+	distSlice []float64
+}
+
+func (sbd slicePair) Len() int {
+	return len(sbd.mainSlice)
+}
+
+func (sbd slicePair) Swap(i, j int) {
+	sbd.mainSlice[i], sbd.mainSlice[j] = sbd.mainSlice[j], sbd.mainSlice[i]
+	sbd.distSlice[i], sbd.distSlice[j] = sbd.distSlice[j], sbd.distSlice[i]
+}
+
+func (sbd slicePair) Less(i, j int) bool {
+	return sbd.distSlice[j] < sbd.distSlice[i]
+}
+
+func SortByDist(list []string, dist []float64) {
+	sbd := slicePair{mainSlice: list, distSlice: dist}
+	sort.Sort(sbd)
+}
+
+func (sm *StatManager) GetProjectStatListSortedBySimilarity(signature string, prjlist map[string]bool) []string {
+	list := sm.GetProjectStatList(prjlist)
+	dist := make([]float64, len(list))
+	compareString := strings.ToUpper(signature)
+	for i, s := range list {
+		dist[i] = smetrics.JaroWinkler(compareString, strings.ToUpper(s), 0.7, 1)
+	}
+	SortByDist(list, dist)
+	return list
 }
 
 func (sm *StatManager) HasStatsForProject(client, name string) bool {
