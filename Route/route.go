@@ -12,10 +12,6 @@ import (
 	"time"
 )
 
-const (
-	JiraStatDir = `C:\Users\Laurent\Google Drive\Travail\NOVAGILE\Gouvernance\Stat Jira\Extract SRE\`
-)
-
 type MgrHandlerFunc func(*mgr.Manager, http.ResponseWriter, *http.Request)
 
 //var Mgr *Manager.Manager
@@ -105,7 +101,7 @@ func GetProjectStatProjectList(mgr *mgr.Manager, w http.ResponseWriter, r *http.
 	w.Header().Set("Content-Type", "application/json")
 	err = mgr.GetProjectStatProjectList(prjid, w)
 	if err != nil {
-		addError(w, &logmsg, err.Error(), http.StatusBadRequest)
+		addError(w, &logmsg, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	logmsg += fmt.Sprintf("ok (%d)", http.StatusOK)
@@ -115,8 +111,25 @@ func GetInitProjectStat(mgr *mgr.Manager, w http.ResponseWriter, r *http.Request
 	logmsg := "Request GetInitProjectStat Received from '" + r.Header.Get("Origin") + "' : "
 	defer func(t time.Time) { log.Printf("%s (served in %v)\n", logmsg, time.Since(t)) }(time.Now())
 	defer r.Body.Close()
-	w.Header().Set("Content-Type", "application/json")
-	mgr.ReinitStatsFromDir(JiraStatDir)
+	w.Header().Set("Content-Type", "text/plain")
+	err := mgr.ReinitStatsFromDir(w)
+	if err != nil {
+		addError(w, &logmsg, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	logmsg += fmt.Sprintf("ok (%d)", http.StatusOK)
+}
+
+func GetUpdateProjectStat(mgr *mgr.Manager, w http.ResponseWriter, r *http.Request) {
+	logmsg := "Request GetUpdateProjectStat Received from '" + r.Header.Get("Origin") + "' : "
+	defer func(t time.Time) { log.Printf("%s (served in %v)\n", logmsg, time.Since(t)) }(time.Now())
+	defer r.Body.Close()
+	w.Header().Set("Content-Type", "text/plain")
+	err := mgr.UpdateWithNewStatFiles(w)
+	if err != nil {
+		addError(w, &logmsg, err.Error(), http.StatusInternalServerError)
+		return
+	}
 	logmsg += fmt.Sprintf("ok (%d)", http.StatusOK)
 }
 

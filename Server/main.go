@@ -22,11 +22,18 @@ const (
 	StatCSVFile = `./Ressources/Stats Projets Novagile.csv`
 	PrjJSONFile = `./Ressources/Projets Novagile.xlsx.json`
 
-	NoWebOpening = `./Ressources/NoWebOpening.lock`
+	NoWebLockFile = `./Ressources/NoWebOpening.lock`
+
+	JiraStatDir     = `C:\Users\Laurent\Google Drive\Travail\NOVAGILE\Gouvernance\Stat Jira\Extract SRE\`
+	ArchivedStatDir = `C:\Users\Laurent\Google Drive\Travail\NOVAGILE\Gouvernance\Stat Jira\Archived SRE`
 )
 
 func main() {
 	manager, err := Manager.NewManager(PrjJSONFile, StatCSVFile)
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = manager.AddStatFileDirs(JiraStatDir, ArchivedStatDir)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -44,13 +51,14 @@ func main() {
 	router.HandleFunc("/ptf/{prjid}", withManager(Route.DeletePrj)).Methods("DELETE")
 	router.HandleFunc("/stat/prjlist/{prjid}", withManager(Route.GetProjectStatProjectList)).Methods("GET")
 	router.HandleFunc("/stat/reinit", withManager(Route.GetInitProjectStat)).Methods("GET")
+	router.HandleFunc("/stat/update", withManager(Route.GetUpdateProjectStat)).Methods("GET")
 	router.HandleFunc("/stat/{prjid}", withManager(Route.GetProjectStat)).Methods("GET")
 	router.HandleFunc("/xls", withManager(Route.GetXLS)).Methods("GET")
 
 	router.PathPrefix(AssetsRoot).Handler(http.StripPrefix(AssetsRoot, http.FileServer(http.Dir(AssetsDir))))
 	router.PathPrefix("/").Handler(http.FileServer(http.Dir(RootDir)))
 
-	LaunchPageInBrowser(NoWebOpening)
+	LaunchPageInBrowser(NoWebLockFile)
 	log.Print("Listening on ", ServicePort)
 	log.Fatal(http.ListenAndServe(ServicePort, router))
 }
@@ -69,7 +77,7 @@ func LaunchPageInBrowser(lockfile string) error {
 // Done Import XLS to JSON
 // Done Export JSON to XLS
 // Done launch webpage with command("cmd /c start http://localhost:8080") or "explorer "http://localhost:8080""
-// TODO expose import service (update stat with all csv file found in "Import" Dir, processed file are zipped and moved to "Imported" dir, or "Failed" dir if an error occurered. A file with related error is produced aside from the rejected file
+// Done expose import service (update stat with all csv file found in "Import" Dir, processed file are zipped and moved to "Imported" dir, or "Failed" dir if an error occurered. A file with related error is produced aside from the rejected file
 // TODO Create a log file containing all server activity
 // TODO expose a service to upload the log file
 // TODO expose an admin front end to show server activity / trigger admin operation

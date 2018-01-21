@@ -5,10 +5,9 @@ import (
 	"errors"
 	"fmt"
 	fm "github.com/lpuig/Novagile/Client/FrontModel"
+	fpr "github.com/lpuig/Novagile/Manager/FileProcesser"
 	"github.com/lpuig/Novagile/Model"
 	"io"
-	"io/ioutil"
-	"log"
 	"os"
 	"time"
 )
@@ -16,6 +15,7 @@ import (
 type Manager struct {
 	Projects *PrjManager
 	Stats    *StatManager
+	Fp       *fpr.FileProcesser
 }
 
 func NewManager(prjfile, statfile string) (*Manager, error) {
@@ -36,11 +36,19 @@ func NewManager(prjfile, statfile string) (*Manager, error) {
 	return m, nil
 }
 
+func (m *Manager) AddStatFileDirs(input, archive string) error {
+	fp, err := fpr.NewFileManager(input, archive)
+	if err != nil {
+		return err
+	}
+	m.Fp = fp
+	return nil
+}
+
 func (m *Manager) GetPrjPtf(w io.Writer) {
-	prjs := []*fm.Project{}
+	prjs := make([]*fm.Project, 0)
 	m.Projects.RLock() // Ensure PTf is not modified while being cloned
 	m.Stats.RLock()
-	// TODO figure out how to avoid allocating full ptf clone before marshaling
 	for _, p := range m.Projects.GetProjectsPtf().Projects {
 		prjs = append(prjs, fm.CloneBEProject(p, m.Stats.HasStatsForProject(getProjectKey(p))))
 	}
@@ -54,11 +62,15 @@ func (m *Manager) GetPrjById(id int) *Model.Project {
 }
 
 func (m *Manager) UpdateProjectsSpentTime() {
-	m.Projects.WLock()
-	defer m.Projects.WUnlockWithPersist()
 	m.Stats.RLock()
 	defer m.Stats.RUnlock()
+	m.Projects.WLock()
+	defer m.Projects.WUnlockWithPersist()
 
+	m.updateProjectsSpentTime()
+}
+
+func (m *Manager) updateProjectsSpentTime() {
 	for _, p := range m.Projects.GetProjectsPtf().Projects {
 		hasStat := m.Stats.HasStatsForProject(getProjectKey(p))
 		if hasStat {
@@ -122,30 +134,68 @@ func (m *Manager) GetProjectsPtfXLS(w io.Writer) {
 	WritePortfolioToXLS(m.Projects.GetProjectsPtf(), w)
 }
 
-func (m *Manager) ReinitStatsFromDir(dir string) error {
+func (m *Manager) UpdateWithNewStatFiles(w io.Writer) error {
 	m.Stats.WLock()
-	m.Stats.ClearStats()
-	files, err := ioutil.ReadDir(dir)
+	defer m.Stats.WUnlockWithPersist()
+
+	err := m.updateWithNewStatFiles(w)
 	if err != nil {
-		return fmt.Errorf("Unable to browse Dir : %s", err.Error())
+		return err
 	}
-	nbRecord := 0
-	for _, file := range files {
-		f, err := os.Open(dir + file.Name())
+
+	m.Projects.WLock()
+	defer m.Projects.WUnlockWithPersist()
+	m.updateProjectsSpentTime()
+
+	return nil
+}
+
+func (m *Manager) updateWithNewStatFiles(w io.Writer) error {
+	tt := time.Now()
+	err := m.Fp.ProcessAndArchive(func(file string) error {
+		f, err := os.Open(file)
 		if err != nil {
+			fmt.Fprintf(w, "%s", err.Error())
 			return err
 		}
+		defer f.Close()
 		t0 := time.Now()
 		added, err := m.UpdateStat(f)
 		dur := time.Since(t0)
 		if err != nil {
-			return fmt.Errorf("UpdateStat error %s", err.Error())
+			fmt.Fprintf(w, "%s", err.Error())
+			return err
 		}
-		log.Printf("Stats updated from '%s': %d record(s) added (took %v)\n", file.Name(), added, dur)
-		nbRecord += added
+		fmt.Fprintf(w, "Stats updated from '%s': %d record(s) added (took %v)\n", file, added, dur)
+		return nil
+	})
+	if err != nil {
+		fmt.Fprintf(w, "Update with new stat files aborted: %s", err.Error())
+		return err
 	}
-	m.Stats.WUnlockWithPersist()
-	m.UpdateProjectsSpentTime()
+	fmt.Fprintf(w, "Update with new stat files completed (took %v)", time.Since(tt))
+	return nil
+}
+
+func (m *Manager) ReinitStatsFromDir(w io.Writer) error {
+	err := m.Fp.RestoreArchives()
+	if err != nil {
+		return err
+	}
+	m.Stats.WLock()
+	defer m.Stats.WUnlockWithPersist()
+
+	m.Stats.ClearStats()
+
+	err = m.updateWithNewStatFiles(w)
+	if err != nil {
+		return err
+	}
+
+	m.Projects.WLock()
+	defer m.Projects.WUnlockWithPersist()
+	m.updateProjectsSpentTime()
+
 	return nil
 }
 
@@ -160,7 +210,7 @@ func getProjectKey(p *Model.Project) (string, string) {
 func (m *Manager) GetProjectStatById(id int, w io.Writer) error {
 	prj := m.Projects.GetProjectsPtf().GetPrjById(id)
 	if prj == nil {
-		return fmt.Errorf("Project id %d not found", id)
+		return fmt.Errorf("project id %d not found", id)
 	}
 
 	//Retrieve Project Stat :
@@ -183,12 +233,11 @@ func (m *Manager) GetProjectStatProjectList(id int, w io.Writer) error {
 	defer m.Projects.RUnlock()
 	prj := m.Projects.GetProjectsPtf().GetPrjById(id)
 	if prj == nil {
-		return fmt.Errorf("Project id %d not found", id)
+		return fmt.Errorf("project id %d not found", id)
 	}
 
 	m.Stats.RLock()
 	defer m.Stats.RUnlock()
-	//TODO Remove already synchronised Project
 	prjlist := m.Stats.GetProjectStatListSortedBySimilarity(prj.Client+"!"+prj.Name, m.Projects.GetProjectsPtf().GetPrjClientName("!"))
 
 	return json.NewEncoder(w).Encode(fm.NewProjectStatNameFromList(prjlist, "!"))
