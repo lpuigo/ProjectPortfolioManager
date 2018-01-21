@@ -45,7 +45,6 @@ func (fm *FileProcesser) ProcessAndArchive(action func(file string) error) error
 		if err != nil {
 			return err
 		}
-		fm.wg.Add(1)
 		go fm.achiveFile(file.Name())
 	}
 	fm.wg.Wait()
@@ -104,6 +103,7 @@ func (fm *FileProcesser) RestoreArchives() error {
 }
 
 func (fm *FileProcesser) achiveFile(file string) error {
+	fm.wg.Add(1)
 	defer fm.wg.Done()
 	archiveFile := file + ".zip"
 
