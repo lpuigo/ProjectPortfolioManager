@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/gorilla/mux"
 	"github.com/lpuig/Novagile/Manager"
+	"github.com/lpuig/Novagile/Manager/Config"
 	"github.com/lpuig/Novagile/Route"
 	"log"
 	"net/http"
@@ -24,16 +25,30 @@ const (
 
 	NoWebLockFile = `./Ressources/NoWebOpening.lock`
 
-	JiraStatDir     = `C:\Users\Laurent\Google Drive\Travail\NOVAGILE\Gouvernance\Stat Jira\Extract SRE\`
+	JiraStatDir     = `C:\Users\Laurent\Google Drive\Travail\NOVAGILE\Gouvernance\Stat Jira\Extract SRE`
 	ArchivedStatDir = `C:\Users\Laurent\Google Drive\Travail\NOVAGILE\Gouvernance\Stat Jira\Archived SRE`
+
+	ConfigFile = `.\config.json`
 )
 
+type Conf struct {
+	StatInputDir   string
+	StatArchiveDir string
+}
+
 func main() {
+
+	config := &Conf{
+		StatInputDir:   JiraStatDir,
+		StatArchiveDir: ArchivedStatDir,
+	}
+	Config.SetFromFile(ConfigFile, config)
+
 	manager, err := Manager.NewManager(PrjJSONFile, StatCSVFile)
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = manager.AddStatFileDirs(JiraStatDir, ArchivedStatDir)
+	err = manager.AddStatFileDirs(config.StatInputDir, config.StatArchiveDir)
 	if err != nil {
 		log.Fatal(err)
 	}
