@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/lpuig/Novagile/Manager/DataManager"
 	ris "github.com/lpuig/Novagile/Manager/RecordIndexedSet"
+	"github.com/lpuig/Novagile/Model"
 	"github.com/xrash/smetrics"
 	"io"
 	"log"
@@ -226,8 +227,7 @@ func (sm *StatManager) GetProjectSpentWL(client, name string) (spent float64, er
 	return
 }
 
-// GetProjectStatInfo returns list of issues, dates slices, and timeSpent, timeRemaining, timeEstimated doubleslices ([#issue][#date]) for given project client/name
-func (sm *StatManager) GetProjectStatInfo(client, name string) (issues, dates []string, spent, remaining, estimated [][]float64, err error) {
+func (sm *StatManager) initStatInfoRecordSet(client, name string) (issuesKeys []string, is *ris.RecordIndexedSet, err error) {
 	pk := pjrKey(client, name)
 	if !sm.hasStatsForProject(pk) {
 		err = fmt.Errorf("No Project Stats for %s/%s", client, name)
@@ -242,11 +242,11 @@ func (sm *StatManager) GetProjectStatInfo(client, name string) (issues, dates []
 	}
 	ps.AddRecords(sm.stat.GetRecordsByIndexKey("PrjKey", pk))
 	// Keep Issue list => result issues slice
-	issuesKeys := ps.GetIndexKeys("Issue")
+	issuesKeys = ps.GetIndexKeys("Issue")
 	sort.Strings(issuesKeys)
 
 	//retrieve all issues found in ps
-	is, errss := sm.stat.CreateSubRecordIndexedSet(
+	is, errss = sm.stat.CreateSubRecordIndexedSet(
 		ris.NewIndexDesc("Issue", "ISSUE"),
 		ris.NewIndexDesc("Dates", "EXTRACT_DATE"),
 		ris.NewIndexDesc("IssueDate", "ISSUE", "EXTRACT_DATE"),
@@ -259,7 +259,12 @@ func (sm *StatManager) GetProjectStatInfo(client, name string) (issues, dates []
 		// retrieve all record related to this issue in a new SubRecordSet (with Date Index)
 		is.AddRecords(sm.stat.GetRecordsByIndexKey("Issue", ik))
 	}
+	return
+}
 
+// GetProjectStatInfo returns list of issues, dates slices, and timeSpent, timeRemaining, timeEstimated doubleslices ([#issue][#date]) for given project client/name
+func (sm *StatManager) GetProjectStatInfo(client, name string) (issues, dates []string, spent, remaining, estimated [][]float64, err error) {
+	issuesKeys, is, err := sm.initStatInfoRecordSet(client, name)
 	issues = make([]string, len(issuesKeys))
 	for i, k := range issuesKeys {
 		issues[i] = strings.TrimLeft(k, "!")
@@ -273,19 +278,6 @@ func (sm *StatManager) GetProjectStatInfo(client, name string) (issues, dates []
 		dates[i] = strings.TrimLeft(k, "!")
 	}
 	// create result S, R, E slice with Date List length
-	initDS := func(ds *[][]float64, len1, len2 int) {
-		*ds = make([][]float64, len1)
-		for i, _ := range *ds {
-			(*ds)[i] = make([]float64, len2)
-		}
-	}
-	convert := func(s string) (float64, error) {
-		f, err := strconv.ParseFloat(s, 64)
-		if err != nil {
-			return 0, err
-		}
-		return f / 8.0, nil
-	}
 	initDS(&spent, len(issues), len(dates))
 	initDS(&remaining, len(issues), len(dates))
 	initDS(&estimated, len(issues), len(dates))
@@ -303,10 +295,84 @@ func (sm *StatManager) GetProjectStatInfo(client, name string) (issues, dates []
 			if r == nil {
 				continue
 			}
-			spent[ii][di], err = convert(r[0][spentPos])
-			remaining[ii][di], err = convert(r[0][remainingPos])
-			estimated[ii][di], err = convert(r[0][estimatedPos])
+			spent[ii][di], err = stringToWL(r[0][spentPos])
+			remaining[ii][di], err = stringToWL(r[0][remainingPos])
+			estimated[ii][di], err = stringToWL(r[0][estimatedPos])
 		}
 	}
 	return
+}
+
+// GetProjectStatInfoOnPeriod returns list of issues, dates slices within Given Period, and timeSpent, timeRemaining, timeEstimated doubleslices ([#issue][#date]) for given project client/name
+func (sm *StatManager) GetProjectStatInfoOnPeriod(client, name, startDate, endDate string) (issues, dates []string, spent, remaining, estimated [][]float64, err error) {
+	issuesKeys, is, err := sm.initStatInfoRecordSet(client, name)
+	issues = make([]string, len(issuesKeys))
+	for i, k := range issuesKeys {
+		issues[i] = strings.TrimLeft(k, "!")
+	}
+	// On the result RecordSet
+	// Keep Date list (chronologically sorted) => result dates slice
+	dateKeys := is.GetIndexKeys("Dates")
+	sort.Strings(dateKeys)
+	dates = make([]string, len(dateKeys))
+	for i, k := range dateKeys {
+		dates[i] = strings.TrimLeft(k, "!")
+	}
+	// create result S, R, E slice with Date List length
+	initDS(&spent, len(issues), len(dates))
+	initDS(&remaining, len(issues), len(dates))
+	initDS(&estimated, len(issues), len(dates))
+	colpos, _ := is.GetRecordColNumByName("TIME_SPENT", "REMAIN_TIME", "INIT_ESTIMATE")
+	spentPos, remainingPos, estimatedPos := colpos[0], colpos[1], colpos[2]
+	// For each Date,
+	for ii, ik := range issuesKeys {
+		for di, dk := range dateKeys {
+			r := is.GetRecordsByIndexKey("IssueDate", ik+dk)
+			if r == nil && di > 0 {
+				spent[ii][di] = spent[ii][di-1]
+				remaining[ii][di] = remaining[ii][di-1]
+				estimated[ii][di] = estimated[ii][di-1]
+			}
+			if r == nil {
+				continue
+			}
+			spent[ii][di], err = stringToWL(r[0][spentPos])
+			remaining[ii][di], err = stringToWL(r[0][remainingPos])
+			estimated[ii][di], err = stringToWL(r[0][estimatedPos])
+		}
+	}
+	return
+}
+
+func initDS(ds *[][]float64, len1, len2 int) {
+	*ds = make([][]float64, len1)
+	for i, _ := range *ds {
+		(*ds)[i] = make([]float64, len2)
+	}
+}
+
+func stringToWL(s string) (float64, error) {
+	f, err := strconv.ParseFloat(s, 64)
+	if err != nil {
+		return 0, err
+	}
+	return f / 8.0, nil
+}
+
+func dateSlice(startDate, endDate string) []string {
+	d1, err := Model.DateFromJSString(startDate)
+	if err != nil {
+		panic("malformated date " + startDate)
+	}
+	d2, err := Model.DateFromJSString(endDate)
+	if err != nil {
+		panic("malformated date " + startDate)
+	}
+	nbdays := d2.DaysSince(d1)
+	res := make([]string, nbdays+1)
+	res[0] = startDate
+	for i := 1; i <= nbdays; i++ {
+		res[i] = d1.AddDays(i).StringJS()
+	}
+	return res
 }

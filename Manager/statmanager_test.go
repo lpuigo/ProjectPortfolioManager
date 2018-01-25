@@ -171,3 +171,22 @@ func TestStatManager_GetProjectSpentWL(t *testing.T) {
 		t.Errorf("GetProjectSpentWL returns unespected value %f instead of 7", wl)
 	}
 }
+
+func TestStatManager_dateSlice(t *testing.T) {
+	tset := []struct {
+		startd string
+		endd   string
+		expres string
+	}{
+		{"2016-12-31", "2016-12-31", "2016-12-31"},
+		{"2016-12-31", "2017-01-01", "2016-12-31 2017-01-01"},
+		{"2016-12-31", "2017-01-02", "2016-12-31 2017-01-01 2017-01-02"},
+	}
+
+	for _, e := range tset {
+		res := dateSlice(e.startd, e.endd)
+		if strings.Join(res, " ") != e.expres {
+			t.Errorf("dateSlice('%s', '%s') returns %s instead of [%s]", res, e.expres)
+		}
+	}
+}
