@@ -112,7 +112,7 @@ func GetInitProjectStat(mgr *mgr.Manager, w http.ResponseWriter, r *http.Request
 	defer func(t time.Time) { log.Printf("%s (served in %v)\n", logmsg, time.Since(t)) }(time.Now())
 	defer r.Body.Close()
 	w.Header().Set("Content-Type", "text/plain")
-	err := mgr.ReinitStatsFromDir(w)
+	err := mgr.ReinitStats(w)
 	if err != nil {
 		addError(w, &logmsg, err.Error(), http.StatusInternalServerError)
 		return

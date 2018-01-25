@@ -37,7 +37,7 @@ func NewManager(prjfile, statfile string) (*Manager, error) {
 }
 
 func (m *Manager) AddStatFileDirs(input, archive string) error {
-	fp, err := fpr.NewFileManager(input, archive)
+	fp, err := fpr.NewFileProcesser(input, archive)
 	if err != nil {
 		return err
 	}
@@ -177,7 +177,7 @@ func (m *Manager) updateWithNewStatFiles(w io.Writer) error {
 	return nil
 }
 
-func (m *Manager) ReinitStatsFromDir(w io.Writer) error {
+func (m *Manager) ReinitStats(w io.Writer) error {
 	err := m.Fp.RestoreArchives()
 	if err != nil {
 		return err

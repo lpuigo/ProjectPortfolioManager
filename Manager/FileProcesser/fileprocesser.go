@@ -16,7 +16,7 @@ type FileProcesser struct {
 	wg         sync.WaitGroup
 }
 
-func NewFileManager(inputDir, archiveDir string) (*FileProcesser, error) {
+func NewFileProcesser(inputDir, archiveDir string) (*FileProcesser, error) {
 	_, err := ioutil.ReadDir(inputDir)
 	if err != nil {
 		return nil, err

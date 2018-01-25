@@ -14,9 +14,9 @@ const (
 )
 
 func TestFileProcesser_Process(t *testing.T) {
-	fm, err := NewFileManager(inputDir, archiveDir)
+	fm, err := NewFileProcesser(inputDir, archiveDir)
 	if err != nil {
-		t.Fatalf("NewFileManager", err.Error())
+		t.Fatalf("NewFileProcesser", err.Error())
 	}
 	err = fm.ProcessAndArchive(func(f string) error {
 		fmt.Printf("Processing  %s\n", f)
@@ -29,9 +29,9 @@ func TestFileProcesser_Process(t *testing.T) {
 }
 
 func TestFileProcesser_RestoreArchives(t *testing.T) {
-	fm, err := NewFileManager(inputDir, archiveDir)
+	fm, err := NewFileProcesser(inputDir, archiveDir)
 	if err != nil {
-		t.Fatalf("NewFileManager", err.Error())
+		t.Fatalf("NewFileProcesser", err.Error())
 	}
 	err = fm.RestoreArchives()
 	if err != nil {
@@ -40,9 +40,9 @@ func TestFileProcesser_RestoreArchives(t *testing.T) {
 }
 
 func TestFileProcesser_RestoreArchivesPROD(t *testing.T) {
-	fm, err := NewFileManager(prdInputDir, prdArchiveDir)
+	fm, err := NewFileProcesser(prdInputDir, prdArchiveDir)
 	if err != nil {
-		t.Fatalf("NewFileManager", err.Error())
+		t.Fatalf("NewFileProcesser", err.Error())
 	}
 	err = fm.RestoreArchives()
 	if err != nil {
