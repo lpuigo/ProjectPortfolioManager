@@ -123,9 +123,9 @@ func createTestSM(t *testing.T) *StatManager {
 	smSource := `EXTRACT_DATE;PRODUCT;CLIENT!PROJECT;ACTIVITY;ISSUE;INIT_ESTIMATE;TIME_SPENT;REMAIN_TIME
 2017-01-01;TestProduct;SomeClient!OtherProject;;Issue0;8.00;0.00;8.00
 2017-01-01;TestProduct;;;Issue1;40.00;0.00;40.00
-2017-01-02;TestProduct;SomeClient!TestProject;;Issue1;40.00;40.00;0.00
-2017-01-02;TestProduct;SomeClient!TESTProject;;Issue2;16.00;8.00;8.00
-2017-01-03;TestProduct;SomeClient!TestProject;;Issue2;16.00;16.00;0.00
+2017-01-03;TestProduct;SomeClient!TestProject;;Issue1;40.00;40.00;0.00
+2017-01-03;TestProduct;SomeClient!TESTProject;;Issue2;16.00;8.00;8.00
+2017-01-05;TestProduct;SomeClient!TestProject;;Issue2;16.00;16.00;0.00
 `
 	sm := &StatManager{}
 	sm.DataManager = DataManager.NewDataManager(func() error { return nil })
@@ -147,7 +147,7 @@ func TestStatManager_GetProjectStatInfo(t *testing.T) {
 	if !RecordSet.Record(issues).Equals(RecordSet.Record{"Issue1", "Issue2"}) {
 		t.Errorf("issues: %s", issues)
 	}
-	if !RecordSet.Record(dates).Equals(RecordSet.Record{"2017-01-01", "2017-01-02", "2017-01-03"}) {
+	if !RecordSet.Record(dates).Equals(RecordSet.Record{"2017-01-01", "2017-01-03", "2017-01-05"}) {
 		t.Errorf("dates: %s", dates)
 	}
 	if !equals(spent, [][]float64{[]float64{0.0, 5.0, 5.0}, []float64{0.0, 1.0, 2.0}}) {
@@ -184,9 +184,37 @@ func TestStatManager_dateSlice(t *testing.T) {
 	}
 
 	for _, e := range tset {
-		res := dateSlice(e.startd, e.endd)
-		if strings.Join(res, " ") != e.expres {
-			t.Errorf("dateSlice('%s', '%s') returns %s instead of [%s]", res, e.expres)
+		res, err := dateSlice(e.startd, e.endd)
+		if err != nil {
+			t.Errorf("dateSlice('%s', '%s') returns %", e.startd, e.endd, err.Error())
+			continue
 		}
+		if strings.Join(res, " ") != e.expres {
+			t.Errorf("dateSlice('%s', '%s') returns %s instead of [%s]", e.startd, e.endd, res, e.expres)
+		}
+	}
+}
+
+func TestStatManager_GetProjectStatInfoOnPeriod(t *testing.T) {
+	sm := createTestSM(t)
+
+	issues, dates, spent, remaining, estimated, err := sm.GetProjectStatInfoOnPeriod("SomeClient", "TestProject", "2017-01-01", "2017-01-06")
+	if err != nil {
+		t.Fatalf("GetProjectStatInfo returns %s", err.Error())
+	}
+	if !RecordSet.Record(issues).Equals(RecordSet.Record{"Issue1", "Issue2"}) {
+		t.Errorf("issues: %s", issues)
+	}
+	if !RecordSet.Record(dates).Equals(RecordSet.Record{"2017-01-01", "2017-01-02", "2017-01-03", "2017-01-04", "2017-01-05", "2017-01-06"}) {
+		t.Errorf("dates: %s", dates)
+	}
+	if !equals(spent, [][]float64{[]float64{0.0, 0.0, 5.0, 5.0, 5.0, 5.0}, []float64{0.0, 0.0, 1.0, 1.0, 2.0, 2.0}}) {
+		t.Errorf("spent %f", spent)
+	}
+	if !equals(remaining, [][]float64{[]float64{5.0, 5.0, 0.0, 0.0, 0.0, 0.0}, []float64{0.0, 0.0, 1.0, 1.0, 0.0, 0.0}}) {
+		t.Errorf("remaining %f", remaining)
+	}
+	if !equals(estimated, [][]float64{[]float64{5.0, 5.0, 5.0, 5.0, 5.0, 5.0}, []float64{0.0, 0.0, 2.0, 2.0, 2.0, 2.0}}) {
+		t.Errorf("estimated: %f", estimated)
 	}
 }

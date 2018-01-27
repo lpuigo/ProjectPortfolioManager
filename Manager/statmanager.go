@@ -311,12 +311,10 @@ func (sm *StatManager) GetProjectStatInfoOnPeriod(client, name, startDate, endDa
 		issues[i] = strings.TrimLeft(k, "!")
 	}
 	// On the result RecordSet
-	// Keep Date list (chronologically sorted) => result dates slice
-	dateKeys := is.GetIndexKeys("Dates")
-	sort.Strings(dateKeys)
-	dates = make([]string, len(dateKeys))
-	for i, k := range dateKeys {
-		dates[i] = strings.TrimLeft(k, "!")
+	// Create Date list (chronologically sorted from start-end dates) => result dates slice
+	dates, err = dateSlice(startDate, endDate)
+	if err != nil {
+		return
 	}
 	// create result S, R, E slice with Date List length
 	initDS(&spent, len(issues), len(dates))
@@ -324,16 +322,42 @@ func (sm *StatManager) GetProjectStatInfoOnPeriod(client, name, startDate, endDa
 	initDS(&estimated, len(issues), len(dates))
 	colpos, _ := is.GetRecordColNumByName("TIME_SPENT", "REMAIN_TIME", "INIT_ESTIMATE")
 	spentPos, remainingPos, estimatedPos := colpos[0], colpos[1], colpos[2]
-	// For each Date,
+
 	for ii, ik := range issuesKeys {
-		for di, dk := range dateKeys {
-			r := is.GetRecordsByIndexKey("IssueDate", ik+dk)
-			if r == nil && di > 0 {
-				spent[ii][di] = spent[ii][di-1]
-				remaining[ii][di] = remaining[ii][di-1]
-				estimated[ii][di] = estimated[ii][di-1]
-			}
+		irs, errirs := is.CreateSubRecordIndexedSet(ris.NewIndexDesc("Dates", "EXTRACT_DATE"))
+		if errirs != nil {
+			err = errirs
+			return
+		}
+		irs.AddRecords(is.GetRecordsByIndexKey("Issue", ik))
+		dateKeys := irs.GetIndexKeys("Dates")
+		sort.Strings(dateKeys)
+		for di, dk := range dates {
+			dateKey := "!" + dk
+			r := is.GetRecordsByIndexKey("IssueDate", ik+dateKey)
 			if r == nil {
+				if di > 0 {
+					spent[ii][di] = spent[ii][di-1]
+					remaining[ii][di] = remaining[ii][di-1]
+					estimated[ii][di] = estimated[ii][di-1]
+				} else { // first date : init values
+					if dateKey < dateKeys[0] {
+						//spent[ii][di] = 0.0
+						//remaining[ii][di] = 0.0
+						//estimated[ii][di] = 0.0
+					} else {
+						var i int
+						for i = 1; i < len(dateKeys); i++ {
+							if dateKey < dateKeys[i] {
+								break
+							}
+						}
+						r := is.GetRecordsByIndexKey("IssueDate", ik+dateKeys[i-1])
+						spent[ii][di], err = stringToWL(r[0][spentPos])
+						remaining[ii][di], err = stringToWL(r[0][remainingPos])
+						estimated[ii][di], err = stringToWL(r[0][estimatedPos])
+					}
+				}
 				continue
 			}
 			spent[ii][di], err = stringToWL(r[0][spentPos])
@@ -359,14 +383,14 @@ func stringToWL(s string) (float64, error) {
 	return f / 8.0, nil
 }
 
-func dateSlice(startDate, endDate string) []string {
+func dateSlice(startDate, endDate string) ([]string, error) {
 	d1, err := Model.DateFromJSString(startDate)
 	if err != nil {
-		panic("malformated date " + startDate)
+		return nil, fmt.Errorf("misformated startDate '%s'", startDate)
 	}
 	d2, err := Model.DateFromJSString(endDate)
 	if err != nil {
-		panic("malformated date " + startDate)
+		return nil, fmt.Errorf("misformated endDate '%s'", endDate)
 	}
 	nbdays := d2.DaysSince(d1)
 	res := make([]string, nbdays+1)
@@ -374,5 +398,5 @@ func dateSlice(startDate, endDate string) []string {
 	for i := 1; i <= nbdays; i++ {
 		res[i] = d1.AddDays(i).StringJS()
 	}
-	return res
+	return res, nil
 }
