@@ -219,7 +219,10 @@ func (m *Manager) GetProjectStatById(id int, w io.Writer) error {
 	m.Projects.RLock()
 	var err error
 	c, n := getProjectKey(prj)
-	sd, ed := dates[0], dates[len(dates)-1]
+	sd, ed := "", ""
+	if len(dates) > 0 {
+		sd, ed = dates[0], dates[len(dates)-1]
+	}
 	ps.Issues, ps.Dates, ps.TimeSpent, ps.TimeRemaining, ps.TimeEstimated, err = m.Stats.GetProjectStatInfoOnPeriod(c, n, sd, ed)
 	m.Projects.RUnlock()
 	m.Stats.RUnlock()

@@ -8,12 +8,13 @@ type Project struct {
 	Id         int        `json:"id"`
 	Client     string     `json:"client"`
 	Name       string     `json:"name"`
-	LeadDev    string     `json:"lead_dev"`
+	LeadPS     string     `json:"lead_ps,omitempty"`
+	LeadDev    string     `json:"lead_dev,omitempty"`
 	Status     string     `json:"status"`
 	Type       string     `json:"type"`
 	ForecastWL float64    `json:"forecast_wl"`
 	CurrentWL  float64    `json:"current_wl"`
-	Comment    string     `json:"comment"`
+	Comment    string     `json:"comment,omitempty"`
 	Situation  Situations `json:"situation"`
 }
 
@@ -22,6 +23,7 @@ func NewProject() *Project {
 	p.Id = 0
 	p.Client = ""
 	p.Name = ""
+	p.LeadPS = ""
 	p.LeadDev = ""
 	p.Status = ""
 	p.Type = ""
@@ -40,6 +42,7 @@ func (p Project) String() string {
 	add("Id", strconv.Itoa(p.Id))
 	add("Client", p.Client)
 	add("Name", p.Name)
+	add("Lead PS", p.LeadPS)
 	add("Lead Dev", p.LeadDev)
 	add("Status", p.Status)
 	add("Type", p.Type)
@@ -55,6 +58,7 @@ func (p Project) String() string {
 func (p *Project) Update(p2 *Project) {
 	p.Client = p2.Client
 	p.Name = p2.Name
+	p.LeadPS = p2.LeadPS
 	p.LeadDev = p2.LeadDev
 	p.Status = p2.Status
 	p.Type = p2.Type

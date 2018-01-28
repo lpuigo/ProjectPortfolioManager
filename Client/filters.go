@@ -11,7 +11,7 @@ import (
 func ChargeFilterRegister(name string) {
 	cf := vue.NewFilter(func(oldValue *js.Object) (newValue interface{}) {
 		p := fm.Project{Object: oldValue}
-		if p.ForecastWL > 0 {
+		if p.ForecastWL > 0 || p.CurrentWL > 0 {
 			res := strconv.FormatFloat(p.CurrentWL, 'f', 1, 64)
 			res += " / "
 			res += strconv.FormatFloat(p.ForecastWL, 'f', 1, 64)

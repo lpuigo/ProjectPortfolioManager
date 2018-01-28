@@ -53,6 +53,11 @@ func NewFrontModel(msg string) *FrontModel {
 		func(p *fm.Project) string {
 			return p.LeadDev
 		})
+	m.ColFilterGroup.AddColFilter(
+		"Pil. Métier",
+		func(p *fm.Project) string {
+			return p.LeadPS
+		})
 	m.EditedPrj = fm.NewProject()
 	m.EditedPrjStat = nil
 	m.PrjStatSignatures = nil

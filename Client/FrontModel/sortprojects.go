@@ -96,6 +96,10 @@ func by(field string, asc bool) lessFunc {
 		return func(p1, p2 *Project) int {
 			return reverse(cmpStr(p1.Name, p2.Name))
 		}
+	case "Pil. Métier":
+		return func(p1, p2 *Project) int {
+			return reverse(cmpStr(p1.LeadPS, p2.LeadPS))
+		}
 	case "Développeur":
 		return func(p1, p2 *Project) int {
 			return reverse(cmpStr(p1.LeadDev, p2.LeadDev))

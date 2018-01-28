@@ -6,11 +6,12 @@ import (
 )
 
 const (
-	PRJ1Json   = `{"id":1,"client":"a client","name":"prj name","lead_dev":"Laurent","status":"3 - Dev","type":"Novagile","forecast_wl":20,"current_wl":2.2,"comment":"all clear","situation":` + SIT1Json + `}`
+	PRJ1Json   = `{"id":1,"client":"a client","name":"prj name","lead_ps":"Vincent","lead_dev":"Laurent","status":"3 - Dev","type":"Novagile","forecast_wl":20,"current_wl":2.2,"comment":"all clear","situation":` + SIT1Json + `}`
 	PRJ1String = `Project :
 	Id : 1
 	Client : a client
 	Name : prj name
+	Lead PS : Vincent
 	Lead Dev : Laurent
 	Status : 3 - Dev
 	Type : Novagile
@@ -29,6 +30,7 @@ func makePRJ1() *Project {
 	p.Name = "prj name"
 	p.Status = StatutDev
 	p.Type = TypoNovagile
+	p.LeadPS = "Vincent"
 	p.LeadDev = "Laurent"
 	p.Comment = "all clear"
 	p.ForecastWL = 20.0

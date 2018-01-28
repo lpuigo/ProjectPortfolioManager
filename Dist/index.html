@@ -78,21 +78,21 @@
                         <th is="col-title" :sortlist.sync="sortlist" class="one wide" title="Client"></th>
                         <th is="col-title" :sortlist.sync="sortlist" class="two wide" title="Projet"></th>
                         <th is="col-title" :sortlist.sync="sortlist" class="" title="Information" iclass="sticky note outline icon"></th>
-                        <th is="col-title" :sortlist.sync="sortlist" class="center aligned" title="Kickoff" iclass="checked calendar icon"></th>
+                        <!--<th is="col-title" :sortlist.sync="sortlist" class="center aligned" title="Kickoff" iclass="checked calendar icon"></th>-->
                         <th is="col-title" :sortlist.sync="sortlist" class="center aligned" title="Cadrage" iclass="checked calendar icon"></th>
-                        <th is="col-title" :sortlist.sync="sortlist" class="center aligned" title="Formation" iclass="checked calendar icon"></th>
+                        <th is="col-title" :sortlist.sync="sortlist" class="center aligned" title="Recette" iclass="checked calendar icon"></th>
                         <th is="col-title" :sortlist.sync="sortlist" class="center aligned" title="Mep" iclass="checked calendar icon"></th>
                         <th is="col-title" :sortlist.sync="sortlist" class="one wide center aligned"  title="Charge" iclass="hourglass half icon"></th>
-                        <!--<th is="col-title" :sortlist.sync="sortlist" class="one wide"       title="Développeur" iclass="desktop icon"></th>-->
                         <th is="col-title-withfilter" :sortlist.sync="sortlist" :colfilter.sync="colfilters" :projects="projects"
-                            class="one wide" title="Développeur" iclass="desktop icon"
+                            class="one wide" title="Pil. Métier" iclass="handshake icon"
                         >
-                        <!--<th is="col-title" :sortlist.sync="sortlist" class="center aligned" title="Type"></th>-->
+                        <th is="col-title-withfilter" :sortlist.sync="sortlist" :colfilter.sync="colfilters" :projects="projects"
+                            class="one wide" title="Développeur" iclass="laptop icon"
+                        >
                         <th is="col-title-withfilter" :sortlist.sync="sortlist" :colfilter.sync="colfilters" :projects="projects"
                             class="center aligned" title="Type"
                         >
                         </th>
-                        <!--<th is="col-title" :sortlist.sync="sortlist" class="one wide" title="Statut"></th>-->
                         <th is="col-title-withfilter" :sortlist.sync="sortlist" :colfilter.sync="colfilters" :projects="projects"
                             class="one wide" title="Statut"
                         >
@@ -104,12 +104,13 @@
                         <td class="collapsing" @click="EditProject(prj)"><i class="edit link icon"></i>{{prj.client}}</td>
                         <td class="collapsing"><i v-if="prj.hasStat" class="area chart link icon" @click="ShowProjectStat(prj)"></i>{{prj.name}}</td>
                         <td style="white-space: pre-wrap;">{{prj.comment}}</td>
-                        <td is="date-cell" :date="prj.milestones.Kickoff"></td>
                         <td is="date-cell" :date="prj.milestones.Cadrage"></td>
-                        <td is="date-cell" :date="prj.milestones.Formation"></td>
+                        <td is="date-cell" :date="prj.milestones.Recette"></td>
+                        <!--<td is="date-cell" :date="prj.milestones.Formation"></td>-->
                         <td is="date-cell" :date="prj.milestones.Mep"></td>
                         <!--<td class="collapsing right aligned">{{prj | ChargeFormat}}</td>-->
                         <td is="workload-cell" :project="prj"></td>
+                        <td class="collapsing">{{prj.lead_ps}}</td>
                         <td class="collapsing">{{prj.lead_dev}}</td>
                         <td class="collapsing center aligned">{{prj.type}}</td>
                         <td class="collapsing">{{prj.status}}</td>

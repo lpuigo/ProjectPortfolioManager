@@ -65,10 +65,10 @@ const (
                                 	:selected.sync="editedprj.type">
                                 </dropdown-list>
                             </div>
-                            <div class="field">
-                                <label>Développeur principal</label>
-                                <input type="text" v-model.trim="editedprj.lead_dev">
-                            </div>
+							<div class="field">
+								<label>Charge prévue</label>
+								<input type="number" min="0" v-model="editedprj.forecast_wl">
+							</div>
                         </div>
                         <div class="field">
                             <label>Commentaire</label>
@@ -76,14 +76,14 @@ const (
                         </div>
                         <div class="field">
                             <div class="two fields">
-                                <div class="field">
-                                    <label>Charge prévue</label>
-                                    <input type="number" min="0" v-model="editedprj.forecast_wl">
-                                </div>
-                                <div class="field">
-                                    <label>Charge consommée</label>
-                                    <input type="number" min="0" v-model="editedprj.current_wl">
-                                </div>
+								<div class="field">
+									<label>Pilote Métier</label>
+									<input type="text" v-model.trim="editedprj.lead_ps">
+								</div>
+								<div class="field">
+									<label>Développeur principal</label>
+									<input type="text" v-model.trim="editedprj.lead_dev">
+								</div>
                             </div>
                         </div>
                     </div>
@@ -225,6 +225,7 @@ func RegisterEditProjectModalComp() *vue.Component {
 		m.GiventPrj = FrontModel.NewProject()
 		m.EditedPrj.Id = -1
 		m.EditedPrj.Name += " (Copie)"
+		m.EditedPrj.CurrentWL = 0.0
 	})
 
 	o.AddMethod("ShowEditProjectModal", func(vm *vue.ViewModel, args []*js.Object) {
