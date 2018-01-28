@@ -2,6 +2,7 @@ package Model
 
 import (
 	"encoding/json"
+	"strings"
 	"testing"
 )
 
@@ -200,5 +201,13 @@ func TestSituationToDate_UpdateWith_DifferenceWith_DeletedMilestone(t *testing.T
 
 	if diff != nil {
 		t.Error("std1.UpdateWith(std1.DifferenceWith(std2)) does not make std1 same as std2")
+	}
+}
+
+func TestSituationToDate_DateListJSFormat(t *testing.T) {
+	std1 := makeSTD1()
+	dl := std1.DateListJSFormat()
+	if strings.Join(dl, " ") != "1971-11-27 1972-12-11" {
+		t.Errorf("std1.DateListJSFormat returns '%s'", dl)
 	}
 }

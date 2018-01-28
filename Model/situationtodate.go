@@ -91,3 +91,15 @@ func (s *SituationToDate) DifferenceWith(s2 *SituationToDate) *SituationToDate {
 	}
 	return std
 }
+
+// DateListJSFormat returns chronologically sorted list of date (JS Format)
+func (s *SituationToDate) DateListJSFormat() []string {
+	res := make([]string, len(s.MileStones))
+	var i int = 0
+	for _, d := range s.MileStones {
+		res[i] = d.StringJS()
+		i++
+	}
+	sort.Strings(res)
+	return res
+}

@@ -212,13 +212,15 @@ func (m *Manager) GetProjectStatById(id int, w io.Writer) error {
 	if prj == nil {
 		return fmt.Errorf("project id %d not found", id)
 	}
-
+	dates := prj.Situation.GetSituationToDate().DateListJSFormat()
 	//Retrieve Project Stat :
 	ps := fm.ProjectStat{}
 	m.Stats.RLock()
 	m.Projects.RLock()
 	var err error
-	ps.Issues, ps.Dates, ps.TimeSpent, ps.TimeRemaining, ps.TimeEstimated, err = m.Stats.GetProjectStatInfo(getProjectKey(prj))
+	c, n := getProjectKey(prj)
+	sd, ed := dates[0], dates[len(dates)-1]
+	ps.Issues, ps.Dates, ps.TimeSpent, ps.TimeRemaining, ps.TimeEstimated, err = m.Stats.GetProjectStatInfoOnPeriod(c, n, sd, ed)
 	m.Projects.RUnlock()
 	m.Stats.RUnlock()
 	if err != nil {

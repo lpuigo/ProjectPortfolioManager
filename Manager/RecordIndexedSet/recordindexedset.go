@@ -71,7 +71,7 @@ func (c *RecordIndexedSet) AddRecord(record ...rs.Record) {
 	}
 }
 
-// AddRecord adds the given record, updating indexes
+// AddRecord adds the given records, updating indexes
 func (c *RecordIndexedSet) AddRecords(records []rs.Record) {
 	c.AddRecord(records...)
 }
