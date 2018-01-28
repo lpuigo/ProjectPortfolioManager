@@ -311,6 +311,15 @@ func (sm *StatManager) GetProjectStatInfoOnPeriod(client, name, startDate, endDa
 		issues[i] = strings.TrimLeft(k, "!")
 	}
 	// On the result RecordSet
+	// Get the available update dates from the project stats
+	prjDates := is.GetIndexKeys("Dates")
+	sort.Strings(prjDates)
+	if "!"+startDate > prjDates[0] {
+		startDate = strings.TrimLeft(prjDates[0], "!")
+	}
+	if "!"+endDate < prjDates[len(prjDates)-1] {
+		endDate = strings.TrimLeft(prjDates[len(prjDates)-1], "!")
+	}
 	// Create Date list (chronologically sorted from start-end dates) => result dates slice
 	dates, err = dateSlice(startDate, endDate)
 	if err != nil {
