@@ -37,10 +37,14 @@ func (c *RecordSet) GetHeader() *Header {
 	return c.header
 }
 
-func (c *RecordSet) Add(record Record) int {
+func (c *RecordSet) Add(record ...Record) []int {
 	num := len(c.data)
-	c.data = append(c.data, record)
-	return num
+	c.data = append(c.data, record...)
+	nums := make([]int, len(record))
+	for i := 0; i < len(record); i++ {
+		nums[i] = num + i
+	}
+	return nums
 }
 
 func (c *RecordSet) Get(num int) Record {

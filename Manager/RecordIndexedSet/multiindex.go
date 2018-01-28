@@ -1,7 +1,7 @@
 package RecordIndexedSet
 
 import (
-	pcsv "github.com/lpuig/Novagile/Manager/RecordSet"
+	rs "github.com/lpuig/Novagile/Manager/RecordSet"
 )
 
 type multiIndex map[string][]int
@@ -36,17 +36,19 @@ func (i multiIndex) Get(key string) ([]int, bool) {
 }
 
 type index struct {
-	genKey pcsv.KeyGenerator
+	genKey rs.KeyGenerator
 	index  multiIndex
 }
 
-func newIndex(rs pcsv.KeyGenerator) *index {
+func newIndex(rs rs.KeyGenerator) *index {
 	return &index{
 		genKey: rs,
 		index:  newMultiIdIndex(),
 	}
 }
 
-func (i *index) Add(record []string, num int) {
-	i.index.Add(i.genKey(record), num)
+func (i *index) Add(record []rs.Record, num []int) {
+	for n, rec := range record {
+		i.index.Add(i.genKey(rec), num[n])
+	}
 }

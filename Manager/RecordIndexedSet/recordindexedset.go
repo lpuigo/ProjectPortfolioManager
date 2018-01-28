@@ -63,19 +63,17 @@ func (c *RecordIndexedSet) AddHeader(record rs.Record) error {
 	return nil
 }
 
-// AddRecord adds the given record, updating indexes
-func (c *RecordIndexedSet) AddRecord(record rs.Record) {
-	num := c.data.Add(record)
+// AddRecord adds the given records, updating indexes
+func (c *RecordIndexedSet) AddRecord(record ...rs.Record) {
+	nums := c.data.Add(record...)
 	for _, v := range c.indexes {
-		v.Add(record, num)
+		v.Add(record, nums)
 	}
 }
 
 // AddRecord adds the given record, updating indexes
 func (c *RecordIndexedSet) AddRecords(records []rs.Record) {
-	for _, r := range records {
-		c.AddRecord(r)
-	}
+	c.AddRecord(records...)
 }
 
 // HasIndexKey returns true if idxname index has given key, false otherwise
