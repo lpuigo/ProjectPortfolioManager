@@ -161,7 +161,7 @@ func (sm *StatManager) UpdateFrom(r io.Reader) (int, error) {
 		return 0, fmt.Errorf("UpdateFrom: %s", err.Error())
 	}
 
-	SREDesc := ris.NewIndexDesc("SRE", "TIME_SPENT", "REMAIN_TIME", "INIT_ESTIMATE")
+	SREDesc := ris.NewIndexDesc("SRE", "CLIENT!PROJECT", "TIME_SPENT", "REMAIN_TIME", "INIT_ESTIMATE")
 	dateDesc := ris.NewIndexDesc("Date", "EXTRACT_DATE")
 	oldStats := sm.GetStats()
 

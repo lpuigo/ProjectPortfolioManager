@@ -104,6 +104,14 @@ func (c *RecordIndexedSet) GetIndexKeys(idxname string) rs.Record {
 	return nil
 }
 
+// GetIndexKeysByPrefix returns all registered keys for given idxname having given prefix
+func (c *RecordIndexedSet) GetIndexKeysByPrefix(idxname, prefix string) rs.Record {
+	if i, found := c.indexes[idxname]; found {
+		return i.index.KeysByPrefix(prefix)
+	}
+	return nil
+}
+
 func (c *RecordIndexedSet) GetKeyGeneratorByIndexDesc(compare IndexDesc) (rs.KeyGenerator, error) {
 	return c.data.GetHeader().NewKeyGenerator(compare.cols...)
 }

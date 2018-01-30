@@ -2,6 +2,7 @@ package RecordIndexedSet
 
 import (
 	rs "github.com/lpuig/Novagile/Manager/RecordSet"
+	"strings"
 )
 
 type multiIndex map[string][]int
@@ -26,6 +27,16 @@ func (i multiIndex) Keys() []string {
 	res := []string{}
 	for k, _ := range i {
 		res = append(res, k)
+	}
+	return res
+}
+
+func (i multiIndex) KeysByPrefix(prefix string) []string {
+	res := []string{}
+	for k, _ := range i {
+		if strings.HasPrefix(k, prefix) {
+			res = append(res, k)
+		}
 	}
 	return res
 }
