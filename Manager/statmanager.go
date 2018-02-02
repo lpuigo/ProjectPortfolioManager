@@ -16,7 +16,7 @@ import (
 
 type StatManager struct {
 	*DataManager.DataManager
-	stat *ris.RecordIndexedSet
+	stat *ris.RecordLinkedIndexedSet
 }
 
 func createRISIndexDescs() []ris.IndexDesc {
@@ -26,8 +26,20 @@ func createRISIndexDescs() []ris.IndexDesc {
 	return res
 }
 
-func newStatSetFrom(r io.Reader) (*ris.RecordIndexedSet, error) {
-	cs := ris.NewRecordIndexedSet(createRISIndexDescs()...)
+func createRISLinkDescs() []ris.LinkDesc {
+	res := []ris.LinkDesc{}
+	res = append(res, ris.NewLinkDesc("issue-prj", "Issue", "PrjKey"))
+	return res
+}
+
+func newStatSetFrom(r io.Reader) (*ris.RecordLinkedIndexedSet, error) {
+	cs := ris.NewRecordLinkedIndexedSet(createRISIndexDescs()...)
+	for _, ld := range createRISLinkDescs() {
+		err := cs.AddLink(ld)
+		if err != nil {
+			return nil, fmt.Errorf("newStatSetFrom: %s", err.Error())
+		}
+	}
 	err := cs.AddCSVDataFrom(r)
 	if err != nil {
 		return nil, fmt.Errorf("newStatSetFrom: %s", err.Error())
@@ -79,15 +91,15 @@ func NewStatManagerFromFile(file string) (*StatManager, error) {
 }
 
 func (sm *StatManager) ClearStats() {
-	sm.stat, _ = sm.stat.CreateSubRecordIndexedSet(createRISIndexDescs()...)
+	sm.stat, _ = sm.stat.CreateSubSet(createRISIndexDescs(), createRISLinkDescs())
 }
 
-func (sm *StatManager) GetStats() *ris.RecordIndexedSet {
+func (sm *StatManager) GetStats() *ris.RecordLinkedIndexedSet {
 	return sm.stat
 }
 
 func (sm *StatManager) GetProjectStatList(prjlist map[string]bool) []string {
-	res := sm.stat.GetIndexKeys("PrjKey")
+	res := sm.stat.GetLink("issue-prj").Values()
 	for i, s := range res {
 		if _, exist := prjlist[s]; exist {
 			res[i] = ""
@@ -182,6 +194,7 @@ func (sm *StatManager) UpdateFrom(r io.Reader) (int, error) {
 				continue
 			}
 		}
+		//TODO Update project associated to issue
 		oldStats.AddRecord(record)
 		added++
 	}
@@ -190,34 +203,26 @@ func (sm *StatManager) UpdateFrom(r io.Reader) (int, error) {
 
 // GetProjectSpentWL returns Spent WorkLoad for given project client/name, or error if project, client stat is found
 func (sm *StatManager) GetProjectSpentWL(client, name string) (spent float64, err error) {
-	pk := pjrKey(client, name)
-	if !sm.hasStatsForProject(pk) {
-		err = fmt.Errorf("No Project Stats for %s/%s", client, name)
-		return
+	_, nums, err := sm.issuesInfosFromProject(client, name)
+	if err != nil {
+		return 0, err
 	}
-	//retrieve all issues associated to prjKey pk
-	ps, errss := sm.stat.CreateSubRecordIndexedSet(
-	//ris.NewIndexDesc("IssueDate", "ISSUE", "EXTRACT_DATE"),
-	)
-	if errss != nil {
-		err = fmt.Errorf("PrjSubSet: %s", errss.Error())
-	}
-	ps.AddRecords(sm.stat.GetRecordsByIndexKey("PrjKey", pk))
-
-	colpos, _ := ps.GetRecordColNumByName("ISSUE", "EXTRACT_DATE", "TIME_SPENT")
-	issuePos, datePos, spentPos := colpos[0], colpos[1], colpos[2]
-	issueDate := map[string]string{}
-	issueSpent := map[string]float64{}
-	for _, record := range ps.GetRecords() {
-		curIssue := record[issuePos]
-		curDate := record[datePos]
-		curWL, _ := strconv.ParseFloat(record[spentPos], 64)
-		previousDate, issueFound := issueDate[curIssue]
-		if issueFound && curDate < previousDate {
-			continue
+	colpos, _ := sm.stat.GetRecordColNumByName("EXTRACT_DATE", "TIME_SPENT")
+	datePos, spentPos := colpos[0], colpos[1]
+	issueDate := map[int]string{}
+	issueSpent := map[int]float64{}
+	for curIssue, inums := range nums {
+		for _, rn := range inums {
+			record := sm.stat.GetRecordByNum(rn)
+			curDate := record[datePos]
+			curWL, _ := strconv.ParseFloat(record[spentPos], 64)
+			previousDate, issueFound := issueDate[curIssue]
+			if issueFound && curDate < previousDate {
+				continue
+			}
+			issueDate[curIssue] = curDate
+			issueSpent[curIssue] = curWL
 		}
-		issueDate[curIssue] = curDate
-		issueSpent[curIssue] = curWL
 	}
 	spent = 0
 	for _, wl := range issueSpent {
@@ -227,98 +232,49 @@ func (sm *StatManager) GetProjectSpentWL(client, name string) (spent float64, er
 	return
 }
 
-func (sm *StatManager) initStatInfoRecordSet(client, name string) (issuesKeys []string, is *ris.RecordIndexedSet, err error) {
+func (sm *StatManager) issuesInfosFromProject(client, name string) (issuesKeys []string, nums [][]int, err error) {
 	pk := pjrKey(client, name)
 	if !sm.hasStatsForProject(pk) {
 		err = fmt.Errorf("No Project Stats for %s/%s", client, name)
 		return
 	}
 	//retrieve all issues associated to prjKey pk
-	ps, errss := sm.stat.CreateSubRecordIndexedSet(
-		ris.NewIndexDesc("Issue", "ISSUE"),
-	)
-	if errss != nil {
-		err = fmt.Errorf("PrjSubSet: %s", errss.Error())
-	}
-	ps.AddRecords(sm.stat.GetRecordsByIndexKey("PrjKey", pk))
-	// Keep Issue list => result issues slice
-	issuesKeys = ps.GetIndexKeys("Issue")
-	sort.Strings(issuesKeys)
-
-	//retrieve all issues found in ps
-	is, errss = sm.stat.CreateSubRecordIndexedSet(
-		ris.NewIndexDesc("Issue", "ISSUE"),
-		ris.NewIndexDesc("Dates", "EXTRACT_DATE"),
-		ris.NewIndexDesc("IssueDate", "ISSUE", "EXTRACT_DATE"),
-	)
-	if errss != nil {
-		err = fmt.Errorf("IssueSubSet: %s", errss.Error())
-	}
-	// For each identified issues,
-	for _, ik := range issuesKeys {
-		// retrieve all record related to this issue in a new SubRecordSet (with Date Index)
-		is.AddRecords(sm.stat.GetRecordsByIndexKey("Issue", ik))
-	}
-	return
-}
-
-// GetProjectStatInfo returns list of issues, dates slices, and timeSpent, timeRemaining, timeEstimated doubleslices ([#issue][#date]) for given project client/name
-func (sm *StatManager) GetProjectStatInfo(client, name string) (issues, dates []string, spent, remaining, estimated [][]float64, err error) {
-	issuesKeys, is, err := sm.initStatInfoRecordSet(client, name)
-	issues = make([]string, len(issuesKeys))
-	for i, k := range issuesKeys {
-		issues[i] = strings.TrimLeft(k, "!")
-	}
-	// On the result RecordSet
-	// Keep Date list (chronologically sorted) => result dates slice
-	dateKeys := is.GetIndexKeys("Dates")
-	sort.Strings(dateKeys)
-	dates = make([]string, len(dateKeys))
-	for i, k := range dateKeys {
-		dates[i] = strings.TrimLeft(k, "!")
-	}
-	// create result S, R, E slice with Date List length
-	initDS(&spent, len(issues), len(dates))
-	initDS(&remaining, len(issues), len(dates))
-	initDS(&estimated, len(issues), len(dates))
-	colpos, _ := is.GetRecordColNumByName("TIME_SPENT", "REMAIN_TIME", "INIT_ESTIMATE")
-	spentPos, remainingPos, estimatedPos := colpos[0], colpos[1], colpos[2]
-	// For each Date,
-	for ii, ik := range issuesKeys {
-		for di, dk := range dateKeys {
-			r := is.GetRecordsByIndexKey("IssueDate", ik+dk)
-			if r == nil && di > 0 {
-				spent[ii][di] = spent[ii][di-1]
-				remaining[ii][di] = remaining[ii][di-1]
-				estimated[ii][di] = estimated[ii][di-1]
-			}
-			if r == nil {
-				continue
-			}
-			spent[ii][di], err = stringToWL(r[0][spentPos])
-			remaining[ii][di], err = stringToWL(r[0][remainingPos])
-			estimated[ii][di], err = stringToWL(r[0][estimatedPos])
-		}
+	issuesKeys = sm.stat.GetLink("issue-prj").KeysMatching(pk)
+	nums = make([][]int, len(issuesKeys))
+	for in, issue := range issuesKeys {
+		nums[in] = sm.stat.GetRecordNumsByIndexKey("Issue", issue)
 	}
 	return
 }
 
 // GetProjectStatInfoOnPeriod returns list of issues, dates slices within Given Period, and timeSpent, timeRemaining, timeEstimated doubleslices ([#issue][#date]) for given project client/name
 func (sm *StatManager) GetProjectStatInfoOnPeriod(client, name, startDate, endDate string) (issues, dates []string, spent, remaining, estimated [][]float64, err error) {
-	issuesKeys, is, err := sm.initStatInfoRecordSet(client, name)
+	issuesKeys, nums, err := sm.issuesInfosFromProject(client, name)
 	issues = make([]string, len(issuesKeys))
 	for i, k := range issuesKeys {
 		issues[i] = strings.TrimLeft(k, "!")
 	}
 	// On the result RecordSet
 	// Get the available update dates from the project stats
-	prjDates := is.GetIndexKeys("Dates")
-	sort.Strings(prjDates)
-	if startDate == "" || "!"+startDate > prjDates[0] {
-		startDate = strings.TrimLeft(prjDates[0], "!")
+	colpos, _ := sm.stat.GetRecordColNumByName("EXTRACT_DATE", "TIME_SPENT", "REMAIN_TIME", "INIT_ESTIMATE")
+	datePos, spentPos, remainingPos, estimatedPos := colpos[0], colpos[1], colpos[2], colpos[3]
+	minDate, maxDate := "9999999", "00000000"
+	for _, num := range nums {
+		for _, n := range num {
+			date := sm.stat.GetRecordByNum(n)[datePos]
+			if date > maxDate {
+				maxDate = date
+			}
+			if date < minDate {
+				minDate = date
+			}
+		}
 	}
-	if endDate == "" || "!"+endDate < prjDates[len(prjDates)-1] {
-		endDate = strings.TrimLeft(prjDates[len(prjDates)-1], "!")
+	if startDate == "" || startDate > minDate {
+		startDate = minDate
+	}
+	if endDate == "" || endDate < maxDate {
+		endDate = maxDate
 	}
 	// Create Date list (chronologically sorted from start-end dates) => result dates slice
 	dates, err = dateSlice(startDate, endDate)
@@ -329,21 +285,25 @@ func (sm *StatManager) GetProjectStatInfoOnPeriod(client, name, startDate, endDa
 	initDS(&spent, len(issues), len(dates))
 	initDS(&remaining, len(issues), len(dates))
 	initDS(&estimated, len(issues), len(dates))
-	colpos, _ := is.GetRecordColNumByName("TIME_SPENT", "REMAIN_TIME", "INIT_ESTIMATE")
-	spentPos, remainingPos, estimatedPos := colpos[0], colpos[1], colpos[2]
 
 	for ii, ik := range issuesKeys {
-		irs, errirs := is.CreateSubRecordIndexedSet(ris.NewIndexDesc("Dates", "EXTRACT_DATE"))
+		irs, errirs := sm.stat.CreateSubSet(
+			[]ris.IndexDesc{
+				ris.NewIndexDesc("Dates", "EXTRACT_DATE"),
+				ris.NewIndexDesc("IssueDate", "ISSUE", "EXTRACT_DATE"),
+			},
+			nil,
+		)
 		if errirs != nil {
 			err = errirs
 			return
 		}
-		irs.AddRecords(is.GetRecordsByIndexKey("Issue", ik))
+		irs.AddRecords(sm.stat.GetRecordsByNums(nums[ii]))
 		dateKeys := irs.GetIndexKeys("Dates")
 		sort.Strings(dateKeys)
 		for di, dk := range dates {
 			dateKey := "!" + dk
-			r := is.GetRecordsByIndexKey("IssueDate", ik+dateKey)
+			r := irs.GetRecordsByIndexKey("IssueDate", ik+dateKey)
 			if r == nil {
 				if di > 0 {
 					spent[ii][di] = spent[ii][di-1]
@@ -361,7 +321,7 @@ func (sm *StatManager) GetProjectStatInfoOnPeriod(client, name, startDate, endDa
 								break
 							}
 						}
-						r := is.GetRecordsByIndexKey("IssueDate", ik+dateKeys[i-1])
+						r := irs.GetRecordsByIndexKey("IssueDate", ik+dateKeys[i-1])
 						spent[ii][di], err = stringToWL(r[0][spentPos])
 						remaining[ii][di], err = stringToWL(r[0][remainingPos])
 						estimated[ii][di], err = stringToWL(r[0][estimatedPos])

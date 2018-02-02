@@ -96,3 +96,5 @@ func LaunchPageInBrowser(lockfile string) error {
 // TODO Create a log file containing all server activity
 // TODO expose a service to upload the log file
 // TODO expose an admin front end to show server activity / trigger admin operation
+
+// TODO expose a service to show recent unmatched Jira issue

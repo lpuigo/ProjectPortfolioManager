@@ -11,9 +11,9 @@ import (
 )
 
 const (
-	StatFile  = `C:\Users\Laurent\Golang\src\github.com\lpuig\Novagile\Ressources\export Jira\extract 2018-01-03.csv`
-	StatFile2 = `C:\Users\Laurent\Golang\src\github.com\lpuig\Novagile\Ressources\export Jira\extract 2018-01-04.csv`
-	StatFile0 = `C:\Users\Laurent\Golang\src\github.com\lpuig\Novagile\Ressources\export Jira\test_extract_init.csv`
+	StatFile  = `C:\Users\Laurent\Golang\src\github.com\lpuig\Novagile\Ressources\Test\extract 2018-01-03.csv`
+	StatFile2 = `C:\Users\Laurent\Golang\src\github.com\lpuig\Novagile\Ressources\Test\extract 2018-01-04.csv`
+	StatFile0 = `C:\Users\Laurent\Golang\src\github.com\lpuig\Novagile\Ressources\Test\test_extract_init.csv`
 )
 
 func TestInitStatManagerFile(t *testing.T) {
@@ -56,13 +56,13 @@ func TestStatManager_GetStats(t *testing.T) {
 }
 
 func TestStatManager_UpdateFrom(t *testing.T) {
-	sm, err := NewStatManagerFromFile(StatFile0)
+	sm, err := NewStatManagerFromFile(StatFile)
 	if err != nil {
 		t.Fatalf("NewStatManagerFromFile: %s", err.Error())
 	}
 	sm.ClearStats()
 
-	f, err := os.Open(StatFile)
+	f, err := os.Open(StatFile2)
 	if err != nil {
 		t.Fatalf("StatManager_UpdateFrom: %s", err.Error())
 	}
@@ -71,34 +71,33 @@ func TestStatManager_UpdateFrom(t *testing.T) {
 	if err != nil {
 		t.Fatalf("UpdateFrom returns %s", err.Error())
 	}
-	if added != 155 {
+	if added != 93 {
 		t.Fatalf("UpdateFrom returns %d added rows, 155 expected", added)
 	}
 }
 
 func TestStatManager_GetProjectStatList(t *testing.T) {
-	sm, err := NewStatManagerFromFile(PrdStatFile)
-	if err != nil {
-		t.Fatalf("NewStatManagerFromFile: %s", err.Error())
+	sm := createTestSM(t)
+	knownProjects := map[string]bool{"!SomeClient!OtherProject": true}
+	projectStatList := sm.GetProjectStatList(knownProjects)
+	if len(projectStatList) != 1 {
+		t.Errorf("GetProjectStatList returns %d result(s) (1 expected)", len(projectStatList))
 	}
-	knownProjects := map[string]bool{"!Bouygues Telecom!DME TVE": true}
-	for i, s := range sm.GetProjectStatList(knownProjects) {
-		//ls := strings.Split(s, "!")
-		fmt.Printf("%2d : %s\n", i, s)
+	if len(projectStatList) > 0 && projectStatList[0] != "SomeClient!TestProject" {
+		t.Errorf("GetProjectStatList returns \n%s\n('%s' expected)", strings.Join(projectStatList, "\n"), "SomeClient!TestProject")
+
 	}
 }
 
 func TestStatManager_GetProjectStatListSortedBySimilarity(t *testing.T) {
-	sm, err := NewStatManagerFromFile(PrdStatFile)
-	if err != nil {
-		t.Fatalf("NewStatManagerFromFile: %s", err.Error())
-	}
-	//knownProjects := map[string]bool{"!Bouygues Telecom!DME TVE": true}
+	sm := createTestSM(t)
+	//knownProjects := map[string]bool{"!SomeClient!OtherProject":true}
 	knownProjects := map[string]bool{}
-	project := "Bouygues Telecom!DME TVE"
+	project := "SomClient!estProject"
 	statsProjects := sm.GetProjectStatListSortedBySimilarity(project, knownProjects)
-	for i, s := range statsProjects {
-		fmt.Printf("%2d : %s\n", i, s)
+	if len(statsProjects) > 0 && statsProjects[0] != "SomeClient!TestProject" {
+		t.Errorf("GetProjectStatListSortedBySimilarity returns \n%s\n('%s' expected first)", strings.Join(statsProjects, "\n"), "SomeClient!TestProject")
+
 	}
 }
 
@@ -135,30 +134,6 @@ func createTestSM(t *testing.T) *StatManager {
 	}
 	sm.stat = cs
 	return sm
-}
-
-func TestStatManager_GetProjectStatInfo(t *testing.T) {
-	sm := createTestSM(t)
-
-	issues, dates, spent, remaining, estimated, err := sm.GetProjectStatInfo("SomeClient", "TestProject")
-	if err != nil {
-		t.Fatalf("GetProjectStatInfo returns %s", err.Error())
-	}
-	if !RecordSet.Record(issues).Equals(RecordSet.Record{"Issue1", "Issue2"}) {
-		t.Errorf("issues: %s", issues)
-	}
-	if !RecordSet.Record(dates).Equals(RecordSet.Record{"2017-01-01", "2017-01-03", "2017-01-05"}) {
-		t.Errorf("dates: %s", dates)
-	}
-	if !equals(spent, [][]float64{[]float64{0.0, 5.0, 5.0}, []float64{0.0, 1.0, 2.0}}) {
-		t.Errorf("spent %f", spent)
-	}
-	if !equals(remaining, [][]float64{[]float64{5.0, 0.0, 0.0}, []float64{0.0, 1.0, 0.0}}) {
-		t.Errorf("remaining %f", remaining)
-	}
-	if !equals(estimated, [][]float64{[]float64{5.0, 5.0, 5.0}, []float64{0.0, 2.0, 2.0}}) {
-		t.Errorf("estimated: %f", estimated)
-	}
 }
 
 func TestStatManager_GetProjectSpentWL(t *testing.T) {

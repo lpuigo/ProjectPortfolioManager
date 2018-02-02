@@ -32,8 +32,8 @@ func NewRecordIndexedSet(indexes ...IndexDesc) *RecordIndexedSet {
 	return c
 }
 
-// CreateSubRecordIndexedSet returns an new empty (no data) RecordIndexedSet using same Header
-func (c *RecordIndexedSet) CreateSubRecordIndexedSet(indexes ...IndexDesc) (*RecordIndexedSet, error) {
+// CreateSubSet returns an new empty (no data) RecordIndexedSet using same Header
+func (c *RecordIndexedSet) CreateSubSet(indexes ...IndexDesc) (*RecordIndexedSet, error) {
 	r := NewRecordIndexedSet(indexes...)
 	err := r.AddHeader(c.data.GetHeader().GetKeys())
 	if err != nil {
@@ -126,12 +126,8 @@ func (c *RecordIndexedSet) GetRecordKeyByIndex(idxname string, record rs.Record)
 
 // GetRecordsByIndexKey returns all records related to given key on given idxname (nil if idxname or key not found)
 func (c *RecordIndexedSet) GetRecordsByIndexKey(idxname, key string) []rs.Record {
-	i, found := c.indexes[idxname]
-	if !found {
-		return nil
-	}
-	r, found := i.index[key]
-	if !found {
+	r := c.GetRecordNumsByIndexKey(idxname, key)
+	if r == nil {
 		return nil
 	}
 	res := []rs.Record{}
@@ -141,9 +137,36 @@ func (c *RecordIndexedSet) GetRecordsByIndexKey(idxname, key string) []rs.Record
 	return res
 }
 
+// GetRecordsByIndexKey returns all records related to given key on given idxname (nil if idxname or key not found)
+func (c *RecordIndexedSet) GetRecordNumsByIndexKey(idxname, key string) []int {
+	i, found := c.indexes[idxname]
+	if !found {
+		return nil
+	}
+	r, found := i.index[key]
+	if !found {
+		return nil
+	}
+	return r
+}
+
 // GetRecords returns slice of all RIS records
 func (c *RecordIndexedSet) GetRecords() []rs.Record {
 	return c.data.GetRecords()
+}
+
+// GetRecordByNum returns RIS record with given num
+func (c *RecordIndexedSet) GetRecordByNum(num int) rs.Record {
+	return c.data.Get(num)
+}
+
+// GetRecordByNum returns RIS record with given num
+func (c *RecordIndexedSet) GetRecordsByNums(nums []int) []rs.Record {
+	res := make([]rs.Record, len(nums))
+	for i, n := range nums {
+		res[i] = c.data.Get(n)
+	}
+	return res
 }
 
 // AddCSVDataFrom populates the RecordIndexedSet with Data from given reader (CSV formated data) (Header and Indexes are populated)

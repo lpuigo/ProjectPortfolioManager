@@ -34,5 +34,7 @@ func TestCSVStats_Max(t *testing.T) {
 		t.Fatal("NewCSVStatsFrom(reader) returns :", err.Error())
 	}
 	max := cs.Max("A", "!a0", NewIndexDesc("", "B"))
-	t.Errorf("CSVStat.Max %v", max)
+	if strings.Join(max, " ") != "a0 a11 a21" {
+		t.Errorf("CSVStat.Max returns %v instead of [%s]", max, "a0 a11 a21")
+	}
 }
