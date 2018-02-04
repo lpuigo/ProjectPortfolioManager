@@ -75,7 +75,15 @@ const (
                             <textarea rows="3" v-model="editedprj.comment"></textarea>
                         </div>
                         <div class="field">
-                            <div class="two fields">
+                            <div class="three fields">
+	                            <div class="field">
+    	                            <label>Risque</label>
+        	                        <dropdown-list ref="RiskDD"
+            	                    	:listvalues="risks"
+                	                	defaulttext="Niveau de risque"
+                    	            	:selected.sync="editedprj.risk">
+                        	        </dropdown-list>
+                            	</div>
 								<div class="field">
 									<label>Pilote Métier</label>
 									<input type="text" v-model.trim="editedprj.lead_ps">
@@ -168,6 +176,7 @@ func NewEditProjectModalComp() *EditProjectModalComp {
 //  <editproject-modal
 // 		:statuts="some_[]*ValText"
 // 		:types="some_[]*ValText"
+// 		:risks="some_[]*ValText"
 //		:milestonekeys="some_[]*ValText"
 // 		v-model="*Project"></editproject-modal>
 func RegisterEditProjectModalComp() *vue.Component {
@@ -177,7 +186,7 @@ func RegisterEditProjectModalComp() *vue.Component {
 	o.Template = TemplateEditProjectModalComp
 	o.Data = NewEditProjectModalComp
 
-	o.AddProp("givenprj", "statuts", "types", "milestonekeys")
+	o.AddProp("givenprj", "statuts", "types", "risks", "milestonekeys")
 	o.AddSubComponent("dropdown-list", RegisterDropDownListComp())
 
 	o.OnLifeCycleEvent(vue.EvtMounted, func(vm *vue.ViewModel) {
@@ -226,6 +235,7 @@ func RegisterEditProjectModalComp() *vue.Component {
 		m.EditedPrj.Id = -1
 		m.EditedPrj.Name += " (Copie)"
 		m.EditedPrj.CurrentWL = 0.0
+		m.EditedPrj.Risk = "0"
 	})
 
 	o.AddMethod("ShowEditProjectModal", func(vm *vue.ViewModel, args []*js.Object) {
@@ -237,6 +247,7 @@ func RegisterEditProjectModalComp() *vue.Component {
 
 		vm.Refs.Get("StatutDD").Call("changeSelected", m.EditedPrj.Status)
 		vm.Refs.Get("TypeDD").Call("changeSelected", m.EditedPrj.Type)
+		vm.Refs.Get("RiskDD").Call("changeSelected", m.EditedPrj.Risk)
 		jq(vm.El).Call("modal", "refresh")
 		jq(vm.El).Call("modal", "show")
 	})

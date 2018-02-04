@@ -25,6 +25,14 @@ func createTypes() []*fm.ValText {
 	return res
 }
 
+func createRisks() []*fm.ValText {
+	res := []*fm.ValText{}
+	res = append(res, fm.NewValText("0", "Normal"))
+	res = append(res, fm.NewValText("1", "Moyen"))
+	res = append(res, fm.NewValText("2", "Elevé"))
+	return res
+}
+
 func createMilestoneKeys() []*fm.ValText {
 	res := []*fm.ValText{}
 	res = append(res, fm.NewValText("Kickoff", "K"))

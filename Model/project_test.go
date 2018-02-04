@@ -11,6 +11,7 @@ const (
 	Id : 1
 	Client : a client
 	Name : prj name
+	Risk : 0
 	Lead PS : Vincent
 	Lead Dev : Laurent
 	Status : 3 - Dev
@@ -28,6 +29,7 @@ func makePRJ1() *Project {
 	p.Id = 1
 	p.Client = "a client"
 	p.Name = "prj name"
+	p.Risk = 0
 	p.Status = StatutDev
 	p.Type = TypoNovagile
 	p.LeadPS = "Vincent"

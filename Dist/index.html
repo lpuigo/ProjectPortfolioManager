@@ -56,6 +56,7 @@
     <editproject-modal
         :statuts="statuts"
         :types="types"
+        :risks="risks"
         :milestonekeys="milestonekeys"
         :givenprj.sync="editedprj"
         @update:givenprj="ProcessEditedPrj"
@@ -103,7 +104,7 @@
                     <tr v-for="prj in sortedProjects" :key="prj.id" v-if="IsDisplayed(prj)">
                         <td class="collapsing" @click="EditProject(prj)"><i class="edit link icon"></i>{{prj.client}}</td>
                         <td class="collapsing"><i v-if="prj.hasStat" class="area chart link icon" @click="ShowProjectStat(prj)"></i>{{prj.name}}</td>
-                        <td style="white-space: pre-wrap;">{{prj.comment}}</td>
+                        <td style="white-space: pre-wrap;"><i :class="RiskIcon(prj)"></i>{{prj.comment}}</td>
                         <td is="date-cell" :date="prj.milestones.Cadrage"></td>
                         <td is="date-cell" :date="prj.milestones.Recette"></td>
                         <!--<td is="date-cell" :date="prj.milestones.Formation"></td>-->

@@ -122,7 +122,7 @@ func by(field string, asc bool) lessFunc {
 		}
 	case "Information":
 		return func(p1, p2 *Project) int {
-			return reverse(cmpStr(p1.Comment, p2.Comment))
+			return reverse(cmpStr(p1.Risk, p2.Risk))
 		}
 	default:
 		return func(p1, p2 *Project) int {

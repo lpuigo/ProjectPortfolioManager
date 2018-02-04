@@ -12,7 +12,8 @@ type Project struct {
 	Id         int               `json:"id"             js:"id"`
 	Client     string            `json:"client"         js:"client"`
 	Name       string            `json:"name"           js:"name"`
-	LeadPS     string            `json:"lead_ps"       js:"lead_ps"`
+	Risk       string            `json:"risk"           js:"risk"`
+	LeadPS     string            `json:"lead_ps"        js:"lead_ps"`
 	LeadDev    string            `json:"lead_dev"       js:"lead_dev"`
 	Status     string            `json:"status"         js:"status"`
 	Type       string            `json:"type"           js:"type"`
@@ -28,6 +29,7 @@ func NewProject() *Project {
 	pf.Id = -1
 	pf.Client = "Client"
 	pf.Name = "Projet"
+	pf.Risk = "0"
 	pf.LeadPS = ""
 	pf.LeadDev = ""
 	pf.Status = "1 - Prospect"
@@ -50,6 +52,7 @@ func (p *Project) Copy(np *Project) {
 	p.Id = np.Id
 	p.Client = np.Client
 	p.Name = np.Name
+	p.Risk = np.Risk
 	p.LeadPS = np.LeadPS
 	p.LeadDev = np.LeadDev
 	p.Status = np.Status
@@ -75,6 +78,7 @@ func (p Project) String() string {
 	add("Id", strconv.Itoa(p.Id))
 	add("Client", p.Client)
 	add("Name", p.Name)
+	add("Risk", p.Risk)
 	add("Lead PS", p.LeadPS)
 	add("Lead Dev", p.LeadDev)
 	add("Status", p.Status)
@@ -142,6 +146,7 @@ func CloneBEProject(p *Model.Project, hasStat bool) *Project {
 	np.Id = p.Id
 	np.Client = p.Client
 	np.Name = p.Name
+	np.Risk = strconv.Itoa(p.Risk)
 	np.LeadPS = p.LeadPS
 	np.LeadDev = p.LeadDev
 	np.Status = p.Status
@@ -162,6 +167,8 @@ func CloneFEProject(p *Project) *Model.Project {
 	np.Id = p.Id
 	np.Client = p.Client
 	np.Name = p.Name
+	r, _ := strconv.ParseInt(p.Risk, 10, 0)
+	np.Risk = int(r)
 	np.LeadPS = p.LeadPS
 	np.LeadDev = p.LeadDev
 	np.Status = p.Status
@@ -180,11 +187,5 @@ func CloneFEProject(p *Project) *Model.Project {
 
 func ProjectFromJS(o *js.Object) *Project {
 	p := &Project{Object: o}
-	//m := make(map[string]string)
-	//mjs := o.Get("milestones")
-	//for _, k := range js.Keys(mjs) {
-	//	m[k] = mjs.Get(k).String()
-	//}
-	//p.MileStones = m
 	return p
 }

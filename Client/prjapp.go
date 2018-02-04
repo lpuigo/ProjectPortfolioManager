@@ -25,6 +25,7 @@ type FrontModel struct {
 	PrjStatSignatures *fm.ProjectStatNames `js:"prjstatsignatures"`
 	Statuts           []*fm.ValText        `js:"statuts"`
 	Types             []*fm.ValText        `js:"types"`
+	Risks             []*fm.ValText        `js:"risks"`
 	MilestoneKeys     []*fm.ValText        `js:"milestonekeys"`
 }
 
@@ -63,6 +64,7 @@ func NewFrontModel(msg string) *FrontModel {
 	m.PrjStatSignatures = nil
 	m.Statuts = createStatuts()
 	m.Types = createTypes()
+	m.Risks = createRisks()
 	m.MilestoneKeys = createMilestoneKeys()
 	return m
 }
@@ -167,13 +169,6 @@ func (m *FrontModel) deletePrj(dprj *fm.Project) {
 	}
 }
 
-/*
-func (m *FrontModel) UpdateEditedPrj(p *fm.Project) {
-	println("recieved : ", p)
-	m.EditedPrj = p
-}
-*/
-
 func (m *FrontModel) ProcessEditedPrj() {
 	if m.EditedPrj.Id >= 0 {
 		go m.callUpdatePrj(m.EditedPrj)
@@ -224,6 +219,19 @@ func (m *FrontModel) showProjectStatModal(p *fm.Project) {
 
 func (m *FrontModel) IsDisplayed(p *fm.Project) bool {
 	return fm.TextFiltered(p, m.TextFilter) && m.ColFilterGroup.ColFiltered(p)
+}
+
+func (m *FrontModel) RiskIcon(p *fm.Project) string {
+	var res string
+	switch p.Risk {
+	case "2":
+		res = "red warning sign icon"
+	case "1":
+		res = "orange warning circle icon"
+	default:
+		//res = "green info circle icon"
+	}
+	return res
 }
 
 var jQuery = jquery.NewJQuery
