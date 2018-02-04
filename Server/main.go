@@ -11,7 +11,7 @@ import (
 	"os/exec"
 )
 
-//go:generate go build -o ../server.exe
+//go:generate go build -v -o ../server.exe
 
 const (
 	AssetsDir  = `../WebAssets`
@@ -62,12 +62,12 @@ func main() {
 	router := mux.NewRouter()
 	router.HandleFunc("/ptf", withManager(Route.GetPtf)).Methods("GET")
 	router.HandleFunc("/ptf", withManager(Route.CreatePrj)).Methods("POST")
-	router.HandleFunc("/ptf/{prjid}", withManager(Route.UpdatePrj)).Methods("PUT")
-	router.HandleFunc("/ptf/{prjid}", withManager(Route.DeletePrj)).Methods("DELETE")
-	router.HandleFunc("/stat/prjlist/{prjid}", withManager(Route.GetProjectStatProjectList)).Methods("GET")
+	router.HandleFunc("/ptf/{prjid:[0-9]+}", withManager(Route.UpdatePrj)).Methods("PUT")
+	router.HandleFunc("/ptf/{prjid:[0-9]+}", withManager(Route.DeletePrj)).Methods("DELETE")
+	router.HandleFunc("/stat/prjlist/{prjid:[0-9]+}", withManager(Route.GetProjectStatProjectList)).Methods("GET")
 	router.HandleFunc("/stat/reinit", withManager(Route.GetInitProjectStat)).Methods("GET")
 	router.HandleFunc("/stat/update", withManager(Route.GetUpdateProjectStat)).Methods("GET")
-	router.HandleFunc("/stat/{prjid}", withManager(Route.GetProjectStat)).Methods("GET")
+	router.HandleFunc("/stat/{prjid:[0-9]+}", withManager(Route.GetProjectStat)).Methods("GET")
 	router.HandleFunc("/xls", withManager(Route.GetXLS)).Methods("GET")
 
 	router.PathPrefix(AssetsRoot).Handler(http.StripPrefix(AssetsRoot, http.FileServer(http.Dir(AssetsDir))))

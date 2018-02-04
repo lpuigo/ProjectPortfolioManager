@@ -193,3 +193,22 @@ func TestStatManager_GetProjectStatInfoOnPeriod(t *testing.T) {
 		t.Errorf("estimated: %f", estimated)
 	}
 }
+
+func TestStatManager_HasStatsForProject(t *testing.T) {
+	sm := createTestSM(t)
+
+	if !sm.HasStatsForProject("SomeClient", "TestProject") {
+		t.Errorf("HasStatsForProject returned False for expected project")
+	}
+	if sm.HasStatsForProject("SomeClient", "TESTProject") {
+		t.Errorf("HasStatsForProject returned True for unexpected project")
+	}
+}
+
+func BenchmarkStatManager_GetProjectStatInfoOnPeriod(b *testing.B) {
+	sm := createTestSM(nil)
+
+	for n := 0; n < b.N; n++ {
+		sm.GetProjectStatInfoOnPeriod("SomeClient", "TestProject", "2017-01-01", "2017-01-06")
+	}
+}

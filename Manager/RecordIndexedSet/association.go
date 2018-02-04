@@ -59,6 +59,15 @@ func (a *Association) KeysMatching(value string) []string {
 	return res
 }
 
+func (a *Association) HasValue(value string) bool {
+	for _, v := range a.data {
+		if v == value {
+			return true
+		}
+	}
+	return false
+}
+
 func (a *Association) Values() []string {
 	vals := NewAssociation(nil, nil)
 	for _, v := range a.data {

@@ -163,7 +163,7 @@ func pjrKey(client, name string) string {
 }
 
 func (sm *StatManager) hasStatsForProject(pk string) bool {
-	return sm.stat.HasIndexKey("PrjKey", pk)
+	return sm.stat.GetLink("issue-prj").HasValue(pk)
 }
 
 // UpdateFrom updates Stats data with new Stats (CSV Formated) found in r
