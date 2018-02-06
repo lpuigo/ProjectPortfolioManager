@@ -7,6 +7,7 @@ import (
 	"io"
 	"os"
 	"sort"
+	"path/filepath"
 )
 
 type IndexDesc struct {
@@ -235,6 +236,10 @@ func (c *RecordIndexedSet) WriteCSVTo(w io.Writer) error {
 }
 
 func (c *RecordIndexedSet) WriteCSVToFile(file string) error {
+	err := os.MkdirAll(filepath.Dir(file), os.ModeDir)
+	if err != nil {
+		return err
+	}
 	f, err := os.Create(file)
 	if err != nil {
 		return err

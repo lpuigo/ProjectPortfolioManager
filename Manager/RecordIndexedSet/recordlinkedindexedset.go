@@ -1,10 +1,10 @@
 package RecordIndexedSet
 
 import (
+	"encoding/csv"
 	"fmt"
 	rs "github.com/lpuig/Novagile/Manager/RecordSet"
 	"io"
-	"encoding/csv"
 	"os"
 )
 
@@ -78,7 +78,7 @@ func (c *RecordLinkedIndexedSet) AddHeader(record rs.Record) error {
 // CreateSubSet returns an new empty (no data) RecordIndexedSet using same Header
 func (c *RecordLinkedIndexedSet) CreateSubSet(indexes []IndexDesc, links []LinkDesc) (*RecordLinkedIndexedSet, error) {
 	r := NewRecordLinkedIndexedSet(indexes...)
-	for _,ld := range links {
+	for _, ld := range links {
 		err := r.AddLink(ld)
 		if err != nil {
 			return nil, err
@@ -143,5 +143,3 @@ func (c *RecordLinkedIndexedSet) AddCSVDataFromFile(file string) error {
 	defer f.Close()
 	return c.AddCSVDataFrom(f)
 }
-
-
