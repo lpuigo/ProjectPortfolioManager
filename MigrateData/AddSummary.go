@@ -6,6 +6,7 @@ import (
 	"io"
 	"io/ioutil"
 	"archive/zip"
+	"strings"
 )
 
 func NewSetFrom(r io.Reader) (*ris.RecordLinkedIndexedSet, error) {
@@ -48,7 +49,8 @@ func MigrateSet(r io.Reader, targetModel *ris.RecordLinkedIndexedSet) (*ris.Reco
 	nt, err := targetModel.CreateSubSet([]ris.IndexDesc{ris.NewIndexDesc("Issue", "ISSUE")}, nil)
 
 	for _, r := range ss.GetRecords() {
-		nr := append(r, a.Get(ss.GetRecordKeyByIndex("Issue", r), ""))
+		summary := a.Get(ss.GetRecordKeyByIndex("Issue", r), "")
+		nr := append(r, strings.TrimLeft(summary, "!"))
 		nt.AddRecord(nr)
 	}
 	return nt, nil

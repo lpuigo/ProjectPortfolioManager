@@ -77,3 +77,33 @@ func TestExtract(t *testing.T) {
 		t.Fatalf("could not Extract: %s", err.Error())
 	}
 }
+
+func TestMigrateAll(t *testing.T) {
+	ts := getTargetModel(JiraStatDir + "extract 2018-02-05.csv", t)
+
+	migrateFile := func(r io.Reader, file string) error {
+		ns, err := MigrateSet(r, ts)
+		if err != nil {
+			return err
+		}
+		err = ns.WriteCSVToFile(filepath.Join(MigratedStatDir, file))
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+
+	processFile := func(archFile string) error {
+		err := ExtractAndProcess(archFile, migrateFile)
+		if err != nil {
+			t.Errorf("could not Extract: %s", err.Error())
+		}
+		t.Logf("Processed %s", archFile)
+		return nil
+	}
+
+	err := ProcessDir(ArchivedStatDir, processFile)
+	if err != nil {
+		t.Fatalf("could not Extract: %s", err.Error())
+	}
+}
