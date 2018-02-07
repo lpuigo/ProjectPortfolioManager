@@ -23,12 +23,14 @@ func createRISIndexDescs() []ris.IndexDesc {
 	res := []ris.IndexDesc{}
 	res = append(res, ris.NewIndexDesc("PrjKey", "CLIENT!PROJECT"))
 	res = append(res, ris.NewIndexDesc("Issue", "ISSUE"))
+	res = append(res, ris.NewIndexDesc("Summary", "SUMMARY"))
 	return res
 }
 
 func createRISLinkDescs() []ris.LinkDesc {
 	res := []ris.LinkDesc{}
 	res = append(res, ris.NewLinkDesc("issue-prj", "Issue", "PrjKey"))
+	res = append(res, ris.NewLinkDesc("issue-summary", "Issue", "Summary"))
 	return res
 }
 
@@ -48,7 +50,7 @@ func newStatSetFrom(r io.Reader) (*ris.RecordLinkedIndexedSet, error) {
 }
 
 func InitStatManagerFile(file string) error {
-	header := "EXTRACT_DATE;PRODUCT;CLIENT!PROJECT;ACTIVITY;ISSUE;INIT_ESTIMATE;TIME_SPENT;REMAIN_TIME"
+	header := "EXTRACT_DATE;PRODUCT;CLIENT!PROJECT;ACTIVITY;ISSUE;INIT_ESTIMATE;TIME_SPENT;REMAIN_TIME;SUMMARY"
 	f, err := os.Create(file)
 	if err != nil {
 		return err
@@ -248,11 +250,13 @@ func (sm *StatManager) issuesInfosFromProject(client, name string) (issuesKeys [
 }
 
 // GetProjectStatInfoOnPeriod returns list of issues, dates slices within Given Period, and timeSpent, timeRemaining, timeEstimated doubleslices ([#issue][#date]) for given project client/name
-func (sm *StatManager) GetProjectStatInfoOnPeriod(client, name, startDate, endDate string) (issues, dates []string, spent, remaining, estimated [][]float64, err error) {
+func (sm *StatManager) GetProjectStatInfoOnPeriod(client, name, startDate, endDate string) (issues, summaries, dates []string, spent, remaining, estimated [][]float64, err error) {
 	issuesKeys, nums, err := sm.issuesInfosFromProject(client, name)
 	issues = make([]string, len(issuesKeys))
+	summaries = make([]string, len(issuesKeys))
 	for i, k := range issuesKeys {
 		issues[i] = strings.TrimLeft(k, "!")
+		summaries[i] = strings.TrimLeft(sm.stat.GetLink("issue-summary").Get(k, "no summary"), "!")
 	}
 	// On the result RecordSet
 	// Get the available update dates from the project stats

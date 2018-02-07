@@ -8,6 +8,7 @@ import (
 type ProjectStat struct {
 	*js.Object
 	Issues        []string    `json:"issues"         js:"issues"`
+	Summaries     []string    `json:"summaries"      js:"summaries"`
 	Dates         []string    `json:"dates"          js:"dates"`
 	TimeSpent     [][]float64 `json:"timeSpent"      js:"timeSpent"`
 	TimeRemaining [][]float64 `json:"timeRemaining"  js:"timeRemaining"`
@@ -17,6 +18,7 @@ type ProjectStat struct {
 func NewProjectStat() *ProjectStat {
 	ps := &ProjectStat{Object: js.Global.Get("Object").New()}
 	ps.Issues = []string{}
+	ps.Summaries = []string{}
 	ps.Dates = []string{}
 	ps.TimeSpent = [][]float64{}
 	ps.TimeRemaining = [][]float64{}
@@ -54,7 +56,7 @@ func CreateIssueStatsFromProjectStat(ps *ProjectStat) []*IssueStat {
 	res := []*IssueStat{}
 	for i, issue := range ps.Issues {
 		is := NewIssueStat()
-		is.Issue = issue
+		is.Issue = issue + " : " + ps.Summaries[i]
 		is.HRef = "http://jira.acticall.com/browse/" + issue
 		is.Dates = ps.Dates
 		is.TimeSpent = ps.TimeSpent[i]

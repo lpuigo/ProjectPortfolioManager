@@ -223,7 +223,7 @@ func (m *Manager) GetProjectStatById(id int, w io.Writer) error {
 	if len(dates) > 0 {
 		sd, ed = dates[0], dates[len(dates)-1]
 	}
-	ps.Issues, ps.Dates, ps.TimeSpent, ps.TimeRemaining, ps.TimeEstimated, err = m.Stats.GetProjectStatInfoOnPeriod(c, n, sd, ed)
+	ps.Issues, ps.Summaries, ps.Dates, ps.TimeSpent, ps.TimeRemaining, ps.TimeEstimated, err = m.Stats.GetProjectStatInfoOnPeriod(c, n, sd, ed)
 	m.Projects.RUnlock()
 	m.Stats.RUnlock()
 	if err != nil {
