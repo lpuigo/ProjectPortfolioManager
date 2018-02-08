@@ -100,6 +100,7 @@ func (sm *StatManager) GetStats() *ris.RecordLinkedIndexedSet {
 	return sm.stat
 }
 
+// GetProjectStatList returns Stats Project List which are not not found in given prjlist
 func (sm *StatManager) GetProjectStatList(prjlist map[string]bool) []string {
 	res := sm.stat.GetLink("issue-prj").Values()
 	for i, s := range res {

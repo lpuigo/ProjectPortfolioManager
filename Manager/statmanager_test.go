@@ -119,12 +119,12 @@ func equals(a, b [][]float64) bool {
 }
 
 func createTestSM(t *testing.T) *StatManager {
-	smSource := `EXTRACT_DATE;PRODUCT;CLIENT!PROJECT;ACTIVITY;ISSUE;INIT_ESTIMATE;TIME_SPENT;REMAIN_TIME
-2017-01-01;TestProduct;SomeClient!OtherProject;;Issue0;8.00;0.00;8.00
-2017-01-01;TestProduct;;;Issue1;40.00;0.00;40.00
-2017-01-03;TestProduct;SomeClient!TestProject;;Issue1;40.00;40.00;0.00
-2017-01-03;TestProduct;SomeClient!TESTProject;;Issue2;16.00;8.00;8.00
-2017-01-05;TestProduct;SomeClient!TestProject;;Issue2;16.00;16.00;0.00
+	smSource := `EXTRACT_DATE;PRODUCT;CLIENT!PROJECT;ACTIVITY;ISSUE;INIT_ESTIMATE;TIME_SPENT;REMAIN_TIME;SUMMARY
+2017-01-01;TestProduct;SomeClient!OtherProject;;Issue0;8.00;0.00;8.00;Summary of Issue0
+2017-01-01;TestProduct;;;Issue1;40.00;0.00;40.00;Issue1
+2017-01-03;TestProduct;SomeClient!TestProject;;Issue1;40.00;40.00;0.00;Summary of Issue1
+2017-01-03;TestProduct;SomeClient!TESTProject;;Issue2;16.00;8.00;8.00;Summary of Issue2
+2017-01-05;TestProduct;SomeClient!TestProject;;Issue2;16.00;16.00;0.00;Summary of Issue2
 `
 	sm := &StatManager{}
 	sm.DataManager = DataManager.NewDataManager(func() error { return nil })
@@ -173,12 +173,15 @@ func TestStatManager_dateSlice(t *testing.T) {
 func TestStatManager_GetProjectStatInfoOnPeriod(t *testing.T) {
 	sm := createTestSM(t)
 
-	issues, dates, spent, remaining, estimated, err := sm.GetProjectStatInfoOnPeriod("SomeClient", "TestProject", "2017-01-01", "2017-01-06")
+	issues, summaries, dates, spent, remaining, estimated, err := sm.GetProjectStatInfoOnPeriod("SomeClient", "TestProject", "2017-01-01", "2017-01-06")
 	if err != nil {
 		t.Fatalf("GetProjectStatInfo returns %s", err.Error())
 	}
 	if !RecordSet.Record(issues).Equals(RecordSet.Record{"Issue1", "Issue2"}) {
 		t.Errorf("issues: %s", issues)
+	}
+	if !RecordSet.Record(summaries).Equals(RecordSet.Record{"Summary of Issue1", "Summary of Issue2"}) {
+		t.Errorf("issues: %s", summaries)
 	}
 	if !RecordSet.Record(dates).Equals(RecordSet.Record{"2017-01-01", "2017-01-02", "2017-01-03", "2017-01-04", "2017-01-05", "2017-01-06"}) {
 		t.Errorf("dates: %s", dates)

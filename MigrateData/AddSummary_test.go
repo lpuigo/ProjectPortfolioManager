@@ -1,11 +1,11 @@
 package MigrateData
 
 import (
-	"os"
-	"testing"
 	ris "github.com/lpuig/Novagile/Manager/RecordIndexedSet"
 	"io"
+	"os"
 	"path/filepath"
+	"testing"
 )
 
 const (
@@ -54,9 +54,8 @@ func getTargetModel(modelFile string, t *testing.T) *ris.RecordLinkedIndexedSet 
 	return ts
 }
 
-
 func TestExtract(t *testing.T) {
-	ts := getTargetModel(JiraStatDir + "extract 2018-02-05.csv", t)
+	ts := getTargetModel(MigratedStatDir+"extract 2018-02-05.csv", t)
 
 	archFile := ArchivedStatDir + "extract 2018-01-03.csv.zip"
 
@@ -79,7 +78,7 @@ func TestExtract(t *testing.T) {
 }
 
 func TestMigrateAll(t *testing.T) {
-	ts := getTargetModel(JiraStatDir + "extract 2018-02-05.csv", t)
+	ts := getTargetModel(MigratedStatDir+"extract 2018-02-05.csv", t)
 
 	migrateFile := func(r io.Reader, file string) error {
 		ns, err := MigrateSet(r, ts)

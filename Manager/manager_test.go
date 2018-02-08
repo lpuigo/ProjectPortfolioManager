@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/lpuig/Novagile/Manager/FileProcesser"
+	"os"
+	"runtime/pprof"
 	"testing"
 	"time"
 )
@@ -42,4 +44,58 @@ func TestInitActualDataOnProdFile(t *testing.T) {
 	fmt.Println(w.String())
 
 	time.Sleep(4 * time.Second)
+}
+
+func TestManager_GetProjectStatById(t *testing.T) {
+	m, err := NewManager(prjfile, PrdStatFile)
+	if err != nil {
+		t.Fatalf("could not create new manager: %s", err.Error())
+	}
+
+	prjIds := map[string]int{}
+	for _, p := range m.Projects.GetProjectsPtf().Projects {
+		pk := p.Client + "!" + p.Name
+		if m.Stats.HasStatsForProject(getProjectKey(p)) {
+			prjIds[pk] = p.Id
+		}
+	}
+
+	for _, id := range prjIds {
+		w := new(bytes.Buffer)
+		m.GetProjectStatById(id, w)
+	}
+}
+
+func BenchmarkManager_GetProjectStatById(b *testing.B) {
+	m, err := NewManager(prjfile, PrdStatFile)
+	if err != nil {
+		b.Fatalf("could not create new manager: %s", err.Error())
+	}
+
+	prjIds := map[string]int{}
+	for _, p := range m.Projects.GetProjectsPtf().Projects {
+		pk := p.Client + "!" + p.Name
+		if m.Stats.HasStatsForProject(getProjectKey(p)) {
+			prjIds[pk] = p.Id
+		}
+	}
+
+	f, err := os.Create("GetProjectStatById.pprof")
+	if err != nil {
+		b.Fatalf("could not create: %s", err.Error())
+	}
+	defer f.Close()
+	pprof.StartCPUProfile(f)
+
+	time.Sleep(3 * time.Second)
+	for p, id := range prjIds {
+		b.Run(fmt.Sprintf("Stat on %s", p), func(b *testing.B) {
+			for n := 0; n < b.N; n++ {
+				w := new(bytes.Buffer)
+				m.GetProjectStatById(id, w)
+			}
+		})
+	}
+	pprof.StopCPUProfile()
+
 }
