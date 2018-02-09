@@ -6,8 +6,8 @@ import (
 	rs "github.com/lpuig/Novagile/Manager/RecordSet"
 	"io"
 	"os"
-	"sort"
 	"path/filepath"
+	"sort"
 )
 
 type IndexDesc struct {
@@ -33,7 +33,7 @@ func NewRecordIndexedSet(indexes ...IndexDesc) *RecordIndexedSet {
 	return c
 }
 
-// CreateSubSet returns an new empty (no data) RecordIndexedSet using same Header
+// CreateSubSet returns an new empty (no values) RecordIndexedSet using same Header
 func (c *RecordIndexedSet) CreateSubSet(indexes ...IndexDesc) (*RecordIndexedSet, error) {
 	r := NewRecordIndexedSet(indexes...)
 	err := r.AddHeader(c.data.GetHeader().GetKeys())
@@ -170,7 +170,7 @@ func (c *RecordIndexedSet) GetRecordsByNums(nums []int) []rs.Record {
 	return res
 }
 
-// AddCSVDataFrom populates the RecordIndexedSet with Data from given reader (CSV formated data) (Header and Indexes are populated)
+// AddCSVDataFrom populates the RecordIndexedSet with Data from given reader (CSV formated values) (Header and Indexes are populated)
 func (c *RecordIndexedSet) AddCSVDataFrom(r io.Reader) error {
 	csvr := csv.NewReader(r)
 	csvr.Comma = ';'

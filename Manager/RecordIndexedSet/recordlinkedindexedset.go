@@ -75,7 +75,7 @@ func (c *RecordLinkedIndexedSet) AddHeader(record rs.Record) error {
 	return nil
 }
 
-// CreateSubSet returns an new empty (no data) RecordIndexedSet using same Header
+// CreateSubSet returns an new empty (no values) RecordIndexedSet using same Header
 func (c *RecordLinkedIndexedSet) CreateSubSet(indexes []IndexDesc, links []LinkDesc) (*RecordLinkedIndexedSet, error) {
 	r := NewRecordLinkedIndexedSet(indexes...)
 	for _, ld := range links {
@@ -106,7 +106,7 @@ func (c *RecordLinkedIndexedSet) AddRecords(records []rs.Record) {
 	c.AddRecord(records...)
 }
 
-// AddCSVDataFrom populates the RecordLinkedIndexedSet with Data from given reader (CSV formated data) (Header, Indexes and Links are populated)
+// AddCSVDataFrom populates the RecordLinkedIndexedSet with Data from given reader (CSV formated values) (Header, Indexes and Links are populated)
 func (c *RecordLinkedIndexedSet) AddCSVDataFrom(r io.Reader) error {
 	csvr := csv.NewReader(r)
 	csvr.Comma = ';'

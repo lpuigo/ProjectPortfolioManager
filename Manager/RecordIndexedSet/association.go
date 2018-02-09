@@ -6,31 +6,56 @@ import (
 )
 
 type Association struct {
-	data     map[string]string
+	values   map[string]string
+	keys     map[string][]string
 	genKey   rs.KeyGenerator
 	genValue rs.KeyGenerator
 }
 
 func NewAssociation(keyfunc, valuefunc rs.KeyGenerator) *Association {
 	a := &Association{}
-	a.data = make(map[string]string)
+	a.values = make(map[string]string)
+	a.keys = make(map[string][]string)
 	a.genKey, a.genValue = keyfunc, valuefunc
 	return a
 }
 
-// Clone returns a new empty Association having the same Key / Value Generators (but no data)
+// Clone returns a new empty Association having the same Key / Value Generators (but no values)
 func (a *Association) Clone() *Association {
 	return NewAssociation(a.genKey, a.genValue)
 }
 
 // Set creates or replaces key entry with value
 func (a *Association) Set(key, value string) {
-	a.data[key] = value
+	oldv, kfound := a.values[key]
+	if kfound && oldv != value { // new value provided for key
+		// remove key from keys[oldv]
+		ks := a.keys[oldv]
+		for i, k := range ks {
+			if k == key {
+				ks = append(ks[:i], ks[i+1:]...)
+				break
+			}
+		}
+		if len(ks) == 0 {
+			delete(a.keys, oldv)
+		} else {
+			a.keys[oldv] = ks
+		}
+	}
+	// set new value
+	a.values[key] = value
+	listKeys, found := a.keys[value]
+	if !found {
+		a.keys[value] = []string{key}
+	} else {
+		a.keys[value] = append(listKeys, key)
+	}
 }
 
 // Get returns value associated with key, if exists, or def otherwise
 func (a *Association) Get(key, def string) string {
-	if v, found := a.data[key]; found {
+	if v, found := a.values[key]; found {
 		return v
 	}
 	return def
@@ -38,9 +63,9 @@ func (a *Association) Get(key, def string) string {
 
 // Keys returns all known keys sorted
 func (a *Association) Keys() []string {
-	res := make([]string, len(a.data))
+	res := make([]string, len(a.values))
 	i := 0
-	for k, _ := range a.data {
+	for k, _ := range a.values {
 		res[i] = k
 		i++
 	}
@@ -49,31 +74,25 @@ func (a *Association) Keys() []string {
 }
 
 func (a *Association) KeysMatching(value string) []string {
-	res := []string{}
-	for k, v := range a.data {
-		if v == value {
-			res = append(res, k)
-		}
-	}
+	res := a.keys[value]
 	sort.Strings(res)
 	return res
 }
 
 func (a *Association) HasValue(value string) bool {
-	for _, v := range a.data {
-		if v == value {
-			return true
-		}
-	}
-	return false
+	_, found := a.keys[value]
+	return found
 }
 
 func (a *Association) Values() []string {
-	vals := NewAssociation(nil, nil)
-	for _, v := range a.data {
-		vals.Set(v, "")
+	res := make([]string, len(a.keys))
+	i := 0
+	for k, _ := range a.keys {
+		res[i] = k
+		i++
 	}
-	return vals.Keys()
+	sort.Strings(res)
+	return res
 }
 
 func (a *Association) UpdateWith(r rs.Record) {
