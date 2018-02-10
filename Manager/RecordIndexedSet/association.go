@@ -28,19 +28,23 @@ func (a *Association) Clone() *Association {
 // Set creates or replaces key entry with value
 func (a *Association) Set(key, value string) {
 	oldv, kfound := a.values[key]
-	if kfound && oldv != value { // new value provided for key
-		// remove key from keys[oldv]
-		ks := a.keys[oldv]
-		for i, k := range ks {
-			if k == key {
-				ks = append(ks[:i], ks[i+1:]...)
-				break
+	if kfound {
+		if oldv == value { // nothing new here, exit
+			return
+		} else { // new value provided for key
+			// remove key from keys[oldv]
+			ks := a.keys[oldv]
+			for i, k := range ks {
+				if k == key {
+					ks = append(ks[:i], ks[i+1:]...)
+					break
+				}
 			}
-		}
-		if len(ks) == 0 {
-			delete(a.keys, oldv)
-		} else {
-			a.keys[oldv] = ks
+			if len(ks) == 0 {
+				delete(a.keys, oldv)
+			} else {
+				a.keys[oldv] = ks
+			}
 		}
 	}
 	// set new value

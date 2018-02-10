@@ -11,6 +11,9 @@ func newAssociation() *Association {
 	a.Set("B", "2")
 	a.Set("A", "1")
 	a.Set("C", "1")
+	a.Set("B", "2")
+	a.Set("A", "1")
+	a.Set("C", "1")
 	return a
 }
 
@@ -30,7 +33,7 @@ func TestAssociation_Get(t *testing.T) {
 	for _, tv := range tvl {
 		res := a.Get(tv.key, tv.def)
 		if res != tv.expres {
-			t.Errorf("Association.Get('%s', '%s') returns %s instead of '%s'", tv.key, tv.def, res, tv.expres)
+			t.Errorf("Association.Get('%s', '%s') returns '%s' instead of '%s'", tv.key, tv.def, res, tv.expres)
 		}
 	}
 }
@@ -67,7 +70,7 @@ func TestAssociation_KeysMatching(t *testing.T) {
 	for _, tv := range tvl {
 		res := strings.Join(a.KeysMatching(tv.value), " ")
 		if res != tv.expres {
-			t.Errorf("Association.KeysMatching('%s') returns %s instead of '%s'", tv.value, res, tv.expres)
+			t.Errorf("Association.KeysMatching('%s') returns '%s' instead of '%s'", tv.value, res, tv.expres)
 		}
 	}
 }

@@ -60,10 +60,12 @@ func TestManager_GetProjectStatById(t *testing.T) {
 		}
 	}
 
-	for _, id := range prjIds {
-		w := new(bytes.Buffer)
-		m.GetProjectStatById(id, w)
-	}
+	w := new(bytes.Buffer)
+	m.GetProjectStatById(5, w)
+	//for _, id := range prjIds {
+	//	w := new(bytes.Buffer)
+	//	m.GetProjectStatById(id, w)
+	//}
 }
 
 func BenchmarkManager_GetProjectStatById(b *testing.B) {
