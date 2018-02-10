@@ -1,9 +1,9 @@
-package Manager
+package manager
 
 import (
 	"errors"
 	"fmt"
-	"github.com/lpuig/Novagile/Model"
+	"github.com/lpuig/novagile/model"
 	"github.com/tealeg/xlsx"
 	"io"
 )
@@ -59,7 +59,7 @@ func processRow(r *xlsx.Row, ptf *PrjPortfolio, index *ColIndex) (err error) {
 	}
 	prj := ptf.GetPrjById(prjId)
 	if prj == nil {
-		prj = Model.NewProject()
+		prj = model.NewProject()
 		prj.Id = prjId
 		ptf.AddPrj(prj)
 	}
@@ -79,8 +79,8 @@ func processRow(r *xlsx.Row, ptf *PrjPortfolio, index *ColIndex) (err error) {
 	}
 	prj.Comment = getInfo("Commentaire").Value
 
-	std := Model.NewSituationToDate()
-	std.UpdateOn = Model.Today()
+	std := model.NewSituationToDate()
+	std.UpdateOn = model.Today()
 	// Parse Cols related to described milstones
 	// TODO Find a way to dynamically choose relevent Cols ID
 	for _, i := range []int{8, 9, 10, 11, 12, 13, 14} {
@@ -89,7 +89,7 @@ func processRow(r *xlsx.Row, ptf *PrjPortfolio, index *ColIndex) (err error) {
 		if err != nil {
 			continue
 		}
-		date := Model.Date(xlsx.TimeFromExcelTime(d, false))
+		date := model.Date(xlsx.TimeFromExcelTime(d, false))
 		std.MileStones[m] = date
 	}
 	prj.Situation.Update(std)
@@ -171,8 +171,8 @@ func writeXLSHeaderRow(ptf *PrjPortfolio, sheet *xlsx.Sheet) map[string]int {
 	}
 	vertTextStyle.ApplyAlignment = true
 
-	ds := Model.Today().AddDays(-30).GetMonday()
-	de := Model.Today().AddDays(85).GetMonday()
+	ds := model.Today().AddDays(-30).GetMonday()
+	de := model.Today().AddDays(85).GetMonday()
 	for d := ds; d.Before(de); d = d.AddDays(7) {
 		col++
 		colIndex[d.String()] = col
@@ -185,7 +185,7 @@ func writeXLSHeaderRow(ptf *PrjPortfolio, sheet *xlsx.Sheet) map[string]int {
 	return colIndex
 }
 
-func writeXLSProjectRow(project *Model.Project, rownum int, sheet *xlsx.Sheet, colIndex map[string]int) {
+func writeXLSProjectRow(project *model.Project, rownum int, sheet *xlsx.Sheet, colIndex map[string]int) {
 	std := project.Situation.GetSituationToDate()
 
 	addMilestone := func(cell *xlsx.Cell, m string) {

@@ -1,20 +1,20 @@
-package Model
+package model
 
 import (
 	"fmt"
-	"github.com/lpuig/Novagile/Model/Stats"
+	"github.com/lpuig/novagile/model/stats"
 	"sort"
 )
 
 type ProjectStat struct {
 	Id        int  `json:"id"`
 	StartDate Date `json:"dates"`
-	*Stats.Stat
+	*stats.Stat
 }
 
 func NewProjectStat() *ProjectStat {
 	ps := &ProjectStat{
-		Stat:      Stats.NewStat(),
+		Stat:      stats.NewStat(),
 		StartDate: Today(),
 	}
 

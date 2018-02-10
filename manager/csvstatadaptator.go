@@ -1,10 +1,10 @@
-package Manager
+package manager
 
 import (
 	"encoding/csv"
 	"fmt"
-	fw "github.com/lpuig/Novagile/Manager/FileWarnings"
-	"github.com/lpuig/Novagile/Model"
+	fw "github.com/lpuig/novagile/manager/filewarnings"
+	"github.com/lpuig/novagile/model"
 	"io"
 	"os"
 	"strconv"
@@ -37,7 +37,7 @@ func parseRecord(record []string, pptf *PrjPortfolio, sptf *StatPortfolio, colin
 	prjKeyCatalog := createProjectKeyCatalog(pptf)
 
 	pk := projectKey(record[colindex["CLIENT_NAME"]], record[colindex["PROJECT"]])
-	d, err := Model.DateFromString(record[colindex["DATE"]])
+	d, err := model.DateFromString(record[colindex["DATE"]])
 	if err != nil {
 		csvFileWarning.AddWarning(numline, err.Error())
 		return 0
@@ -62,7 +62,7 @@ func parseRecord(record []string, pptf *PrjPortfolio, sptf *StatPortfolio, colin
 	sp := sptf.GetStatById(id)
 	if sp == nil {
 		// related project does not has stat yet, let's create it
-		sp = Model.NewProjectStat()
+		sp = model.NewProjectStat()
 		sp.Id = id
 		sp.StartDate = d
 		sptf.AddProjectStat(sp)

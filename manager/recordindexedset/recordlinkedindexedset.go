@@ -1,9 +1,9 @@
-package RecordIndexedSet
+package recordindexedset
 
 import (
 	"encoding/csv"
 	"fmt"
-	rs "github.com/lpuig/Novagile/Manager/RecordSet"
+	rs "github.com/lpuig/novagile/manager/recordset"
 	"io"
 	"os"
 )

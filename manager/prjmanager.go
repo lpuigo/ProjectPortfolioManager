@@ -1,18 +1,18 @@
-package Manager
+package manager
 
 import (
-	"github.com/lpuig/Novagile/Manager/DataManager"
+	"github.com/lpuig/novagile/manager/datamanager"
 	"log"
 )
 
 type PrjManager struct {
-	*DataManager.DataManager
+	*datamanager.DataManager
 	ptf *PrjPortfolio
 }
 
 func NewPrjManagerFromPersistFile(file string) (*PrjManager, error) {
 	pm := &PrjManager{}
-	pm.DataManager = DataManager.NewDataManager(func() error {
+	pm.DataManager = datamanager.NewDataManager(func() error {
 		return pm.GetProjectsPtf().WriteJsonFile(file)
 	})
 	p, err := NewPrjPortfolioFromJSONFile(file)

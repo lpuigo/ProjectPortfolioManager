@@ -1,7 +1,7 @@
-package RecordIndexedSet
+package recordindexedset
 
 import (
-	rs "github.com/lpuig/Novagile/Manager/RecordSet"
+	rs "github.com/lpuig/novagile/manager/recordset"
 	"strings"
 )
 

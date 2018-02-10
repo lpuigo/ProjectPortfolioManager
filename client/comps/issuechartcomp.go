@@ -1,8 +1,8 @@
-package Comps
+package comps
 
 import (
 	"github.com/gopherjs/gopherjs/js"
-	fm "github.com/lpuig/Novagile/Client/FrontModel"
+	fm "github.com/lpuig/novagile/client/frontmodel"
 	"github.com/oskca/gopherjs-vue"
 )
 

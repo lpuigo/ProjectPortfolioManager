@@ -1,9 +1,9 @@
-package Manager
+package manager
 
 import (
 	"bytes"
 	"fmt"
-	"github.com/lpuig/Novagile/Manager/FileProcesser"
+	"github.com/lpuig/novagile/manager/fileprocesser"
 	"os"
 	"runtime/pprof"
 	"testing"
@@ -11,11 +11,11 @@ import (
 )
 
 const (
-	prjfile = `C:\Users\Laurent\Golang\src\github.com\lpuig\Novagile\Ressources\Projets Novagile.xlsx.json`
-	//StatFile = `C:\Users\Laurent\Google Drive\Golang\src\github.com\lpuig\Novagile\Ressources\Test Stats Projets Novagile.json`
-	csvfile = `C:\Users\Laurent\Golang\src\github.com\lpuig\Novagile\Ressources\export Jira\extract 2018-01-03.csv`
+	prjfile = `C:\Users\Laurent\Golang\src\github.com\lpuig\novagile\Ressources\Projets Novagile.xlsx.json`
+	//StatFile = `C:\Users\Laurent\Google Drive\Golang\src\github.com\lpuig\novagile\Ressources\Test Stats Projets Novagile.json`
+	csvfile = `C:\Users\Laurent\Golang\src\github.com\lpuig\novagile\Ressources\export Jira\extract 2018-01-03.csv`
 
-	PrdStatFile     = `C:\Users\Laurent\Golang\src\github.com\lpuig\Novagile\Ressources\Stats Projets Novagile.csv`
+	PrdStatFile     = `C:\Users\Laurent\Golang\src\github.com\lpuig\novagile\Ressources\Stats Projets Novagile.csv`
 	UpdateStatDir   = `C:\Users\Laurent\Google Drive\Travail\NOVAGILE\Gouvernance\Stat Jira\Extract SRE\`
 	ArchivedStatDir = `C:\Users\Laurent\Google Drive\Travail\NOVAGILE\Gouvernance\Stat Jira\Archived SRE`
 	UpdateStatFile  = UpdateStatDir + `extract 2018-01-04.csv`
@@ -33,7 +33,7 @@ func TestInitActualDataOnProdFile(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewManager returns %s", err.Error())
 	}
-	m.Fp, err = FileProcesser.NewFileProcesser(UpdateStatDir, ArchivedStatDir)
+	m.Fp, err = fileprocesser.NewFileProcesser(UpdateStatDir, ArchivedStatDir)
 	if err != nil {
 		t.Fatalf("NewFileProcesser returns %s", err.Error())
 	}

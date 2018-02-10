@@ -1,9 +1,9 @@
-package Comps
+package comps
 
 import (
 	"github.com/gopherjs/gopherjs/js"
 	"github.com/gopherjs/jquery"
-	"github.com/lpuig/Novagile/Client/FrontModel"
+	"github.com/lpuig/novagile/client/frontmodel"
 	"github.com/oskca/gopherjs-vue"
 )
 
@@ -157,15 +157,15 @@ const (
 
 type EditProjectModalComp struct {
 	*js.Object
-	GiventPrj   *FrontModel.Project   `js:"givenprj"`
-	EditedPrj   *FrontModel.Project   `js:"editedprj"`
-	PrjStatList []*FrontModel.ValText `js:"prjstatlist"`
+	GiventPrj   *frontmodel.Project   `js:"givenprj"`
+	EditedPrj   *frontmodel.Project   `js:"editedprj"`
+	PrjStatList []*frontmodel.ValText `js:"prjstatlist"`
 }
 
 func NewEditProjectModalComp() *EditProjectModalComp {
 	a := &EditProjectModalComp{Object: js.Global.Get("Object").New()}
-	a.GiventPrj = FrontModel.NewProject()
-	a.EditedPrj = FrontModel.NewProject()
+	a.GiventPrj = frontmodel.NewProject()
+	a.EditedPrj = frontmodel.NewProject()
 	a.PrjStatList = nil
 
 	return a
@@ -231,7 +231,7 @@ func RegisterEditProjectModalComp() *vue.Component {
 
 	o.AddMethod("duplicateProject", func(vm *vue.ViewModel, args []*js.Object) {
 		m := &EditProjectModalComp{Object: vm.Object}
-		m.GiventPrj = FrontModel.NewProject()
+		m.GiventPrj = frontmodel.NewProject()
 		m.EditedPrj.Id = -1
 		m.EditedPrj.Name += " (Copie)"
 		m.EditedPrj.CurrentWL = 0.0
@@ -240,10 +240,10 @@ func RegisterEditProjectModalComp() *vue.Component {
 
 	o.AddMethod("ShowEditProjectModal", func(vm *vue.ViewModel, args []*js.Object) {
 		m := &EditProjectModalComp{Object: vm.Object}
-		p := &FrontModel.Project{Object: args[0]}
+		p := &frontmodel.Project{Object: args[0]}
 		m.EditedPrj.Copy(p)
 
-		m.PrjStatList = FrontModel.NewProjectStatNameFromJS(args[1]).GetProjectStatSignatures()
+		m.PrjStatList = frontmodel.NewProjectStatNameFromJS(args[1]).GetProjectStatSignatures()
 
 		vm.Refs.Get("StatutDD").Call("changeSelected", m.EditedPrj.Status)
 		vm.Refs.Get("TypeDD").Call("changeSelected", m.EditedPrj.Type)
@@ -254,7 +254,7 @@ func RegisterEditProjectModalComp() *vue.Component {
 
 	o.AddMethod("SetClientProject", func(vm *vue.ViewModel, args []*js.Object) {
 		m := &EditProjectModalComp{Object: vm.Object}
-		v := &FrontModel.ValText{Object: args[0]}
+		v := &frontmodel.ValText{Object: args[0]}
 		jq(vm.Refs.Get("ProjectStatLookUpDD")).Call("dropdown", "hide")
 		m.EditedPrj.Client = v.Value
 		m.EditedPrj.Name = v.Text

@@ -1,4 +1,4 @@
-package RecordIndexedSet
+package recordindexedset
 
 import (
 	"strings"

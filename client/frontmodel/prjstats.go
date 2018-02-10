@@ -1,10 +1,13 @@
-package FrontModel
+package frontmodel
 
 import (
 	"github.com/gopherjs/gopherjs/js"
 	"strings"
 )
 
+//go:generate easyjson.exe prjstats.go
+
+//easyjson:json
 type ProjectStat struct {
 	*js.Object
 	Issues        []string    `json:"issues"         js:"issues"`

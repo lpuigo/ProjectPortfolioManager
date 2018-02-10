@@ -1,25 +1,25 @@
-package Manager
+package manager
 
 import (
 	"encoding/json"
-	"github.com/lpuig/Novagile/Model"
-	"github.com/lpuig/Novagile/Model/IdIndex"
+	"github.com/lpuig/novagile/model"
+	"github.com/lpuig/novagile/model/idindex"
 	"os"
 )
 
 type StatPortfolio struct {
-	index IdIndex.IdIndex
-	Stats []*Model.ProjectStat `json:"stats"`
+	index idindex.IdIndex
+	Stats []*model.ProjectStat `json:"stats"`
 }
 
 func NewStatPortfolio() *StatPortfolio {
-	sptf := &StatPortfolio{Stats: []*Model.ProjectStat{}}
+	sptf := &StatPortfolio{Stats: []*model.ProjectStat{}}
 	sptf.refreshIndex()
 	return sptf
 }
 
 // GetStatById returns the ProjectStat with given Id (nil if not found)
-func (sptf *StatPortfolio) GetStatById(id int) *Model.ProjectStat {
+func (sptf *StatPortfolio) GetStatById(id int) *model.ProjectStat {
 	e, found := sptf.index.ById(id)
 	if !found {
 		return nil
@@ -34,7 +34,7 @@ func (sptf *StatPortfolio) GetStatById(id int) *Model.ProjectStat {
 }
 
 func (sptf *StatPortfolio) refreshIndex() {
-	sptf.index = IdIndex.New()
+	sptf.index = idindex.New()
 	for pos, s := range sptf.Stats {
 		sptf.index.AddElem(s.Id, pos)
 	}
@@ -54,7 +54,7 @@ func (sptf *StatPortfolio) nextId() int {
 }
 
 // AddProjectStat adds the given ProjectStat to the StatPortfolio
-func (sptf *StatPortfolio) AddProjectStat(ps *Model.ProjectStat) *Model.ProjectStat {
+func (sptf *StatPortfolio) AddProjectStat(ps *model.ProjectStat) *model.ProjectStat {
 	sptf.index.AddElem(ps.Id, len(sptf.Stats))
 	sptf.Stats = append(sptf.Stats, ps)
 	return ps

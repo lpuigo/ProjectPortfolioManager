@@ -1,25 +1,25 @@
-package Manager
+package manager
 
 import (
 	"encoding/json"
-	"github.com/lpuig/Novagile/Model"
-	"github.com/lpuig/Novagile/Model/IdIndex"
+	"github.com/lpuig/novagile/model"
+	"github.com/lpuig/novagile/model/idindex"
 	"os"
 )
 
 type PrjPortfolio struct {
-	index    IdIndex.IdIndex
-	Projects []*Model.Project `json:"projects"`
+	index    idindex.IdIndex
+	Projects []*model.Project `json:"projects"`
 }
 
 func NewPrjPortfolio() *PrjPortfolio {
-	pptf := &PrjPortfolio{Projects: []*Model.Project{}}
+	pptf := &PrjPortfolio{Projects: []*model.Project{}}
 	pptf.refreshIndex()
 	return pptf
 }
 
 // GetPrjById returns the Project with given Id (nil if not found)
-func (pptf *PrjPortfolio) GetPrjById(id int) *Model.Project {
+func (pptf *PrjPortfolio) GetPrjById(id int) *model.Project {
 	e, found := pptf.index.ById(id)
 	if !found {
 		return nil
@@ -34,7 +34,7 @@ func (pptf *PrjPortfolio) GetPrjById(id int) *Model.Project {
 }
 
 func (pptf *PrjPortfolio) refreshIndex() {
-	pptf.index = IdIndex.New()
+	pptf.index = idindex.New()
 	for pos, p := range pptf.Projects {
 		pptf.index.AddElem(p.Id, pos)
 	}
@@ -54,7 +54,7 @@ func (pptf *PrjPortfolio) nextId() int {
 }
 
 // AddPrj adds the given project to the PrjPortfolio (new project p is assigned a new Id, but no unicity control is being undertaken for PrjPortfolio consistency)
-func (pptf *PrjPortfolio) AddPrj(p *Model.Project) *Model.Project {
+func (pptf *PrjPortfolio) AddPrj(p *model.Project) *model.Project {
 	p.Id = pptf.nextId()
 	pptf.index.AddElem(p.Id, len(pptf.Projects))
 	pptf.Projects = append(pptf.Projects, p)

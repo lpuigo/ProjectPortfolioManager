@@ -1,8 +1,8 @@
-package FrontModel
+package frontmodel
 
 import (
 	"github.com/gopherjs/gopherjs/js"
-	"github.com/lpuig/Novagile/Model"
+	"github.com/lpuig/novagile/model"
 	"strconv"
 	"strings"
 )
@@ -137,11 +137,11 @@ func (p *Project) AddMileStone(msName string) {
 	for k, v := range p.MileStones {
 		nms[k] = v
 	}
-	nms[msName] = Model.Today().StringJS()
+	nms[msName] = model.Today().StringJS()
 	p.MileStones = nms
 }
 
-func CloneBEProject(p *Model.Project, hasStat bool) *Project {
+func CloneBEProject(p *model.Project, hasStat bool) *Project {
 	np := &Project{}
 	np.Id = p.Id
 	np.Client = p.Client
@@ -162,8 +162,8 @@ func CloneBEProject(p *Model.Project, hasStat bool) *Project {
 	return np
 }
 
-func CloneFEProject(p *Project) *Model.Project {
-	np := &Model.Project{}
+func CloneFEProject(p *Project) *model.Project {
+	np := &model.Project{}
 	np.Id = p.Id
 	np.Client = p.Client
 	np.Name = p.Name
@@ -176,10 +176,10 @@ func CloneFEProject(p *Project) *Model.Project {
 	np.ForecastWL = p.ForecastWL
 	np.CurrentWL = p.CurrentWL
 	np.Comment = p.Comment
-	np.Situation = Model.NewSituations()
-	std := Model.NewSituationToDate()
+	np.Situation = model.NewSituations()
+	std := model.NewSituationToDate()
 	for m, d := range p.MileStones {
-		std.MileStones[m], _ = Model.DateFromJSString(d)
+		std.MileStones[m], _ = model.DateFromJSString(d)
 	}
 	np.Situation.Update(std)
 	return np

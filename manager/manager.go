@@ -1,12 +1,13 @@
-package Manager
+package manager
 
 import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	fm "github.com/lpuig/Novagile/Client/FrontModel"
-	fpr "github.com/lpuig/Novagile/Manager/FileProcesser"
-	"github.com/lpuig/Novagile/Model"
+	fm "github.com/lpuig/novagile/client/frontmodel"
+	fpr "github.com/lpuig/novagile/manager/fileprocesser"
+	"github.com/lpuig/novagile/model"
+	"github.com/mailru/easyjson"
 	"io"
 	"os"
 	"time"
@@ -57,7 +58,7 @@ func (m *Manager) GetPrjPtf(w io.Writer) {
 	json.NewEncoder(w).Encode(prjs)
 }
 
-func (m *Manager) GetPrjById(id int) *Model.Project {
+func (m *Manager) GetPrjById(id int) *model.Project {
 	return m.Projects.GetProjectsPtf().GetPrjById(id)
 }
 
@@ -83,7 +84,7 @@ func (m *Manager) updateProjectsSpentTime() {
 	}
 }
 
-func (m *Manager) UpdateProject(op, np *Model.Project) bool {
+func (m *Manager) UpdateProject(op, np *model.Project) bool {
 	m.Projects.WLock()
 	defer m.Projects.WUnlockWithPersist()
 	m.Stats.RLock()
@@ -100,7 +101,7 @@ func (m *Manager) UpdateProject(op, np *Model.Project) bool {
 	return hasStat
 }
 
-func (m *Manager) CreateProject(p *Model.Project) (*Model.Project, bool) {
+func (m *Manager) CreateProject(p *model.Project) (*model.Project, bool) {
 	m.Projects.WLock()
 	defer m.Projects.WUnlockWithPersist()
 	m.Projects.GetProjectsPtf().AddPrj(p)
@@ -203,7 +204,7 @@ func (m *Manager) UpdateStat(r io.Reader) (int, error) {
 	return m.Stats.UpdateFrom(r)
 }
 
-func getProjectKey(p *Model.Project) (string, string) {
+func getProjectKey(p *model.Project) (string, string) {
 	return p.Client, p.Name
 }
 
@@ -229,7 +230,8 @@ func (m *Manager) GetProjectStatById(id int, w io.Writer) error {
 	if err != nil {
 		return err
 	}
-	json.NewEncoder(w).Encode(ps)
+	easyjson.MarshalToWriter(ps, w)
+	//json.NewEncoder(w).Encode(ps)
 	return nil
 }
 

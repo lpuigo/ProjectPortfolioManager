@@ -1,10 +1,10 @@
-package Manager
+package manager
 
 import (
 	"fmt"
-	"github.com/lpuig/Novagile/Manager/DataManager"
-	ris "github.com/lpuig/Novagile/Manager/RecordIndexedSet"
-	"github.com/lpuig/Novagile/Model"
+	"github.com/lpuig/novagile/manager/datamanager"
+	ris "github.com/lpuig/novagile/manager/recordindexedset"
+	"github.com/lpuig/novagile/model"
 	"github.com/xrash/smetrics"
 	"io"
 	"log"
@@ -15,7 +15,7 @@ import (
 )
 
 type StatManager struct {
-	*DataManager.DataManager
+	*datamanager.DataManager
 	stat *ris.RecordLinkedIndexedSet
 }
 
@@ -80,7 +80,7 @@ func NewStatManagerFromFile(file string) (*StatManager, error) {
 	defer f.Close()
 
 	sm := &StatManager{}
-	sm.DataManager = DataManager.NewDataManager(func() error {
+	sm.DataManager = datamanager.NewDataManager(func() error {
 		return sm.stat.WriteCSVToFile(file)
 	})
 	cs, err := newStatSetFrom(f)
@@ -358,11 +358,11 @@ func stringToWL(s string) (float64, error) {
 }
 
 func dateSlice(startDate, endDate string) ([]string, error) {
-	d1, err := Model.DateFromJSString(startDate)
+	d1, err := model.DateFromJSString(startDate)
 	if err != nil {
 		return nil, fmt.Errorf("misformated startDate '%s'", startDate)
 	}
-	d2, err := Model.DateFromJSString(endDate)
+	d2, err := model.DateFromJSString(endDate)
 	if err != nil {
 		return nil, fmt.Errorf("misformated endDate '%s'", endDate)
 	}

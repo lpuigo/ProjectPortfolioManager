@@ -1,12 +1,12 @@
-package Manager
+package manager
 
 import (
-	"github.com/lpuig/Novagile/Model"
+	"github.com/lpuig/novagile/model"
 	"sort"
 	"strings"
 )
 
-type Project = Model.Project
+type Project = model.Project
 
 type lessFunc func(p1, p2 *Project) int
 

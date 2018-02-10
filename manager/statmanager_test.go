@@ -1,9 +1,9 @@
-package Manager
+package manager
 
 import (
 	"fmt"
-	"github.com/lpuig/Novagile/Manager/DataManager"
-	"github.com/lpuig/Novagile/Manager/RecordSet"
+	"github.com/lpuig/novagile/manager/datamanager"
+	"github.com/lpuig/novagile/manager/recordset"
 	"os"
 	"sort"
 	"strings"
@@ -127,7 +127,7 @@ func createTestSM(t *testing.T) *StatManager {
 2017-01-05;TestProduct;SomeClient!TestProject;;Issue2;16.00;16.00;0.00;Summary of Issue2
 `
 	sm := &StatManager{}
-	sm.DataManager = DataManager.NewDataManager(func() error { return nil })
+	sm.DataManager = datamanager.NewDataManager(func() error { return nil })
 	cs, err := newStatSetFrom(strings.NewReader(smSource))
 	if err != nil {
 		t.Fatalf("newStatSetFrom returns %s", err.Error())
@@ -177,13 +177,13 @@ func TestStatManager_GetProjectStatInfoOnPeriod(t *testing.T) {
 	if err != nil {
 		t.Fatalf("GetProjectStatInfo returns %s", err.Error())
 	}
-	if !RecordSet.Record(issues).Equals(RecordSet.Record{"Issue1", "Issue2"}) {
+	if !recordset.Record(issues).Equals(recordset.Record{"Issue1", "Issue2"}) {
 		t.Errorf("issues: %s", issues)
 	}
-	if !RecordSet.Record(summaries).Equals(RecordSet.Record{"Summary of Issue1", "Summary of Issue2"}) {
+	if !recordset.Record(summaries).Equals(recordset.Record{"Summary of Issue1", "Summary of Issue2"}) {
 		t.Errorf("issues: %s", summaries)
 	}
-	if !RecordSet.Record(dates).Equals(RecordSet.Record{"2017-01-01", "2017-01-02", "2017-01-03", "2017-01-04", "2017-01-05", "2017-01-06"}) {
+	if !recordset.Record(dates).Equals(recordset.Record{"2017-01-01", "2017-01-02", "2017-01-03", "2017-01-04", "2017-01-05", "2017-01-06"}) {
 		t.Errorf("dates: %s", dates)
 	}
 	if !equals(spent, [][]float64{[]float64{0.0, 0.0, 5.0, 5.0, 5.0, 5.0}, []float64{0.0, 0.0, 1.0, 1.0, 2.0, 2.0}}) {
