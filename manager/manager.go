@@ -7,7 +7,6 @@ import (
 	fm "github.com/lpuig/novagile/client/frontmodel"
 	fpr "github.com/lpuig/novagile/manager/fileprocesser"
 	"github.com/lpuig/novagile/model"
-	"github.com/mailru/easyjson"
 	"io"
 	"os"
 	"time"
@@ -230,8 +229,8 @@ func (m *Manager) GetProjectStatById(id int, w io.Writer) error {
 	if err != nil {
 		return err
 	}
-	easyjson.MarshalToWriter(ps, w)
-	//json.NewEncoder(w).Encode(ps)
+	//easyjson.MarshalToWriter(ps, w)
+	json.NewEncoder(w).Encode(ps)
 	return nil
 }
 

@@ -7,7 +7,7 @@ import (
 
 //go:generate easyjson.exe prjstats.go
 
-//easyjson:json
+// disabled easyjson:json
 type ProjectStat struct {
 	*js.Object
 	Issues        []string    `json:"issues"         js:"issues"`
