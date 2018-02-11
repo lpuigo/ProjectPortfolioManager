@@ -15,10 +15,14 @@ const (
 	//StatFile = `C:\Users\Laurent\Google Drive\Golang\src\github.com\lpuig\novagile\Ressources\Test Stats Projets Novagile.json`
 	csvfile = `C:\Users\Laurent\Golang\src\github.com\lpuig\novagile\Ressources\export Jira\extract 2018-01-03.csv`
 
-	PrdStatFile     = `C:\Users\Laurent\Golang\src\github.com\lpuig\novagile\Ressources\Stats Projets Novagile.csv`
-	UpdateStatDir   = `C:\Users\Laurent\Google Drive\Travail\NOVAGILE\Gouvernance\Stat Jira\Extract SRE\`
-	ArchivedStatDir = `C:\Users\Laurent\Google Drive\Travail\NOVAGILE\Gouvernance\Stat Jira\Archived SRE`
-	UpdateStatFile  = UpdateStatDir + `extract 2018-01-04.csv`
+	PrdStatFile        = `C:\Users\Laurent\Golang\src\github.com\lpuig\novagile\Ressources\Stats Projets Novagile.csv`
+	UpdateStatDir      = `C:\Users\Laurent\Google Drive\Travail\NOVAGILE\Gouvernance\Stat Jira\Extract SRE\`
+	ArchivedStatDir    = `C:\Users\Laurent\Google Drive\Travail\NOVAGILE\Gouvernance\Stat Jira\Archived SRE`
+	UpdateStatFile     = UpdateStatDir + `extract 2018-01-04.csv`
+	BenchPrjFile       = `C:\Users\Laurent\Golang\src\github.com\lpuig\novagile\Ressources\Test\Bench\Projets Novagile.xlsx.json`
+	BenchStatFile      = `C:\Users\Laurent\Golang\src\github.com\lpuig\novagile\Ressources\Test\Bench\Stats Projets Novagile.csv`
+	BenchArchiveSREDir = `C:\Users\Laurent\Golang\src\github.com\lpuig\novagile\Ressources\Test\Bench\ArchivedSRE`
+	BenchExtractSREDir = `C:\Users\Laurent\Golang\src\github.com\lpuig\novagile\Ressources\Test\Bench\ExtractSRE`
 )
 
 func TestNewManager(t *testing.T) {
@@ -99,5 +103,34 @@ func BenchmarkManager_GetProjectStatById(b *testing.B) {
 		})
 	}
 	pprof.StopCPUProfile()
+}
 
+func BenchmarkManager_ReinitStats(b *testing.B) {
+	m, err := NewManager(BenchPrjFile, BenchStatFile)
+	if err != nil {
+		b.Fatalf("NewManager returns %s", err.Error())
+	}
+	m.Fp, err = fileprocesser.NewFileProcesser(BenchExtractSREDir, BenchArchiveSREDir)
+	if err != nil {
+		b.Fatalf("NewFileProcesser returns %s", err.Error())
+	}
+
+	f, err := os.Create("ReinitStats.pprof")
+	if err != nil {
+		b.Fatalf("could not create: %s", err.Error())
+	}
+	defer f.Close()
+	pprof.StartCPUProfile(f)
+
+	for n := 0; n < b.N; n++ {
+		for i := 0; i < 10; i++ {
+			w := new(bytes.Buffer)
+			m.ReinitStats(w)
+			//b.Log(w.String())
+
+		}
+	}
+	pprof.StopCPUProfile()
+
+	time.Sleep(4 * time.Second)
 }
