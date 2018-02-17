@@ -4,7 +4,16 @@ import (
 	"github.com/gopherjs/gopherjs/js"
 	fm "github.com/lpuig/novagile/client/frontmodel"
 	"github.com/oskca/gopherjs-vue"
+	"time"
 )
+
+const TimeJSLayout string = "2006-01-02"
+
+func dateFromJSString(s string) int64 {
+	res := time.Time{}
+	res, _ = time.Parse(TimeJSLayout, s)
+	return res.Unix() * 1000
+}
 
 type IssueChartComp struct {
 	*js.Object
@@ -45,6 +54,8 @@ func RegisterIssueChartComp() *vue.Component {
 		ic := &IssueChartComp{Object: vm.Object}
 		is := ic.IssueStat
 
+		startDate := dateFromJSString(is.StartDate)
+
 		chartdesc := js.M{
 			"chart": js.M{
 				"backgroundColor": "#F7F7F7",
@@ -53,8 +64,15 @@ func RegisterIssueChartComp() *vue.Component {
 			"title": js.M{
 				"text": nil,
 			},
+			//"xAxis": js.M{
+			//	"categories": is.Dates,
+			//	"tickPixelInterval" : 400,
+			//},
 			"xAxis": js.M{
-				"categories": is.Dates,
+				"type": "datetime",
+				"dateTimeLabelFormats": js.M{
+					"day": "%e %b",
+				},
 			},
 			"yAxis": js.M{
 				"title": js.M{
@@ -66,11 +84,13 @@ func RegisterIssueChartComp() *vue.Component {
 				"align":         "right",
 				"verticalAlign": "top",
 			},
-			//"plotOptions": js.M{
-			//	"series": js.M{
-			//		"allowPointSelect": false,
-			//	},
-			//},
+			"plotOptions": js.M{
+				"series": js.M{
+					"allowPointSelect": false,
+					"pointStart":       startDate,
+					"pointInterval":    24 * 3600 * 1000, // one day
+				},
+			},
 			"series": js.S{
 				js.M{
 					"name": "Passé",

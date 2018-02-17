@@ -251,7 +251,7 @@ func (sm *StatManager) issuesInfosFromProject(client, name string) (issuesKeys [
 }
 
 // GetProjectStatInfoOnPeriod returns list of issues, dates slices within Given Period, and timeSpent, timeRemaining, timeEstimated doubleslices ([#issue][#date]) for given project client/name
-func (sm *StatManager) GetProjectStatInfoOnPeriod(client, name, startDate, endDate string) (issues, summaries, dates []string, spent, remaining, estimated [][]float64, err error) {
+func (sm *StatManager) GetProjectStatInfoOnPeriod(client, name, startDate, endDate string) (issues, summaries []string, sDate string, spent, remaining, estimated [][]float64, err error) {
 	issuesKeys, nums, err := sm.issuesInfosFromProject(client, name)
 	issues = make([]string, len(issuesKeys))
 	summaries = make([]string, len(issuesKeys))
@@ -281,7 +281,9 @@ func (sm *StatManager) GetProjectStatInfoOnPeriod(client, name, startDate, endDa
 	if endDate == "" || endDate < maxDate {
 		endDate = maxDate
 	}
+	sDate = startDate
 	// Create Date list (chronologically sorted from start-end dates) => result dates slice
+	var dates []string
 	dates, err = dateSlice(startDate, endDate)
 	if err != nil {
 		return

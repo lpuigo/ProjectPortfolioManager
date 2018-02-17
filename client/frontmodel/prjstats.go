@@ -12,7 +12,7 @@ type ProjectStat struct {
 	*js.Object
 	Issues        []string    `json:"issues"         js:"issues"`
 	Summaries     []string    `json:"summaries"      js:"summaries"`
-	Dates         []string    `json:"dates"          js:"dates"`
+	StartDate     string      `json:"startDate"      js:"startDate"`
 	TimeSpent     [][]float64 `json:"timeSpent"      js:"timeSpent"`
 	TimeRemaining [][]float64 `json:"timeRemaining"  js:"timeRemaining"`
 	TimeEstimated [][]float64 `json:"timeEstimated"  js:"timeEstimated"`
@@ -22,7 +22,7 @@ func NewProjectStat() *ProjectStat {
 	ps := &ProjectStat{Object: js.Global.Get("Object").New()}
 	ps.Issues = []string{}
 	ps.Summaries = []string{}
-	ps.Dates = []string{}
+	ps.StartDate = ""
 	ps.TimeSpent = [][]float64{}
 	ps.TimeRemaining = [][]float64{}
 	ps.TimeEstimated = [][]float64{}
@@ -38,7 +38,7 @@ type IssueStat struct {
 	*js.Object
 	Issue         string    `js:"issue"`
 	HRef          string    `js:"href"`
-	Dates         []string  `js:"dates"`
+	StartDate     string    `js:"startDate"`
 	TimeSpent     []float64 `js:"timeSpent"`
 	TimeRemaining []float64 `js:"timeRemaining"`
 	TimeEstimated []float64 `js:"timeEstimated"`
@@ -48,7 +48,7 @@ func NewIssueStat() *IssueStat {
 	is := &IssueStat{Object: js.Global.Get("Object").New()}
 	is.Issue = ""
 	is.HRef = ""
-	is.Dates = []string{}
+	is.StartDate = ""
 	is.TimeSpent = []float64{}
 	is.TimeRemaining = []float64{}
 	is.TimeEstimated = []float64{}
@@ -61,7 +61,7 @@ func CreateIssueStatsFromProjectStat(ps *ProjectStat) []*IssueStat {
 		is := NewIssueStat()
 		is.Issue = issue + " : " + ps.Summaries[i]
 		is.HRef = "http://jira.acticall.com/browse/" + issue
-		is.Dates = ps.Dates
+		is.StartDate = ps.StartDate
 		is.TimeSpent = ps.TimeSpent[i]
 		is.TimeRemaining = ps.TimeRemaining[i]
 		is.TimeEstimated = ps.TimeEstimated[i]
@@ -72,10 +72,10 @@ func CreateIssueStatsFromProjectStat(ps *ProjectStat) []*IssueStat {
 
 func CreateSumStatFromProjectStat(ps *ProjectStat) *IssueStat {
 	sis := NewIssueStat()
-	sis.Dates = ps.Dates
+	sis.StartDate = ps.StartDate
 	sis.Issue = "Ensemble du projet"
 
-	for j, _ := range ps.Dates {
+	for j, _ := range ps.TimeSpent[0] {
 		s, r, e := 0.0, 0.0, 0.0
 		for i, _ := range ps.Issues {
 			s += ps.TimeSpent[i][j]
