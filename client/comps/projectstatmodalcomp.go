@@ -9,30 +9,32 @@ import (
 
 const (
 	TemplateProjectStatModalComp = `
-        <div class="ui large modal" id="ProjectStatModalComp">
-			<i class="close icon"></i>
-            <div class="header">
-                <!--<h3>Edition du projet : <span style="color: steelblue">{{projecttitle}}</span></h3>-->
-                <h3 class="ui header">
-                	<i class="area chart icon"></i>
-                	<div class="content">
-                		Statistiques du projet : <span style="color: teal">{{givenprj.client}} - {{givenprj.name}}</span>                	
-					</div>
-                </h3>
+<div class="ui large modal" id="ProjectStatModalComp">
+    <i class="close icon"></i>
+	<!--<div id="_copytarget_" ></div>-->
+	<div id="_copytarget_" style="position: absolute; left: -9999px; top:0"></div>
+    <div class="header">
+        <!--<h3>Edition du projet : <span style="color: steelblue">{{projecttitle}}</span></h3>-->
+        <h3 class="ui header">
+            <i class="area chart icon"></i>
+            <div class="content">
+                Statistiques du projet : <span style="color: teal">{{givenprj.client}} - {{givenprj.name}}</span>                	
             </div>
+        </h3>
+    </div>
 
-            <!--<div class="content" v-if="project">-->
-            <div class="scrolling content">
-            	<issue-chart :issuestat="sumstat" v-if="sumstat"></issue-chart>
-            	
-            	<issue-chart v-for="istat in issuestats" :issuestat="istat"></issue-chart>
-            </div>
-            <!--<div class="actions">-->
-				<!--<div class="ui button">-->
-					<!--Fermer-->
-				<!--</div>-->
-            <!--</div>-->
+    <!--<div class="content" v-if="project">-->
+    <div class="scrolling content">
+        <issue-chart :issuestat="sumstat" v-if="sumstat"></issue-chart>
+        
+        <issue-chart v-for="istat in issuestats" :issuestat="istat"></issue-chart>
+    </div>
+    <div class="actions">
+        <div class="ui button" @click="CopyJiraLinks()">
+            Copier les liens
         </div>
+    </div>
+</div>
 `
 )
 
@@ -51,6 +53,36 @@ func NewProjectStatModalComp() *ProjectStatModalComp {
 	psm.IssueStats = nil
 	psm.SumStat = nil
 	return psm
+}
+
+func (psm *ProjectStatModalComp) copyJiraLinks(vm *vue.ViewModel) {
+	res := ""
+	for _, is := range psm.IssueStats {
+		res += `<a href="`+ is.HRef + `">` + is.Issue + `</a><br>`
+	}
+
+	var document = js.Global.Get("document")
+
+	//var aux = document.createElement("div");
+	copyTarget := document.Call("getElementById", "_copytarget_")
+	//aux.setAttribute("contentEditable", true);
+	copyTarget.Set("contentEditable", true)
+	//aux.innerHTML = document.getElementById(element_id).innerHTML;
+	copyTarget.Set("innerHTML", res)
+	//aux.setAttribute("onfocus", "document.execCommand('selectAll',false,null)");
+	copyTarget.Set("onfocus", func(event *js.Object) {
+		document.Call("execCommand", "selectAll", "false", "null")
+	})
+	//document.body.appendChild(aux);
+
+	//aux.focus();
+	copyTarget.Call("focus")
+
+	//document.execCommand("copy");
+	isSuccessful := document.Call("execCommand", "copy").Bool()
+	if !isSuccessful {
+		js.Global.Call("alert", "Copy Fail")
+	}
 }
 
 // RegisterProjectStatModalComp registers to current vue intance a ProjectStatModal component
@@ -86,6 +118,12 @@ func RegisterProjectStatModalComp() *vue.Component {
 			},
 		}
 		jq(vm.El).Call("modal", modalOptions)
+	})
+
+	o.AddMethod("CopyJiraLinks", func(vm *vue.ViewModel, args []*js.Object) {
+		psm := &ProjectStatModalComp{Object: vm.Object}
+
+		psm.copyJiraLinks(vm)
 	})
 
 	o.AddMethod("ShowProjectStatModal", func(vm *vue.ViewModel, args []*js.Object) {
