@@ -94,6 +94,7 @@ func LaunchPageInBrowser(lockfile string) error {
 // Done launch webpage with command("cmd /c start http://localhost:8080") or "explorer "http://localhost:8080""
 // Done expose import service (update stat with all csv file found in "Import" Dir, processed file are zipped and moved to "Imported" dir, or "Failed" dir if an error occurered. A file with related error is produced aside from the rejected file
 // TODO Create a log file containing all server activity
+// TODO Create rules in RecordSet to format record (eg : ensure SRE are formated as %.4f)
 // TODO expose a service to upload the log file
 // TODO expose an admin front end to show server activity / trigger admin operation
 
