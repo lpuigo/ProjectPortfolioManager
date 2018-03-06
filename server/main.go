@@ -33,22 +33,22 @@ const (
 )
 
 type Conf struct {
-	StatInputDir   string
-	StatArchiveDir string
-	ServicePort    string
-	LogFile        string
-	NoWebLock      bool
+	StatInputDir     string
+	StatArchiveDir   string
+	ServicePort      string
+	LogFile          string
+	LaunchWebBrowser bool
 }
 
 func main() {
 
 	// Init Config
 	conf := &Conf{
-		StatInputDir:   JiraStatDir,
-		StatArchiveDir: ArchivedStatDir,
-		ServicePort:    ServicePort,
-		LogFile:        LogFile,
-		NoWebLock:      LaunchWebBrowser,
+		StatInputDir:     JiraStatDir,
+		StatArchiveDir:   ArchivedStatDir,
+		ServicePort:      ServicePort,
+		LogFile:          LogFile,
+		LaunchWebBrowser: LaunchWebBrowser,
 	}
 	if err := config.SetFromFile(ConfigFile, conf); err != nil {
 		log.Fatal(err)
@@ -88,7 +88,7 @@ func main() {
 	router.PathPrefix(AssetsRoot).Handler(http.StripPrefix(AssetsRoot, http.FileServer(http.Dir(AssetsDir))))
 	router.PathPrefix("/").Handler(http.FileServer(http.Dir(RootDir)))
 
-	LaunchPageInBrowser(conf.NoWebLock)
+	LaunchPageInBrowser(conf.LaunchWebBrowser)
 	log.Print("Listening on ", ServicePort)
 	log.Fatal(http.ListenAndServe(ServicePort, router))
 }
