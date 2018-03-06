@@ -7,7 +7,7 @@ func createStatuts() []*fm.ValText {
 	res = append(res, fm.NewValText("1 - Candidat", "Candidat"))
 	res = append(res, fm.NewValText("2 - Cadrage", "Cadrage en cours"))
 	res = append(res, fm.NewValText("3 - En Cours", "Développement en cours"))
-	res = append(res, fm.NewValText("4 - Pilote", "Phase Pilote client en cours"))
+	res = append(res, fm.NewValText("4 - Recette", "Recette client en cours"))
 	res = append(res, fm.NewValText("5 - SAV", "Suivi post Mise en Service"))
 	res = append(res, fm.NewValText("6 - Terminé", "Terminé"))
 	res = append(res, fm.NewValText("0 - Candidat Perdu", "Candidat Perdu"))
@@ -22,6 +22,7 @@ func createTypes() []*fm.ValText {
 	res = append(res, fm.NewValText("Sitel", "Novagile pour Sitel"))
 	res = append(res, fm.NewValText("Specif", "Spécifique"))
 	res = append(res, fm.NewValText("Archi", "Architecture"))
+	res = append(res, fm.NewValText("Roadmap", "Roadmap"))
 	return res
 }
 
