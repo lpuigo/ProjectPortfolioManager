@@ -23,7 +23,7 @@ const (
 	StatCSVFile = `./Ressources/Stats Projets Novagile.csv`
 	PrjJSONFile = `./Ressources/Projets Novagile.xlsx.json`
 
-	NoWebLockFile = `./Ressources/NoWebOpening.lock`
+	NoWebLock = true
 
 	JiraStatDir     = `C:\Users\Laurent\Google Drive\Travail\NOVAGILE\Gouvernance\Stat Jira\Extract SRE`
 	ArchivedStatDir = `C:\Users\Laurent\Google Drive\Travail\NOVAGILE\Gouvernance\Stat Jira\Archived SRE`
