@@ -23,7 +23,7 @@ const (
 	StatCSVFile = `./Ressources/Stats Projets Novagile.csv`
 	PrjJSONFile = `./Ressources/Projets Novagile.xlsx.json`
 
-	NoWebLock = true
+	LaunchWebBrowser = true
 
 	JiraStatDir     = `C:\Users\Laurent\Google Drive\Travail\NOVAGILE\Gouvernance\Stat Jira\Extract SRE`
 	ArchivedStatDir = `C:\Users\Laurent\Google Drive\Travail\NOVAGILE\Gouvernance\Stat Jira\Archived SRE`
@@ -48,7 +48,7 @@ func main() {
 		StatArchiveDir: ArchivedStatDir,
 		ServicePort:    ServicePort,
 		LogFile:        LogFile,
-		NoWebLock:      NoWebLock,
+		NoWebLock:      LaunchWebBrowser,
 	}
 	if err := config.SetFromFile(ConfigFile, conf); err != nil {
 		log.Fatal(err)
@@ -93,8 +93,8 @@ func main() {
 	log.Fatal(http.ListenAndServe(ServicePort, router))
 }
 
-func LaunchPageInBrowser(lanchWeb bool) error {
-	if lanchWeb {
+func LaunchPageInBrowser(launchWeb bool) error {
+	if launchWeb {
 		cmd := exec.Command("cmd", "/c", "start", "http://localhost:8080")
 		return cmd.Start()
 	}
