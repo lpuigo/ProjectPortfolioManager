@@ -6,8 +6,8 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
-	"strings"
 	"sync"
+	"path"
 )
 
 type FileProcesser struct {
@@ -21,12 +21,12 @@ func NewFileProcesser(inputDir, archiveDir string) (*FileProcesser, error) {
 	if err != nil {
 		return nil, err
 	}
-	if !strings.HasSuffix(inputDir, `\`) {
-		inputDir += `\`
-	}
-	if !strings.HasSuffix(archiveDir, `\`) {
-		archiveDir += `\`
-	}
+	//if !strings.HasSuffix(inputDir, `\`) {
+	//	inputDir += `\`
+	//}
+	//if !strings.HasSuffix(archiveDir, `\`) {
+	//	archiveDir += `\`
+	//}
 	_, err = ioutil.ReadDir(archiveDir)
 	if err != nil {
 		return nil, err
@@ -41,7 +41,7 @@ func (fm *FileProcesser) ProcessAndArchive(action func(file string) error) error
 		return fmt.Errorf("input dir: %s", err.Error())
 	}
 	for _, file := range files {
-		err := action(fm.inputDir + file.Name())
+		err := action(path.Join(fm.inputDir, file.Name()))
 		if err != nil {
 			return err
 		}
@@ -58,7 +58,7 @@ func (fm *FileProcesser) RestoreArchives() error {
 	}
 
 	unzipArchiveFile := func(zfile *zip.File) error {
-		path := fm.inputDir + zfile.Name
+		path := path.Join(fm.inputDir, zfile.Name)
 		fileReader, err := zfile.Open()
 		if err != nil {
 			return err
@@ -76,7 +76,7 @@ func (fm *FileProcesser) RestoreArchives() error {
 	}
 
 	unzipArchive := func(afi os.FileInfo) error {
-		zipReader, err := zip.OpenReader(fm.archiveDir + afi.Name())
+		zipReader, err := zip.OpenReader(path.Join(fm.archiveDir, afi.Name()))
 		if err != nil {
 			return err
 		}
@@ -97,7 +97,7 @@ func (fm *FileProcesser) RestoreArchives() error {
 			return err
 		}
 		// remove archivefile
-		err = os.Remove(fm.archiveDir + archiveFileInfo.Name())
+		err = os.Remove(path.Join(fm.archiveDir, archiveFileInfo.Name()))
 	}
 	return nil
 }
@@ -108,7 +108,7 @@ func (fm *FileProcesser) achiveFile(file string) error {
 	archiveFile := file + ".zip"
 
 	// Create new archive file
-	zipf, err := os.Create(fm.archiveDir + archiveFile)
+	zipf, err := os.Create(path.Join(fm.archiveDir, archiveFile))
 	if err != nil {
 		return err
 	}
@@ -118,7 +118,7 @@ func (fm *FileProcesser) achiveFile(file string) error {
 	defer zipWriter.Close()
 
 	// Add file to archive file
-	archivedFile := fm.inputDir + file
+	archivedFile := path.Join(fm.inputDir, file)
 	archivedf, err := os.Open(archivedFile)
 	if err != nil {
 		return err

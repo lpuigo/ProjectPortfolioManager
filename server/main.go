@@ -25,11 +25,11 @@ const (
 
 	LaunchWebBrowser = true
 
-	JiraStatDir     = `C:\Users\Laurent\Google Drive\Travail\NOVAGILE\Gouvernance\Stat Jira\Extract SRE`
-	ArchivedStatDir = `C:\Users\Laurent\Google Drive\Travail\NOVAGILE\Gouvernance\Stat Jira\Archived SRE`
+	JiraStatDir     = `C:/Users/Laurent/Google Drive/Travail/NOVAGILE/Gouvernance/Stat Jira/Extract SRE`
+	ArchivedStatDir = `C:/Users/Laurent/Google Drive/Travail/NOVAGILE/Gouvernance/Stat Jira/Archived SRE`
 
-	ConfigFile = `.\config.json`
-	LogFile    = `.\server.log`
+	ConfigFile = `./config.json`
+	LogFile    = `./server.log`
 )
 
 type Conf struct {
