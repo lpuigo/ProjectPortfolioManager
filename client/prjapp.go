@@ -38,9 +38,21 @@ func NewFrontModel(msg string) *FrontModel {
 		fm.NewSortCol("Client", true),
 		fm.NewSortCol("Projet", true),
 	}
+	m.initColFilter()
+	m.EditedPrj = fm.NewProject()
+	m.EditedPrjStat = nil
+	m.PrjStatSignatures = nil
+	m.Statuts = createStatuts()
+	m.Types = createTypes()
+	m.Risks = createRisks()
+	m.MilestoneKeys = createMilestoneKeys()
+	return m
+}
+
+func (m *FrontModel) initColFilter() {
 	m.ColFilterGroup = fm.NewColFilterGroup()
 	m.ColFilterGroup.AddColFilter(
-		"Statut",
+		"Status",
 		func(p *fm.Project) string {
 			return p.Status
 		})
@@ -50,23 +62,15 @@ func NewFrontModel(msg string) *FrontModel {
 			return p.Type
 		})
 	m.ColFilterGroup.AddColFilter(
-		"Développeur",
+		"Lead Dev",
 		func(p *fm.Project) string {
 			return p.LeadDev
 		})
 	m.ColFilterGroup.AddColFilter(
-		"Pil. Métier",
+		"PS",
 		func(p *fm.Project) string {
 			return p.LeadPS
 		})
-	m.EditedPrj = fm.NewProject()
-	m.EditedPrjStat = nil
-	m.PrjStatSignatures = nil
-	m.Statuts = createStatuts()
-	m.Types = createTypes()
-	m.Risks = createRisks()
-	m.MilestoneKeys = createMilestoneKeys()
-	return m
 }
 
 func (m *FrontModel) GetPtf() {

@@ -17,10 +17,10 @@ func createStatuts() []*fm.ValText {
 func createTypes() []*fm.ValText {
 	res := []*fm.ValText{}
 	res = append(res, fm.NewValText("Legacy", "Legacy"))
-	res = append(res, fm.NewValText("Acti", "Novagile pour Acticall"))
-	res = append(res, fm.NewValText("Nov", "Novagile pour Client"))
-	res = append(res, fm.NewValText("Sitel", "Novagile pour Sitel"))
-	res = append(res, fm.NewValText("Specif", "Spécifique"))
+	res = append(res, fm.NewValText("Acti", "Novagile for Acticall"))
+	res = append(res, fm.NewValText("Nov", "Novagile for Client"))
+	res = append(res, fm.NewValText("Sitel", "Novagile for Sitel"))
+	res = append(res, fm.NewValText("Specif", "Specific"))
 	res = append(res, fm.NewValText("Archi", "Architecture"))
 	res = append(res, fm.NewValText("Roadmap", "Roadmap"))
 	return res
@@ -28,9 +28,9 @@ func createTypes() []*fm.ValText {
 
 func createRisks() []*fm.ValText {
 	res := []*fm.ValText{}
-	res = append(res, fm.NewValText("0", "Normal"))
-	res = append(res, fm.NewValText("1", "Moyen"))
-	res = append(res, fm.NewValText("2", "Elevé"))
+	res = append(res, fm.NewValText("0", "No Risk"))
+	res = append(res, fm.NewValText("1", "Low Risk"))
+	res = append(res, fm.NewValText("2", "High Risk"))
 	return res
 }
 

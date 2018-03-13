@@ -25,7 +25,7 @@
 <div id="prj-app">
     <div class="ui teal inverted fixed menu">
         <div class="item">
-            <h3>Novagile Portefeuille Projet</h3>
+            <h3>Novagile Project Portfolio</h3>
         </div>
         <div class="item"></div>
         <a class="item" @click="GetPtf">
@@ -46,7 +46,7 @@
         <div class="right menu">
             <div class="item">
                 <div class="ui transparent icon input">
-                    <input type="text" placeholder="Filtre..." v-model="textfilter">
+                    <input type="text" placeholder="Filter..." v-model="textfilter">
                     <i class="filter icon"></i>
                 </div>
             </div>
@@ -77,25 +77,25 @@
                 <thead>
                     <tr>
                         <th is="col-title" :sortlist.sync="sortlist" class="one wide" title="Client"></th>
-                        <th is="col-title" :sortlist.sync="sortlist" class="two wide" title="Projet"></th>
+                        <th is="col-title" :sortlist.sync="sortlist" class="two wide" title="Project"></th>
                         <th is="col-title" :sortlist.sync="sortlist" class="" title="Information" iclass="sticky note outline icon"></th>
                         <!--<th is="col-title" :sortlist.sync="sortlist" class="center aligned" title="Kickoff" iclass="checked calendar icon"></th>-->
                         <th is="col-title" :sortlist.sync="sortlist" class="center aligned" title="Kickoff" iclass="checked calendar icon"></th>
-                        <th is="col-title" :sortlist.sync="sortlist" class="center aligned" title="Recette" iclass="checked calendar icon"></th>
-                        <th is="col-title" :sortlist.sync="sortlist" class="center aligned" title="Mep" iclass="checked calendar icon"></th>
-                        <th is="col-title" :sortlist.sync="sortlist" class="one wide center aligned"  title="Charge" iclass="hourglass half icon"></th>
+                        <th is="col-title" :sortlist.sync="sortlist" class="center aligned" title="UAT" iclass="checked calendar icon"></th>
+                        <th is="col-title" :sortlist.sync="sortlist" class="center aligned" title="GoLive" iclass="checked calendar icon"></th>
+                        <th is="col-title" :sortlist.sync="sortlist" class="one wide center aligned"  title="Work L." iclass="hourglass half icon"></th>
                         <th is="col-title-withfilter" :sortlist.sync="sortlist" :colfilter.sync="colfilters" :projects="projects"
-                            class="one wide" title="Pil. Métier" iclass="handshake icon"
+                            class="one wide" title="PS" iclass="handshake icon"
                         >
                         <th is="col-title-withfilter" :sortlist.sync="sortlist" :colfilter.sync="colfilters" :projects="projects"
-                            class="one wide" title="Développeur" iclass="laptop icon"
+                            class="one wide" title="Lead Dev" iclass="laptop icon"
                         >
                         <th is="col-title-withfilter" :sortlist.sync="sortlist" :colfilter.sync="colfilters" :projects="projects"
                             class="center aligned" title="Type"
                         >
                         </th>
                         <th is="col-title-withfilter" :sortlist.sync="sortlist" :colfilter.sync="colfilters" :projects="projects"
-                            class="one wide" title="Statut"
+                            class="one wide" title="Status"
                         >
                         </th>
                     </tr>
