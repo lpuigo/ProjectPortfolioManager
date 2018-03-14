@@ -4,13 +4,13 @@ import fm "github.com/lpuig/novagile/client/frontmodel"
 
 func createStatuts() []*fm.ValText {
 	res := []*fm.ValText{}
-	res = append(res, fm.NewValText("1 - Candidat", "Candidat"))
-	res = append(res, fm.NewValText("2 - Cadrage", "Cadrage en cours"))
-	res = append(res, fm.NewValText("3 - En Cours", "Développement en cours"))
-	res = append(res, fm.NewValText("4 - Recette", "Recette client en cours"))
-	res = append(res, fm.NewValText("5 - SAV", "Suivi post Mise en Service"))
-	res = append(res, fm.NewValText("6 - Terminé", "Terminé"))
-	res = append(res, fm.NewValText("0 - Candidat Perdu", "Candidat Perdu"))
+	res = append(res, fm.NewValText("1 - Candidate", "Candidate"))
+	res = append(res, fm.NewValText("2 - Outlining", "Outline in progress"))
+	res = append(res, fm.NewValText("3 - On Going", "On Going"))
+	res = append(res, fm.NewValText("4 - UAT", "UAT in progress"))
+	res = append(res, fm.NewValText("5 - Monitoring", "Monitoring in progress"))
+	res = append(res, fm.NewValText("6 - Done", "Done"))
+	res = append(res, fm.NewValText("0 - Lost", "Candidate lost"))
 	return res
 }
 
@@ -37,11 +37,11 @@ func createRisks() []*fm.ValText {
 func createMilestoneKeys() []*fm.ValText {
 	res := []*fm.ValText{}
 	res = append(res, fm.NewValText("Kickoff", "K"))
-	res = append(res, fm.NewValText("Cadrage", "C"))
-	res = append(res, fm.NewValText("Recette", "R"))
-	res = append(res, fm.NewValText("Formation", "F"))
-	res = append(res, fm.NewValText("Pilote", "P"))
-	res = append(res, fm.NewValText("Mep", "M"))
-	res = append(res, fm.NewValText("Mes", "S"))
+	res = append(res, fm.NewValText("Outline", "C"))
+	res = append(res, fm.NewValText("UAT", "R"))
+	res = append(res, fm.NewValText("Training", "F"))
+	res = append(res, fm.NewValText("Pilot End", "P"))
+	res = append(res, fm.NewValText("RollOut", "M"))
+	res = append(res, fm.NewValText("GoLive", "S"))
 	return res
 }

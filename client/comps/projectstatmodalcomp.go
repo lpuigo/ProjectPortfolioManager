@@ -18,7 +18,7 @@ const (
         <h3 class="ui header">
             <i class="area chart icon"></i>
             <div class="content">
-                Statistiques du projet : <span style="color: teal">{{givenprj.client}} - {{givenprj.name}}</span>                	
+                Project Statistics : <span style="color: teal">{{givenprj.client}} - {{givenprj.name}}</span>                	
             </div>
         </h3>
     </div>
@@ -31,7 +31,7 @@ const (
     </div>
     <div class="actions">
         <div class="ui button" @click="CopyJiraLinks()">
-            Copier les liens
+            Copy Jira links
         </div>
     </div>
 </div>

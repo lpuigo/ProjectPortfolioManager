@@ -14,7 +14,7 @@ const (
     <div class="header">
         <h3 class="ui header">
             <i class="edit icon"></i>
-            <div class="content">Edition du projet : <span style="color: steelblue">{{editedprj.client}} - {{editedprj.name}}</span></div>
+            <div class="content">Edit Project : <span style="color: steelblue">{{editedprj.client}} - {{editedprj.name}}</span></div>
         </h3>
     </div>
     
@@ -26,10 +26,10 @@ const (
                 <div class="two fields">
                     <div class="field">
                         <label>Client</label>
-                        <input type="text" placeholder="Nom Client" v-model.trim="editedprj.client">
+                        <input type="text" placeholder="Client Name" v-model.trim="editedprj.client">
                     </div>
                     <div class="field">
-                        <label>Nom Projet</label>
+                        <label>Project Name</label>
                         <div class="ui left action input">
                             <button class="ui icon button" @click.prevent="">
                                 <!--<i class="search icon"></i>-->
@@ -40,41 +40,41 @@ const (
                                     </div>			
                                 </div>
                             </button>
-                            <input type="text" placeholder="Nom Projet" v-model.trim="editedprj.name">
+                            <input type="text" placeholder="Project Name" v-model.trim="editedprj.name">
                         </div>
                     </div>
                 </div>
             </div>
             <div class="fields">
                 <div class="five wide field">
-                    <label>Pilote Métier</label>
+                    <label>PS Actor</label>
                     <input type="text" v-model.trim="editedprj.lead_ps">
                 </div>
                 <div class="five wide field">
-                    <label>Développeur principal</label>
+                    <label>Lead Dev</label>
                     <input type="text" v-model.trim="editedprj.lead_dev">
                 </div>
                 <div class="four wide field">
                     <label>Type</label>
                     <dropdown-list ref="TypeDD"
                         :listvalues="types"
-                        defaulttext="Type du projet"
+                        defaulttext="Project type"
                         :selected.sync="editedprj.type">
                     </dropdown-list>
                 </div>
                 <div class="two wide field">
-                    <label>Charge prévue</label>
+                    <label>Estim. WL</label>
                     <input type="number" min="0" v-model="editedprj.forecast_wl">
                 </div>
             </div>
             <div class="field">
-                <label>Commentaire</label>
+                <label>Comment</label>
                 <textarea rows="3" v-model="editedprj.comment"></textarea>
             </div>
             <div class="field">
                 <div class="two fields">
                     <div class="field">
-                        <label>Statut</label>
+                        <label>Status</label>
                         <dropdown-list ref="StatutDD"
 	                        :listvalues="statuts"
                             defaulttext="Statut du projet"
@@ -82,10 +82,10 @@ const (
                         </dropdown-list>
                     </div>
                     <div class="field">
-                        <label>Risque</label>
+                        <label>Risk</label>
                         <dropdown-list ref="RiskDD"
                             :listvalues="risks"
-                            defaulttext="Niveau de risque"
+                            defaulttext="Risk Level"
                             :selected.sync="editedprj.risk">
                         </dropdown-list>
                     </div>
@@ -106,7 +106,7 @@ const (
                                     </div>
                                 </div>
                             </th>
-                            <th class="three wide right aligned">Jalon</th>
+                            <th class="three wide right aligned">Milestone</th>
                             <th>Date</th>
                         </tr>
                     </thead>
@@ -132,18 +132,18 @@ const (
     </div>
     <div class="actions">
         <div class="ui red right labeled icon button" v-if="editedprj.id >= 0" @click.prevent="deleteProject">
-            Supprimer
+            Delete
             <i class="trash outline icon"></i>
         </div>
         <div class="ui right labeled icon button" v-if="editedprj.id >= 0" @click.prevent="duplicateProject">
-            Dupliquer
+            Duplicate
             <i class="clone icon"></i>
         </div>
         <div class="ui black deny button">
-            Annuler
+            Cancel
         </div>
         <div class="ui positive right labeled icon button">
-            Modifier
+            Confirm
             <i class="checkmark icon"></i>
         </div>
     </div>

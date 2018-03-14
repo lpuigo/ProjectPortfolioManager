@@ -73,7 +73,7 @@ func CreateIssueStatsFromProjectStat(ps *ProjectStat) []*IssueStat {
 func CreateSumStatFromProjectStat(ps *ProjectStat) *IssueStat {
 	sis := NewIssueStat()
 	sis.StartDate = ps.StartDate
-	sis.Issue = "Ensemble du projet"
+	sis.Issue = "Project overall"
 
 	for j, _ := range ps.TimeSpent[0] {
 		s, r, e := 0.0, 0.0, 0.0

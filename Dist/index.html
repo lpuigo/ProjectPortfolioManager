@@ -82,8 +82,8 @@
                         <!--<th is="col-title" :sortlist.sync="sortlist" class="center aligned" title="Kickoff" iclass="checked calendar icon"></th>-->
                         <th is="col-title" :sortlist.sync="sortlist" class="center aligned" title="Kickoff" iclass="checked calendar icon"></th>
                         <th is="col-title" :sortlist.sync="sortlist" class="center aligned" title="UAT" iclass="checked calendar icon"></th>
-                        <th is="col-title" :sortlist.sync="sortlist" class="center aligned" title="GoLive" iclass="checked calendar icon"></th>
-                        <th is="col-title" :sortlist.sync="sortlist" class="one wide center aligned"  title="Work L." iclass="hourglass half icon"></th>
+                        <th is="col-title" :sortlist.sync="sortlist" class="center aligned" title="RollOut" iclass="checked calendar icon"></th>
+                        <th is="col-title" :sortlist.sync="sortlist" class="one wide center aligned"  title="Workload" iclass="hourglass half icon"></th>
                         <th is="col-title-withfilter" :sortlist.sync="sortlist" :colfilter.sync="colfilters" :projects="projects"
                             class="one wide" title="PS" iclass="handshake icon"
                         >
@@ -106,9 +106,9 @@
                         <td class="collapsing"><i v-if="prj.hasStat" class="area chart link icon" @click="ShowProjectStat(prj)"></i>{{prj.name}}</td>
                         <td style="white-space: pre-wrap;"><i :class="RiskIcon(prj)"></i>{{prj.comment}}</td>
                         <td is="date-cell" :date="prj.milestones.Kickoff"></td>
-                        <td is="date-cell" :date="prj.milestones.Recette"></td>
-                        <!--<td is="date-cell" :date="prj.milestones.Formation"></td>-->
-                        <td is="date-cell" :date="prj.milestones.Mep"></td>
+                        <td is="date-cell" :date="prj.milestones.UAT"></td>
+                        <!--<td is="date-cell" :date="prj.milestones.Training"></td>-->
+                        <td is="date-cell" :date="prj.milestones.RollOut"></td>
                         <!--<td class="collapsing right aligned">{{prj | ChargeFormat}}</td>-->
                         <td is="workload-cell" :project="prj"></td>
                         <td class="collapsing">{{prj.lead_ps}}</td>

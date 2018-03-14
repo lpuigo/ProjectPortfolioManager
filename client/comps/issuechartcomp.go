@@ -37,15 +37,15 @@ func RegisterIssueChartComp() *vue.Component {
 
 	o.Template = `
 	<div>
-		<h5 v-if="issuestat.href">Evolution des temps : <a :href="issuestat.href" target="_blank">{{issuestat.issue}}</a></h5>
-		<h4 v-else>Evolution des temps : {{issuestat.issue}}</h4>
+		<h5 v-if="issuestat.href">Work load : <a :href="issuestat.href" target="_blank">{{issuestat.issue}}</a></h5>
+		<h4 v-else>Work load : {{issuestat.issue}}</h4>
 		<div class="issuechart" ref="container" :style="SetStyle()"></div>
 	</div>`
 
 	o.AddMethodWithReturnValue("SetStyle", func(vm *vue.ViewModel, args []*js.Object) interface{} {
 		ic := &IssueChartComp{Object: vm.Object}
 		if ic.IssueStat.HRef == "" {
-			return "width:100%; height:200px;"
+			return "width:100%; height:250px;"
 		}
 		return "width:100%; height:150px;"
 	})
@@ -76,7 +76,7 @@ func RegisterIssueChartComp() *vue.Component {
 			},
 			"yAxis": js.M{
 				"title": js.M{
-					"text": "Jours",
+					"text": "Days",
 				},
 			},
 			"legend": js.M{
@@ -93,15 +93,15 @@ func RegisterIssueChartComp() *vue.Component {
 			},
 			"series": js.S{
 				js.M{
-					"name": "Passé",
+					"name": "Spent",
 					"data": is.TimeSpent,
 				},
 				js.M{
-					"name": "Restant",
+					"name": "Remaining",
 					"data": is.TimeRemaining,
 				},
 				js.M{
-					"name": "Estimé",
+					"name": "Estimated",
 					"data": is.TimeEstimated,
 				},
 			},

@@ -61,7 +61,6 @@ func RegisterDateTableCellComp() *vue.Component {
 
 	o.AddProp("date")
 
-	//<td class="collapsing center aligned disabled">{{prj.milestones.Kickoff | DateFormat}}</td>
 	o.Template = `
 	<td class="collapsing center aligned" :class="displaymode">
 	{{date | DateFormat}}

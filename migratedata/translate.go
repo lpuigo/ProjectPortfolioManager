@@ -2,7 +2,7 @@ package migratedata
 
 import (
 	"bufio"
-	"fmt"
+	"io"
 	"os"
 	"strings"
 
@@ -25,14 +25,8 @@ func NewDictionnaryFromCSVFile(file string) (*Dictionnary, error) {
 	return d, err
 }
 
-func (d Dictionnary) TranslateFile(file string) error {
-	f, err := os.Open(file)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
-	scanner := bufio.NewScanner(f)
+func (d Dictionnary) Translate(r io.Reader, w io.Writer) error {
+	scanner := bufio.NewScanner(r)
 
 	for scanner.Scan() {             // internally, it advances token based on separator
 		orig := scanner.Text()
@@ -41,7 +35,10 @@ func (d Dictionnary) TranslateFile(file string) error {
 			orig = strings.Replace(orig, sd[0], sd[1], -1)
 		}
 
-		fmt.Println(orig)
+		_, err := w.Write([]byte(orig))
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }

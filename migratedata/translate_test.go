@@ -2,13 +2,14 @@ package migratedata
 
 import (
 	"fmt"
+	"os"
 	"testing"
 )
 
 const (
-	Dico = "french2english.csv"
+	Dico     = "french2english.csv"
 	PrjFile1 = "Projets Novagile formatted.json"
-	PrjFile2 = "Projets Novagile.xlsx.json"
+	PrjFile2 = "C:/Users/Laurent/Google Drive/Travail/NOVAGILE/Gouvernance/Ptf Projets/NovagileProjectManager/Ressources/Projets Novagile.xlsx.json"
 )
 
 func NewDico(t *testing.T) *Dictionnary {
@@ -30,7 +31,21 @@ func TestNewDictionnaryFromCSVFile(t *testing.T) {
 func TestDictionnary_TranslateFile(t *testing.T) {
 	d := NewDico(t)
 
-	err :=d.TranslateFile(PrjFile2)
+	targertFile := PrjFile2 + ".translated"
+
+	sf, err := os.Open(PrjFile2)
+	if err != nil {
+		t.Fatal("could not open source", err.Error())
+	}
+	defer sf.Close()
+
+	tf, err := os.Create(targertFile)
+	if err != nil {
+		t.Fatal("could not open target", err.Error())
+	}
+	defer tf.Close()
+
+	err = d.Translate(sf, tf)
 	if err != nil {
 		t.Fatal("TranslateFile returns", err.Error())
 	}
