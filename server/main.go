@@ -2,12 +2,12 @@ package main
 
 import (
 	"github.com/gorilla/mux"
+	"github.com/lpuig/novagile/logger"
 	"github.com/lpuig/novagile/manager"
 	"github.com/lpuig/novagile/manager/config"
 	"github.com/lpuig/novagile/route"
 	"log"
 	"net/http"
-	"os"
 	"os/exec"
 )
 
@@ -55,7 +55,7 @@ func main() {
 	}
 
 	// Init Log
-	logfile := StartLog(conf.LogFile)
+	logfile := logger.StartLog(conf.LogFile)
 	defer logfile.Close()
 	log.Println("Server Started =============================================================================")
 
@@ -100,17 +100,6 @@ func LaunchPageInBrowser(launchWeb bool) error {
 	}
 	log.Printf("No Web Lock found")
 	return nil
-}
-
-func StartLog(logfile string) *os.File {
-	//create your file with desired read/write permissions
-	f, err := os.OpenFile(logfile, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
-	if err != nil {
-		log.Fatal(err)
-	}
-	//set output of logs to f
-	log.SetOutput(f)
-	return f
 }
 
 // Done Persist JSON repo after each Route request
