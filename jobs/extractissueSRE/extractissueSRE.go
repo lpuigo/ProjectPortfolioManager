@@ -22,8 +22,8 @@ const (
 	OutputDir        = "."
 	OutputFileFormat = "extract__DATE_.csv"
 
-	UserPwd = "readAccess:queo7VaechileiNa"
-	DBName  = "tcp(jira.acticall.com:3306)/JIRA"
+	UserPwd = "username:password"
+	DBName  = "dbserver/basename"
 
 	jiraQuery = `
 SELECT DISTINCT 
