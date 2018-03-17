@@ -20,7 +20,7 @@ const (
 
 	LogFile          = "./extractIssueSRE.log"
 	OutputDir        = "."
-	OutputFileFormat = "extract _DATE_.csv"
+	OutputFileFormat = "extract__DATE_.csv"
 
 	UserPwd = "readAccess:queo7VaechileiNa"
 	DBName  = "tcp(jira.acticall.com:3306)/JIRA"
@@ -126,9 +126,11 @@ type Conf struct {
 
 func main() {
 	conf := &Conf{
-		UserPwd: UserPwd,
-		DBName:  DBName,
-		LogFile: LogFile,
+		UserPwd:          UserPwd,
+		DBName:           DBName,
+		LogFile:          LogFile,
+		OutputDir:        OutputDir,
+		OutputFileFormat: OutputFileFormat,
 	}
 	if err := config.SetFromFile(ConfigFile, conf); err != nil {
 		log.Fatal(err)
