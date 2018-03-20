@@ -47,6 +47,10 @@ type Conf struct {
 
 //go:generate go build -v -o ../extractIssueSRE.exe
 
+type Querier interface {
+	QueryTo(db *sql.DB, w *csv.Writer) error
+}
+
 func main() {
 	conf := &Conf{
 		UserPwd:          UserPwd,
@@ -68,21 +72,18 @@ func main() {
 	db := dbConnect(conf)
 	defer db.Close()
 
-	queryfunc := func(w *csv.Writer) error {
-		j := jirarow{}
-		return j.QueryTo(db, w)
-	}
-
 	outputfilename := strings.Replace(conf.OutputFileFormat, "_DATE_", time.Now().Format(DateFormat), 1)
 	outputfile := path.Join(conf.OutputDir, outputfilename)
 
-	if err := queryResultToCSVFile(queryfunc, outputfile); err != nil {
+	j := &jirarow{}
+
+	if err := queryResultToCSVFile(j, db, outputfile); err != nil {
 		log.Fatal(err)
 	}
 
-	//TODO Call HTTP.Get to trigger resultfile loading
+	// Call HTTP.Get to trigger resultfile loading
 	if conf.CallServer {
-		time.Sleep(time.Second)
+		time.Sleep(time.Second) // timer to let the file persist to disk. Usefull ?
 		if err := triggerExtractProcess(conf.ServerUrl); err != nil {
 			log.Fatal("could not trigger extract processing", err.Error())
 		}
@@ -101,7 +102,7 @@ func dbConnect(conf *Conf) *sql.DB {
 	return jiraDb
 }
 
-func queryResultToCSVFile(query func(w *csv.Writer) error, file string) error {
+func queryResultToCSVFile(q Querier, db *sql.DB, file string) error {
 	f, err := os.Create(file)
 	if err != nil {
 		fmt.Errorf("could not create extract file :%s", err.Error())
@@ -112,9 +113,14 @@ func queryResultToCSVFile(query func(w *csv.Writer) error, file string) error {
 	cw := csv.NewWriter(f)
 	cw.UseCRLF = true
 	cw.Comma = ';'
+	defer cw.Flush()
 
-	//TODO Remove file if query fails
-	return query(cw)
+	if err := q.QueryTo(db, cw); err != nil {
+		// if query fails, remove the created file
+		os.Remove(file)
+		return err
+	}
+	return nil
 }
 
 func triggerExtractProcess(url string) error {
