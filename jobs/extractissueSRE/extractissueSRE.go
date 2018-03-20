@@ -74,7 +74,7 @@ func main() {
 	}
 
 	outputfilename := strings.Replace(conf.OutputFileFormat, "_DATE_", time.Now().Format(DateFormat), 1)
-	outputfile := path.Join(OutputDir, outputfilename)
+	outputfile := path.Join(conf.OutputDir, outputfilename)
 
 	if err := queryResultToCSVFile(queryfunc, outputfile); err != nil {
 		log.Fatal(err)
@@ -113,6 +113,7 @@ func queryResultToCSVFile(query func(w *csv.Writer) error, file string) error {
 	cw.UseCRLF = true
 	cw.Comma = ';'
 
+	//TODO Remove file if query fails
 	return query(cw)
 }
 
