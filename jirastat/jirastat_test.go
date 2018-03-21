@@ -10,7 +10,7 @@ const (
 )
 
 func displayJs(js *JiraStat) {
-	for _, r := range js.GetRecords() {
+	for _, r := range js.Stats.GetRecords() {
 		fmt.Println(r)
 	}
 }
@@ -22,6 +22,6 @@ func TestJiraStat_LoadFromFile(t *testing.T) {
 		t.Fatal("js.LoadFromFile returns", err.Error())
 	}
 
-	displayJs(js)
+	js.GroupBy("LotClientTrackedday")
 
 }

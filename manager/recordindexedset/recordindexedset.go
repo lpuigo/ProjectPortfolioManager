@@ -43,6 +43,10 @@ func (c *RecordIndexedSet) CreateSubSet(indexes ...IndexDesc) (*RecordIndexedSet
 	return r, nil
 }
 
+func (c *RecordIndexedSet) GetHeaderRecord() rs.Record {
+	return c.data.GetHeader().GetKeys()
+}
+
 func (c *RecordIndexedSet) Len() int {
 	return c.data.Len()
 }
@@ -95,6 +99,16 @@ func (c *RecordIndexedSet) GetIndexesNames() rs.Record {
 	}
 	sort.Strings(res)
 	return res
+}
+
+// GetIndexHeader returns col names of given idxname (or nil if idxname is not found)
+func (c *RecordIndexedSet) GetIndexHeader(idxname string) rs.Record {
+	for _, id := range c.indexDescs {
+		if id.name == idxname {
+			return id.cols
+		}
+	}
+	return nil
 }
 
 // GetIndexKeys returns all registered keys for given idxname
