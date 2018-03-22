@@ -197,7 +197,7 @@ func (sm *StatManager) UpdateFrom(r io.Reader) (int, error) {
 				continue
 			}
 		}
-		//TODO Update project associated to issue
+		// Update project associated to issue with rlis link
 		oldStats.AddRecord(record)
 		added++
 	}

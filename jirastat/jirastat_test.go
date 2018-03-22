@@ -15,13 +15,20 @@ func displayJs(js *JiraStat) {
 	}
 }
 
-func TestJiraStat_LoadFromFile(t *testing.T) {
+func TestJiraStat_SpentHourBy(t *testing.T) {
 	js := NewJiraStat()
 
 	if err := js.LoadFromFile(testFile); err != nil {
 		t.Fatal("js.LoadFromFile returns", err.Error())
 	}
 
-	js.GroupBy("LotClientTrackedday")
+	keys, values, err := js.SpentHourBy("LotClient")
+	if err != nil {
+		t.Fatal("JiraStat.SpentHourBy returns", err.Error())
+	}
+
+	for i, k := range keys {
+		fmt.Printf("%s : %0.3f\n", k, values[i]/8)
+	}
 
 }
