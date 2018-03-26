@@ -58,6 +58,8 @@ func (m *Manager) GetPrjPtf(w io.Writer) {
 }
 
 func (m *Manager) GetPrjById(id int) *model.Project {
+	m.Projects.RLock()
+	defer m.Projects.RUnlock()
 	return m.Projects.GetProjectsPtf().GetPrjById(id)
 }
 

@@ -21,10 +21,14 @@ func addError(w http.ResponseWriter, logmsg *string, errmsg string, code int) {
 	http.Error(w, errmsg, code)
 }
 
+func formatLog(t time.Time, msg *string) {
+	log.Printf("%s (served in %v)\n", *msg, time.Since(t))
+}
+
 func GetPtf(mgr *mgr.Manager, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	logmsg := "Request GetPtf Received from '" + r.Header.Get("Origin") + "' : "
-	defer func(t time.Time) { log.Printf("%s (served in %v)\n", logmsg, time.Since(t)) }(time.Now())
+	defer formatLog(time.Now(), &logmsg)
 
 	w.Header().Set("Content-Type", "application/json")
 	mgr.GetPrjPtf(w)
@@ -34,7 +38,7 @@ func GetPtf(mgr *mgr.Manager, w http.ResponseWriter, r *http.Request) {
 func UpdatePrj(mgr *mgr.Manager, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	logmsg := "Request UpdatePrj Received from '" + r.Header.Get("Origin") + "' : "
-	defer func(t time.Time) { log.Printf("%s (served in %v)\n", logmsg, time.Since(t)) }(time.Now())
+	defer formatLog(time.Now(), &logmsg)
 
 	vars := mux.Vars(r)
 	prjid, err := strconv.Atoi(vars["prjid"])
@@ -71,7 +75,7 @@ func UpdatePrj(mgr *mgr.Manager, w http.ResponseWriter, r *http.Request) {
 
 func GetProjectStat(mgr *mgr.Manager, w http.ResponseWriter, r *http.Request) {
 	logmsg := "Request GetProjectStat Received from '" + r.Header.Get("Origin") + "' : "
-	defer func(t time.Time) { log.Printf("%s (served in %v)\n", logmsg, time.Since(t)) }(time.Now())
+	defer formatLog(time.Now(), &logmsg)
 	defer r.Body.Close()
 	vars := mux.Vars(r)
 	prjid, err := strconv.Atoi(vars["prjid"])
@@ -90,7 +94,7 @@ func GetProjectStat(mgr *mgr.Manager, w http.ResponseWriter, r *http.Request) {
 
 func GetProjectStatProjectList(mgr *mgr.Manager, w http.ResponseWriter, r *http.Request) {
 	logmsg := "Request GetProjectStatProjectList Received from '" + r.Header.Get("Origin") + "' : "
-	defer func(t time.Time) { log.Printf("%s (served in %v)\n", logmsg, time.Since(t)) }(time.Now())
+	defer formatLog(time.Now(), &logmsg)
 	defer r.Body.Close()
 	vars := mux.Vars(r)
 	prjid, err := strconv.Atoi(vars["prjid"])
@@ -109,7 +113,7 @@ func GetProjectStatProjectList(mgr *mgr.Manager, w http.ResponseWriter, r *http.
 
 func GetInitProjectStat(mgr *mgr.Manager, w http.ResponseWriter, r *http.Request) {
 	logmsg := "Request GetInitProjectStat Received from '" + r.Header.Get("Origin") + "' : "
-	defer func(t time.Time) { log.Printf("%s (served in %v)\n", logmsg, time.Since(t)) }(time.Now())
+	defer formatLog(time.Now(), &logmsg)
 	defer r.Body.Close()
 	w.Header().Set("Content-Type", "text/plain")
 	err := mgr.ReinitStats(w)
@@ -122,7 +126,7 @@ func GetInitProjectStat(mgr *mgr.Manager, w http.ResponseWriter, r *http.Request
 
 func GetUpdateProjectStat(mgr *mgr.Manager, w http.ResponseWriter, r *http.Request) {
 	logmsg := "Request GetUpdateProjectStat Received from '" + r.Header.Get("Origin") + "' : "
-	defer func(t time.Time) { log.Printf("%s (served in %v)\n", logmsg, time.Since(t)) }(time.Now())
+	defer formatLog(time.Now(), &logmsg)
 	defer r.Body.Close()
 	w.Header().Set("Content-Type", "text/plain")
 	err := mgr.UpdateWithNewStatFiles(w)
@@ -136,7 +140,7 @@ func GetUpdateProjectStat(mgr *mgr.Manager, w http.ResponseWriter, r *http.Reque
 func CreatePrj(mgr *mgr.Manager, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	logmsg := "Request CreatePrj Received from '" + r.Header.Get("Origin") + "' : "
-	defer func(t time.Time) { log.Printf("%s (served in %v)\n", logmsg, time.Since(t)) }(time.Now())
+	defer formatLog(time.Now(), &logmsg)
 
 	var prj = &fm.Project{}
 	if r.Body == nil {
@@ -158,7 +162,7 @@ func CreatePrj(mgr *mgr.Manager, w http.ResponseWriter, r *http.Request) {
 func DeletePrj(mgr *mgr.Manager, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	logmsg := "Request DeletePrj Received from '" + r.Header.Get("Origin") + "' : "
-	defer func(t time.Time) { log.Printf("%s (served in %v)\n", logmsg, time.Since(t)) }(time.Now())
+	defer formatLog(time.Now(), &logmsg)
 
 	vars := mux.Vars(r)
 	prjid, err := strconv.Atoi(vars["prjid"])
@@ -174,7 +178,7 @@ func DeletePrj(mgr *mgr.Manager, w http.ResponseWriter, r *http.Request) {
 func GetXLS(mgr *mgr.Manager, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	logmsg := "Request GetXLS Received from '" + r.Header.Get("Origin") + "' : "
-	defer func(t time.Time) { log.Printf("%s (served in %v)\n", logmsg, time.Since(t)) }(time.Now())
+	defer formatLog(time.Now(), &logmsg)
 
 	w.Header().Set("Content-Disposition", "attachment; filename=\"Projet Novagile.xlsx\"")
 	w.Header().Set("Content-Type", "application/vnd.ms-excel")
