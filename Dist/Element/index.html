@@ -46,13 +46,14 @@
 
 <body>
     <div id="app">
+<!--
         <project-edit
                 ref="ProjectEdit"
                 :edited_project.sync="editedProject"
                 @newproject="AddProject"
                 @removeproject="RemoveProject"
         ></project-edit>
-
+-->
         <div class="lp_block tip">
             <pre>EditedProject: {{editedProject}}</pre>
         </div>
@@ -63,15 +64,17 @@
                 @selected_project="EditProject"
         ></project-table>
 
+<!--
         <div class="lp_block warning">
             <pre>Projects: {{projects}}</pre>
         </div>
+-->
     </div>
 </body>
 
 
-<script src="/Assets/vue/2.5.16/vue.min.js"></script>
+<script src="/Assets/vue/2.5.16/vue.js"></script>
 <script src="/Assets/element-ui/2.3.3/lib/index.js"></script>
-<script type="text/javascript" src="main.js"></script>
+<script type="text/javascript" src="prjapp.js"></script>
 
 </html>
