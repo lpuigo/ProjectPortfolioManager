@@ -4,3 +4,4 @@ Dist/*.js.map
 Dist/Element/*.js
 Dist/Element/*.js.map
 Ressources/*
+*.exe
