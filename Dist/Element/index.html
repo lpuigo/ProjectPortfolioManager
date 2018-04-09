@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <title>Prj Portfolio</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/Assets/element-ui/2.3.3/lib/theme-chalk/index.css">
+    <style>
+        body {
+            font-family: Ubuntu, Calibri, sans-serif;
+        }
+
+        p {
+            margin : 8px 0;
+        }
+
+        pre {
+            margin: 4px 0;
+        }
+        .el-table .warning-row {
+            background: oldlace;
+        }
+
+        .el-table .success-row {
+            background: #f0f9eb;
+        }
+
+        .lp_block {
+            padding: 8px 16px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
+        .lp_block.tip {
+            background-color: #ecf8ff;
+            border-left: 5px solid #50bfff;
+        }
+
+        .lp_block.warning {
+            background-color: #fff6f7;
+            border-left: 5px solid #fe6c6f;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <project-edit
+                ref="ProjectEdit"
+                :edited_project.sync="editedProject"
+                @newproject="AddProject"
+                @removeproject="RemoveProject"
+        ></project-edit>
+
+        <div class="lp_block tip">
+            <pre>EditedProject: {{editedProject}}</pre>
+        </div>
+
+        <project-table
+                :projects="projects"
+                :selected_project.sync="editedProject"
+                @selected_project="EditProject"
+        ></project-table>
+
+        <div class="lp_block warning">
+            <pre>Projects: {{projects}}</pre>
+        </div>
+    </div>
+</body>
+
+
+<script src="/Assets/vue/2.5.16/vue.min.js"></script>
+<script src="/Assets/element-ui/2.3.3/lib/index.js"></script>
+<script type="text/javascript" src="main.js"></script>
+
+</html>

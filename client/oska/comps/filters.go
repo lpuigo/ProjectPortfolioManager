@@ -1,4 +1,4 @@
-package main
+package comps
 
 import (
 	"github.com/gopherjs/gopherjs/js"

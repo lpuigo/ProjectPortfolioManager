@@ -1,8 +1,8 @@
-package main
+package business
 
 import fm "github.com/lpuig/novagile/client/frontmodel"
 
-func createStatuts() []*fm.ValText {
+func CreateStatuts() []*fm.ValText {
 	res := []*fm.ValText{}
 	res = append(res, fm.NewValText("1 - Candidate", "Candidate"))
 	res = append(res, fm.NewValText("2 - Outlining", "Outline in progress"))
@@ -14,7 +14,7 @@ func createStatuts() []*fm.ValText {
 	return res
 }
 
-func createTypes() []*fm.ValText {
+func CreateTypes() []*fm.ValText {
 	res := []*fm.ValText{}
 	res = append(res, fm.NewValText("Legacy", "Legacy"))
 	res = append(res, fm.NewValText("Acti", "Novagile for Acticall"))
@@ -26,7 +26,7 @@ func createTypes() []*fm.ValText {
 	return res
 }
 
-func createRisks() []*fm.ValText {
+func CreateRisks() []*fm.ValText {
 	res := []*fm.ValText{}
 	res = append(res, fm.NewValText("0", "No Risk"))
 	res = append(res, fm.NewValText("1", "Low Risk"))
@@ -34,7 +34,7 @@ func createRisks() []*fm.ValText {
 	return res
 }
 
-func createMilestoneKeys() []*fm.ValText {
+func CreateMilestoneKeys() []*fm.ValText {
 	res := []*fm.ValText{}
 	res = append(res, fm.NewValText("Kickoff", "K"))
 	res = append(res, fm.NewValText("Outline", "C"))

@@ -3,7 +3,8 @@ package main
 import (
 	"github.com/gopherjs/gopherjs/js"
 	"github.com/gopherjs/jquery"
-	"github.com/lpuig/novagile/client/comps"
+	biz "github.com/lpuig/novagile/client/business"
+	"github.com/lpuig/novagile/client/oska/comps"
 	fm "github.com/lpuig/novagile/client/frontmodel"
 	"github.com/oskca/gopherjs-json"
 	"github.com/oskca/gopherjs-vue"
@@ -42,10 +43,10 @@ func NewFrontModel(msg string) *FrontModel {
 	m.EditedPrj = fm.NewProject()
 	m.EditedPrjStat = nil
 	m.PrjStatSignatures = nil
-	m.Statuts = createStatuts()
-	m.Types = createTypes()
-	m.Risks = createRisks()
-	m.MilestoneKeys = createMilestoneKeys()
+	m.Statuts = biz.CreateStatuts()
+	m.Types = biz.CreateTypes()
+	m.Risks = biz.CreateRisks()
+	m.MilestoneKeys = biz.CreateMilestoneKeys()
 	return m
 }
 
@@ -249,8 +250,8 @@ func main() {
 	comps.RegisterWorkLoadCellComp()
 	comps.RegisterProjectStatModalComp()
 
-	ChargeFilterRegister("ChargeFormat")
-	DateFilterRegister("DateFormat")
+	comps.ChargeFilterRegister("ChargeFormat")
+	comps.DateFilterRegister("DateFormat")
 
 	mo := vue.NewOption()
 	mo.El = "#prj-app"
