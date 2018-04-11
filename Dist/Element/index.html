@@ -45,7 +45,7 @@
             /*height: calc(100vh - 120px);*/
         /*}*/
         /*
-            === Project Table style ===
+            === Menu Header style ===
          */
         .novagile {
             background: #4abbbd;
@@ -60,18 +60,39 @@
         .header-menu-container .content {
             margin: 0px 5px;
         }
+        /*
+            === Project Table style ===
+         */
+        .novagile-light {
+            background: #a1e6e6;
+            color: #66696f;
+        }
         .el-table--mini td, .el-table--mini th {
             padding: 1px 0px;
         }
         .el-table .cell {
             white-space: pre-wrap;
+            word-break: break-word;
+            line-height: 1.5em;
         }
         .el-table .project-row-done {
-            background: #efefef;
+            background: #f8f8f8;
             color: #adadad;
         }
         .el-table .project-row-outline {
             background: #fef8e7;
+        }
+        .el-table .project-row-monitoring {
+            background: rgba(237, 252, 237, 0.59);
+        }
+        .risk-icon {
+            margin-right: 5px;
+        }
+        .risk-icon.low-risk {
+            color: #f29b00;
+        }
+        .risk-icon.high-risk {
+            color: #ff3200;
         }
 
 
@@ -103,7 +124,9 @@
                         <el-input
                                 placeholder="Filter"
                                 prefix-icon="el-icon-search"
-                                v-model="filter">
+                                v-model="filter"
+                                size="mini">
+                            <el-button slot="append" icon="el-icon-delete" @click="filter = ''"></el-button>
                         </el-input>
                     </div>
                 </div>
@@ -116,7 +139,7 @@
                     @selected_project="EditProject"
                 ></project-table>
             </el-main>
-            <el-footer>Footer</el-footer>
+            <!--<el-footer>Footer</el-footer>-->
         </el-container>
 
 

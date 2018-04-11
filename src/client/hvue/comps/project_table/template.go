@@ -1,6 +1,5 @@
 package project_table
 
-
 /*
 	max-height="100%"
     style="width: 100%"
@@ -14,41 +13,61 @@ package project_table
 const template = `
 <el-table
     :data="filteredProjects"
+	header-row-class-name="novagile-light"
     :row-class-name="TableRowClassName"
+	:default-sort = "{prop: 'client', order: 'ascending'}"
     @current-change="SetSelectedProject"
     @row-dblclick="SelectRow"
 	height="100%"
     size="mini"
 	:border=true
 >
-    <el-table-column
-        prop="client"	label="Client"	width="160px"
-		:resizable=false
+    <el-table-column 
+            label="Client"	prop="client"	width="160px" sortable :sort-by="['client','name']" 
+            :resizable=true :show-overflow-tooltip=true
     ></el-table-column>
+
     <el-table-column
-        prop="name"	label="Project Name"	width="220px"
+            label="Project Name"	prop="name"	width="200px"
+			:resizable=true :show-overflow-tooltip=true
     ></el-table-column>
+
     <el-table-column
-        prop="comment"	label="Comment"
-		:resizable=false
+            label="Comment" prop="comment"
+		    :resizable=false
+    >
+        <template slot-scope="scope">
+            <i :class="RiskIconClass(scope.row.risk)"></i><span>{{scope.row.comment}}</span>
+        </template>
+	</el-table-column>
+
+    <el-table-column 
+            label="Roll Out"	prop="milestones.RollOut"	width="100px"	sortable :sort-by="['milestones.RollOut', 'client','name']"
+		    :resizable=false    align="center"	:formatter="FormatDate"
     ></el-table-column>
+
     <el-table-column
-        prop="lead_ps"	label="PS"	width="120px"
-		:resizable=false
+            label="PS"	prop="lead_ps"	width="120px" sortable :sort-by="['lead_ps', 'client','name']"
+		    :resizable=false :show-overflow-tooltip=true
+ 		    :filters="FilterList('lead_ps')"	:filter-method="FilterHandler"	filter-placement="bottom-end"
     ></el-table-column>
+
     <el-table-column
-        prop="lead_dev"	label="Lead Dev"	width="120px"
-		:resizable=false
+            label="Lead Dev"	prop="lead_dev"	width="120px" sortable :sort-by="['lead_dev', 'client','name']"
+		    :resizable=false :show-overflow-tooltip=true
+ 		    :filters="FilterList('lead_dev')"	:filter-method="FilterHandler"	filter-placement="bottom-end"
     ></el-table-column>
+
     <el-table-column
-        prop="type"	label="Type"	width="70px"
-		:resizable=false
+            label="Type"	prop="type"	width="80px"
+		    :resizable=false
+ 		    :filters="FilterList('type')"	:filter-method="FilterHandler"	filter-placement="bottom-end"
     ></el-table-column>
+
     <el-table-column
-        prop="status"	label="Status"	width="100px"
-		:resizable=false
- 		:filters="StatusList()"
-		:filter-method="StatusFilter"
-		filter-placement="bottom-end"    ></el-table-column>
+            label="Status"	prop="status"	width="100px" sortable :sort-by="['status', 'client','name']"
+		    :resizable=false
+ 		    :filters="FilterList('status')"	:filter-method="FilterHandler"	filter-placement="bottom-end" :filtered-value="FilteredValue()"
+	></el-table-column>
 </el-table>
 `
