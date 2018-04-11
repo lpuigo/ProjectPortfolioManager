@@ -3,6 +3,7 @@ package project_table
 import (
 	"github.com/gopherjs/gopherjs/js"
 	"github.com/huckridgesw/hvue"
+	"github.com/lpuig/novagile/src/client/business"
 	fm "github.com/lpuig/novagile/src/client/frontmodel"
 	"github.com/lpuig/novagile/src/client/hvue/tools"
 )
@@ -55,12 +56,22 @@ func (ptm *ProjectTableModel) TableRowClassName(rowInfo *js.Object) string {
 	p := &fm.Project{Object: rowInfo.Get("row")}
 	var res string
 	switch p.Status {
-	case "WiP":
-		res = "warning-row"
-	case "Done":
-		res = "success-row"
+	case "6 - Done", "0 - Lost":
+		res = "project-row-done"
+	case "1 - Candidate", "2 - Outlining":
+		res = "project-row-outline"
 	default:
 		res = ""
 	}
 	return res
 }
+
+func (ptm *ProjectTableModel) StatusList() []*fm.ValText{
+	return business.CreateStatuts()
+}
+
+func (ptm *ProjectTableModel) StatusFilter(value string, p *fm.Project) bool {
+	return p.Status == value
+}
+
+

@@ -24,6 +24,7 @@ func main() {
 			mpm.GetPtf()
 		}),
 	)
+	js.Global.Get("Vue").Call("use", "ELEMENT.lang.en")
 
 	// TODO to remove after debug
 	js.Global.Set("mpm", mpm)
