@@ -17,11 +17,24 @@ func Register() {
 func ComponentOptions() []hvue.ComponentOption {
 	return []hvue.ComponentOption{
 		hvue.Template(template),
-		hvue.Props("selected_project", "projects"),
+		hvue.Props("selected_project", "projects", "filter"),
 		hvue.DataFunc(func(vm *hvue.VM) interface{} {
 			return NewProjectTableModel(vm)
 		}),
 		hvue.MethodsOf(&ProjectTableModel{}),
+		hvue.Computed("filteredProjects", func(vm *hvue.VM) interface{} {
+			ptm := &ProjectTableModel{Object: vm.Object}
+			if ptm.Filter == "" {
+				return ptm.Projects
+			}
+			res := []*fm.Project{}
+			for _, p := range ptm.Projects {
+				if fm.TextFiltered(p, ptm.Filter) {
+					res = append(res, p)
+				}
+			}
+			return res
+		}),
 	}
 }
 
@@ -29,6 +42,7 @@ func NewProjectTableModel(vm *hvue.VM) *ProjectTableModel {
 	ptm := &ProjectTableModel{Object: tools.O()}
 	ptm.Projects = nil
 	ptm.SelectedProject = nil
+	ptm.Filter = ""
 	ptm.VM = vm
 	return ptm
 }
@@ -38,6 +52,7 @@ type ProjectTableModel struct {
 
 	SelectedProject *fm.Project   `js:"selected_project"`
 	Projects        []*fm.Project `js:"projects"`
+	Filter          string        `js:"filter"`
 
 	VM *hvue.VM `js:"VM"`
 }
@@ -66,12 +81,10 @@ func (ptm *ProjectTableModel) TableRowClassName(rowInfo *js.Object) string {
 	return res
 }
 
-func (ptm *ProjectTableModel) StatusList() []*fm.ValText{
+func (ptm *ProjectTableModel) StatusList() []*fm.ValText {
 	return business.CreateStatuts()
 }
 
 func (ptm *ProjectTableModel) StatusFilter(value string, p *fm.Project) bool {
 	return p.Status == value
 }
-
-

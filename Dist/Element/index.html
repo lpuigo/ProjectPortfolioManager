@@ -47,6 +47,19 @@
         /*
             === Project Table style ===
          */
+        .novagile {
+            background: #4abbbd;
+            color: white;
+        }
+        .header-menu-container {
+            height: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header-menu-container .content {
+            margin: 0px 5px;
+        }
         .el-table--mini td, .el-table--mini th {
             padding: 1px 0px;
         }
@@ -80,12 +93,25 @@
         </div>
 -->
         <el-container style="height: 100%;border: 1px solid #eee">
-            <el-header>Header
-                <el-button icon="el-icon-refresh" @click="GetPtf" size="mini"></el-button>
+            <el-header class="novagile">
+                <div class="header-menu-container">
+                    <div class="header-menu-container">
+                        <h3 class="content">Novagile Project Portfolio</h3>
+                        <el-button class="content" icon="el-icon-refresh" @click="GetPtf" size="mini"></el-button>
+                    </div>
+                    <div>
+                        <el-input
+                                placeholder="Filter"
+                                prefix-icon="el-icon-search"
+                                v-model="filter">
+                        </el-input>
+                    </div>
+                </div>
             </el-header>
             <el-main style="height:100%; padding: 0px 10px;">
                 <project-table
                     :projects="projects"
+                    :filter="filter"
                     :selected_project.sync="editedProject"
                     @selected_project="EditProject"
                 ></project-table>

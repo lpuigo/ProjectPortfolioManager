@@ -36,12 +36,14 @@ type MainPageModel struct {
 
 	Projects      []*fm.Project `js:"projects"`
 	EditedProject *fm.Project   `js:"editedProject"`
+	Filter        string        `js:"filter"`
 }
 
 func NewMainPageModel() *MainPageModel {
 	mpm := &MainPageModel{Object: tools.O()}
 	mpm.Projects = nil
 	mpm.EditedProject = nil
+	mpm.Filter = ""
 	return mpm
 }
 

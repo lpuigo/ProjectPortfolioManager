@@ -13,7 +13,7 @@ package project_table
 
 const template = `
 <el-table
-    :data="projects"
+    :data="filteredProjects"
     :row-class-name="TableRowClassName"
     @current-change="SetSelectedProject"
     @row-dblclick="SelectRow"
