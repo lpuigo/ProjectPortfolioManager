@@ -3,8 +3,8 @@ package project_table
 import (
 	"github.com/gopherjs/gopherjs/js"
 	"github.com/huckridgesw/hvue"
-	"github.com/lpuig/novagile/src/client/business"
 	fm "github.com/lpuig/novagile/src/client/frontmodel"
+	"github.com/lpuig/novagile/src/client/hvue/comps/project_table/wl_progress_bar"
 	"github.com/lpuig/novagile/src/client/hvue/tools"
 	"sort"
 	"strconv"
@@ -19,6 +19,7 @@ func Register() {
 func ComponentOptions() []hvue.ComponentOption {
 	return []hvue.ComponentOption{
 		hvue.Template(template),
+		hvue.Component("project-progress-bar", wl_progress_bar.ComponentOptions()...),
 		hvue.Props("selected_project", "projects", "filter"),
 		hvue.DataFunc(func(vm *hvue.VM) interface{} {
 			return NewProjectTableModel(vm)
@@ -43,15 +44,6 @@ func ComponentOptions() []hvue.ComponentOption {
 	}
 }
 
-func NewProjectTableModel(vm *hvue.VM) *ProjectTableModel {
-	ptm := &ProjectTableModel{Object: tools.O()}
-	ptm.Projects = nil
-	ptm.SelectedProject = nil
-	ptm.Filter = ""
-	ptm.VM = vm
-	return ptm
-}
-
 type ProjectTableModel struct {
 	*js.Object
 
@@ -62,6 +54,18 @@ type ProjectTableModel struct {
 	VM *hvue.VM `js:"VM"`
 }
 
+func NewProjectTableModel(vm *hvue.VM) *ProjectTableModel {
+	ptm := &ProjectTableModel{Object: tools.O()}
+	ptm.Projects = nil
+	ptm.SelectedProject = nil
+	ptm.Filter = ""
+	ptm.VM = vm
+	return ptm
+}
+
+//
+// Comp Event Related Methods
+
 func (ptm *ProjectTableModel) SelectRow(vm *hvue.VM, prj *fm.Project, event *js.Object) {
 	vm.Emit("selected_project", prj)
 }
@@ -71,6 +75,9 @@ func (ptm *ProjectTableModel) SetSelectedProject(np *fm.Project) {
 	ptm.SelectedProject = np
 	ptm.VM.Emit("update:selected_project", np)
 }
+
+//
+// Formatting Related Methods
 
 func (ptm *ProjectTableModel) TableRowClassName(rowInfo *js.Object) string {
 	p := &fm.Project{Object: rowInfo.Get("row")}
@@ -92,17 +99,25 @@ func (ptm *ProjectTableModel) HeaderCellStyle() string {
 	return "background: #a1e6e6;"
 }
 
-func (ptm *ProjectTableModel) StatusList() []*fm.ValText {
-	return business.CreateStatuts()
+func (ptm *ProjectTableModel) RiskIconClass(risk string) string {
+	var res string
+	switch risk {
+	case "2":
+		res = "fas fa-exclamation-triangle risk-icon high-risk"
+	case "1":
+		res = "fas fa-exclamation-circle risk-icon low-risk"
+	default:
+		//res = "green info circle icon"
+	}
+	return res
 }
 
-func (ptm *ProjectTableModel) StatusType() []*fm.ValText {
-	return business.CreateTypes()
+func (ptm *ProjectTableModel) FormatDate(r, c *js.Object, date string) string {
+	return fm.DateString(date)
 }
 
-func (ptm *ProjectTableModel) StatusFilter(value string, p *fm.Project) bool {
-	return p.Status == value
-}
+//
+// Column Filtering Related Methods
 
 func (ptm *ProjectTableModel) FilterHandler(value string, p *js.Object, col *js.Object) bool {
 	prop := col.Get("property").String()
@@ -141,21 +156,4 @@ func (ptm *ProjectTableModel) FilteredValue() []string {
 		"5 - Monitoring",
 	}
 	return res
-}
-
-func (ptm *ProjectTableModel) RiskIconClass(risk string) string {
-	var res string
-	switch risk {
-	case "2":
-		res = "el-icon-warning risk-icon high-risk"
-	case "1":
-		res = "el-icon-warning risk-icon low-risk"
-	default:
-		//res = "green info circle icon"
-	}
-	return res
-}
-
-func (ptm *ProjectTableModel) FormatDate(r, c *js.Object, date string) string {
-	return fm.DateString(date)
 }

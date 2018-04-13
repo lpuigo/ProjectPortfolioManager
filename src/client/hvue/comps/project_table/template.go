@@ -1,6 +1,7 @@
 package project_table
 
 /*
+    size="mini"
 	max-height="100%"
     style="width: 100%"
 
@@ -19,7 +20,6 @@ const template = `
     @current-change="SetSelectedProject"
     @row-dblclick="SelectRow"
 	height="100%"
-    size="mini"
 	:border=true
 >
     <el-table-column 
@@ -46,6 +46,15 @@ const template = `
 		    :resizable=false    align="center"	:formatter="FormatDate"
     ></el-table-column>
 
+    <el-table-column 
+            label="WorkLoad"	width="150px"
+		    :resizable=false
+    >
+        <template slot-scope="scope">
+            <project-progress-bar :project="scope.row"></project-progress-bar>
+        </template>
+	</el-table-column>
+
     <el-table-column
             label="PS"	prop="lead_ps"	width="120px" sortable :sort-by="['lead_ps', 'client','name']"
 		    :resizable=false :show-overflow-tooltip=true
@@ -65,8 +74,8 @@ const template = `
     ></el-table-column>
 
     <el-table-column
-            label="Status"	prop="status"	width="100px" sortable :sort-by="['status', 'client','name']"
-		    :resizable=false
+            label="Status"	prop="status"	width="120px" sortable :sort-by="['status', 'client','name']"
+		    :resizable=false :show-overflow-tooltip=true
  		    :filters="FilterList('status')"	:filter-method="FilterHandler"	filter-placement="bottom-end" :filtered-value="FilteredValue()"
 	></el-table-column>
 </el-table>
