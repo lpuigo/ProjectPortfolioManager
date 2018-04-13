@@ -42,13 +42,23 @@ const template = `
 	</el-table-column>
 
     <el-table-column 
-            label="Roll Out"	prop="milestones.RollOut"	width="100px"	sortable :sort-by="['milestones.RollOut', 'client','name']"
+            label="KickOff"	prop="milestones.Kickoff"	width="100px"	sortable    :sort-by="['milestones.Kickoff', 'client','name']"
 		    :resizable=false    align="center"	:formatter="FormatDate"
     ></el-table-column>
 
     <el-table-column 
-            label="WorkLoad"	width="150px"
-		    :resizable=false
+            label="UAT"	prop="milestones.UAT"	width="100px"	sortable    :sort-by="['milestones.UAT', 'client','name']"
+		    :resizable=false    align="center"	:formatter="FormatDate"
+    ></el-table-column>
+
+    <el-table-column 
+            label="RollOut"	prop="milestones.RollOut"	width="100px"	sortable    :sort-by="['milestones.RollOut', 'client','name']"
+		    :resizable=false    align="center"	:formatter="FormatDate"
+    ></el-table-column>
+
+    <el-table-column 
+            label="WorkLoad"	width="120px"
+		    :resizable=false	align="center"
     >
         <template slot-scope="scope">
             <project-progress-bar :project="scope.row"></project-progress-bar>
