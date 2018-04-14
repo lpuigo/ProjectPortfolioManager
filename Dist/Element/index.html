@@ -11,14 +11,18 @@
 
 <body>
     <div id="app" style="height: 100%;">
+
 <!--
-        <project-edit
+@newproject="AddProject"
+@removeproject="RemoveProject"
+
+-->
+        <project-edit-modal
                 ref="ProjectEdit"
                 :edited_project.sync="editedProject"
-                @newproject="AddProject"
-                @removeproject="RemoveProject"
-        ></project-edit>
+         ></project-edit-modal>
 
+<!--
         <div class="lp_block tip">
             <pre>EditedProject: {{editedProject}}</pre>
         </div>

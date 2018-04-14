@@ -4,6 +4,7 @@ import (
 	"github.com/gopherjs/gopherjs/js"
 	"github.com/huckridgesw/hvue"
 	fm "github.com/lpuig/novagile/src/client/frontmodel"
+	"github.com/lpuig/novagile/src/client/hvue/comps/project_edit_modal"
 	"github.com/lpuig/novagile/src/client/hvue/comps/project_table"
 	"github.com/lpuig/novagile/src/client/hvue/tools"
 	"honnef.co/go/js/xhr"
@@ -17,6 +18,7 @@ func main() {
 	hvue.NewVM(
 		hvue.El("#app"),
 		hvue.Component("project-table", project_table.ComponentOptions()...),
+		hvue.Component("project-edit-modal", project_edit_modal.ComponentOptions()...),
 		hvue.DataS(mpm),
 		hvue.MethodsOf(mpm),
 		hvue.Mounted(func(vm *hvue.VM) {
@@ -28,7 +30,6 @@ func main() {
 
 	// TODO to remove after debug
 	js.Global.Set("mpm", mpm)
-
 }
 
 type MainPageModel struct {
@@ -37,6 +38,8 @@ type MainPageModel struct {
 	Projects      []*fm.Project `js:"projects"`
 	EditedProject *fm.Project   `js:"editedProject"`
 	Filter        string        `js:"filter"`
+
+	VM *hvue.VM `js:"VM"`
 }
 
 func NewMainPageModel() *MainPageModel {
@@ -53,6 +56,7 @@ func (m *MainPageModel) GetPtf() {
 
 func (m *MainPageModel) EditProject(p *fm.Project) {
 	m.EditedProject = p
+	m.VM.Refs("ProjectEdit").Call("Show", p)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
