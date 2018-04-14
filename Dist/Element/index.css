@@ -1,5 +1,6 @@
 html, body {
-    font-family: Ubuntu, Calibri, sans-serif;
+    /*font-family: Ubuntu, Calibri, sans-serif;*/
+    font-family: Calibri, sans-serif;
     font-size: 14px;
     height: 100%;
     margin:0;
@@ -92,4 +93,26 @@ pre {
 }
 .risk-icon.high-risk {
     color: #ff3200;
+}
+
+/* Workload Columns */
+.small-font {
+    font-size: 0.75em;
+    line-height: 0.9em;
+}
+
+.el-progress-bar__outer {
+    background-color: #cccccc;
+}
+
+.el-progress-bar__inner {
+    background-color: #7f7f7f;
+}
+
+.over-spent {
+    color: #ff3200;
+}
+
+.over-spent .el-progress-bar__inner {
+    background-color: #ff3200;
 }
