@@ -74,16 +74,18 @@ func (pemm *ProjectEditModalModel) ConfirmChange() {
 func (pemm *ProjectEditModalModel) Duplicate() {
 	pemm.EditedProject = pemm.CurrentProject
 	pemm.CurrentProject.Name += " (Copy)"
+	pemm.CurrentProject.Id = -1
+	pemm.CurrentProject.CurrentWL = 0.0
 	pemm.IsNewProject = true
 }
 
 func (pemm *ProjectEditModalModel) NewProject() {
-	pemm.VM.Emit("newproject", pemm.CurrentProject)
+	pemm.VM.Emit("update:edited_project", pemm.EditedProject)
 	pemm.Visible = false
 }
 
-func (pemm *ProjectEditModalModel) RemoveProject() {
-	pemm.VM.Emit("removeproject", pemm.EditedProject)
+func (pemm *ProjectEditModalModel) DeleteProject() {
+	pemm.VM.Emit("delete:edited_project", pemm.EditedProject)
 	pemm.ShowConfirmDelete = false
 	pemm.Visible = false
 }

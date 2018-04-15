@@ -59,7 +59,7 @@ const template = `
             <p>Confirm to delete this project ?</p>
             <div style="text-align: right; margin: 0">
             <el-button size="mini" type="text" @click="showconfirmdelete = false">Cancel</el-button>
-            <el-button size="mini" type="primary" @click="RemoveProject">Delete</el-button>
+            <el-button size="mini" type="primary" @click="DeleteProject">Delete</el-button>
             </div>
         </el-popover>
         

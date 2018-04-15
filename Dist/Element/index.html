@@ -20,6 +20,8 @@
         <project-edit-modal
                 ref="ProjectEdit"
                 :edited_project.sync="editedProject"
+                @update:edited_project="ProcessEditedProject"
+                @delete:edited_project="ProcessDeleteProject"
          ></project-edit-modal>
 
 <!--

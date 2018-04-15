@@ -4,10 +4,13 @@ import (
 	"github.com/gopherjs/gopherjs/js"
 	"github.com/huckridgesw/hvue"
 	fm "github.com/lpuig/novagile/src/client/frontmodel"
+	"github.com/lpuig/novagile/src/client/goel/message"
 	"github.com/lpuig/novagile/src/client/hvue/comps/project_edit_modal"
 	"github.com/lpuig/novagile/src/client/hvue/comps/project_table"
 	"github.com/lpuig/novagile/src/client/hvue/tools"
+	"github.com/oskca/gopherjs-json"
 	"honnef.co/go/js/xhr"
+	"strconv"
 )
 
 //go:generate bash ./makejs.sh
@@ -59,7 +62,28 @@ func (m *MainPageModel) EditProject(p *fm.Project) {
 	m.VM.Refs("ProjectEdit").Call("Show", p)
 }
 
+func (m *MainPageModel) ProcessEditedProject(p *fm.Project) {
+	m.EditedProject = p
+	if p.Id >= 0 {
+		go m.callUpdatePrj(p)
+	} else {
+		go m.callCreatePrj(p)
+	}
+}
+
+func (m *MainPageModel) ProcessDeleteProject(p *fm.Project) {
+	m.EditedProject = p
+	if m.EditedProject.Id >= 0 {
+		go m.callDeletePrj(m.EditedProject)
+	}
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+const (
+	SuccessMsgDuration = 1000
+	WarningMsgDuration = 5000
+)
 
 func (m *MainPageModel) callGetPtf() {
 	req := xhr.NewRequest("GET", "/ptf")
@@ -77,4 +101,72 @@ func (m *MainPageModel) callGetPtf() {
 	})
 	//m.DispPrj = true
 	//js.Global.Set("resp", m.Resp)
+}
+
+func (m *MainPageModel) callUpdatePrj(uprj *fm.Project) {
+	req := xhr.NewRequest("PUT", "/ptf/"+strconv.Itoa(uprj.Id))
+	req.Timeout = 1000
+	req.ResponseType = xhr.JSON
+	err := req.Send(json.Stringify(uprj))
+	if err != nil {
+		message.ErrorStr(m.VM, "Oups! "+err.Error(), true)
+		return
+	}
+	if req.Status == 200 {
+		uprj.Copy(fm.ProjectFromJS(req.Response))
+		message.SetDuration(SuccessMsgDuration)
+		message.SuccesStr(m.VM, "Project updated !", true)
+	} else {
+		message.SetDuration(WarningMsgDuration)
+		message.WarningStr(m.VM, "Something went wrong!\nServer returned code "+strconv.Itoa(req.Status), true)
+	}
+}
+
+func (m *MainPageModel) callCreatePrj(uprj *fm.Project) {
+	req := xhr.NewRequest("POST", "/ptf")
+	req.Timeout = 1000
+	req.ResponseType = xhr.JSON
+	err := req.Send(json.Stringify(uprj))
+	if err != nil {
+		message.ErrorStr(m.VM, "Oups! "+err.Error(), true)
+		return
+	}
+	if req.Status == 201 {
+		m.EditedProject.Copy(fm.ProjectFromJS(req.Response))
+		m.Projects = append(m.Projects, m.EditedProject)
+		message.SetDuration(SuccessMsgDuration)
+		message.SuccesStr(m.VM, "New project added !", true)
+	} else {
+		message.SetDuration(WarningMsgDuration)
+		message.WarningStr(m.VM, "Something went wrong!\nServer returned code "+strconv.Itoa(req.Status), true)
+	}
+}
+
+func (m *MainPageModel) callDeletePrj(dprj *fm.Project) {
+	req := xhr.NewRequest("DELETE", "/ptf/"+strconv.Itoa(dprj.Id))
+	req.Timeout = 1000
+	req.ResponseType = xhr.JSON
+	err := req.Send(nil)
+	if err != nil {
+		message.ErrorStr(m.VM, "Oups! "+err.Error(), true)
+		return
+	}
+	if req.Status == 200 {
+		m.deletePrj(dprj)
+		message.SetDuration(SuccessMsgDuration)
+		message.SuccesStr(m.VM, "Project deleted !", true)
+	} else {
+		message.SetDuration(WarningMsgDuration)
+		message.WarningStr(m.VM, "Something went wrong!\nServer returned code "+strconv.Itoa(req.Status), true)
+	}
+}
+
+func (m *MainPageModel) deletePrj(dprj *fm.Project) {
+	for i, p := range m.Projects {
+		if p.Id == dprj.Id {
+			m.EditedProject = nil
+			m.Projects = append(m.Projects[:i], m.Projects[i+1:]...)
+			break
+		}
+	}
 }
