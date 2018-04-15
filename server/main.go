@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/lpuig/novagile/logger"
 	"github.com/lpuig/novagile/manager"
@@ -88,9 +89,13 @@ func main() {
 	router.PathPrefix(AssetsRoot).Handler(http.StripPrefix(AssetsRoot, http.FileServer(http.Dir(AssetsDir))))
 	router.PathPrefix("/").Handler(http.FileServer(http.Dir(RootDir)))
 
+	// TODO consider using github.com/nytimes/gziphandler (more versatile / efficient ?)
+	gzipedrouter := handlers.CompressHandler(router)
+	//gzipedrouter := router
+
 	LaunchPageInBrowser(conf.LaunchWebBrowser)
 	log.Print("Listening on ", ServicePort)
-	log.Fatal(http.ListenAndServe(ServicePort, router))
+	log.Fatal(http.ListenAndServe(ServicePort, gzipedrouter))
 }
 
 func LaunchPageInBrowser(launchWeb bool) error {
