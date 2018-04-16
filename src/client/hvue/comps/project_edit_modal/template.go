@@ -20,17 +20,17 @@ const template = `
         </el-form-item>
         <el-form-item label="Project Risk">
             <el-select v-model="currentProject.risk" placeholder="Risk level">
-                <el-option v-for="vt in riskList" :label="vt.text" :value="vt.value"></el-option>
+                <el-option v-for="(vt, index) in riskList" :key="index" :label="vt.text" :value="vt.value"></el-option>
             </el-select>
         </el-form-item>
         <el-form-item label="Project Status">
             <el-select v-model="currentProject.status" placeholder="Project status">
-                <el-option v-for="vt in statusList" :label="vt.text" :value="vt.value"></el-option>
+                <el-option v-for="(vt, index) in statusList" :key="index" :label="vt.text" :value="vt.value"></el-option>
             </el-select>
         </el-form-item>
         <el-form-item label="Project Type">
             <el-select v-model="currentProject.type" placeholder="Project Type">
-                <el-option v-for="vt in typeList" :label="vt.text" :value="vt.value"></el-option>
+                <el-option v-for="(vt, index) in typeList" :key="index" :label="vt.text" :value="vt.value"></el-option>
             </el-select>
         </el-form-item>
         <el-form-item label="Forecast WorkLoad">
