@@ -33,7 +33,7 @@ const template = `
     ></el-table-column>
 
     <el-table-column
-            label="Comment" prop="comment"
+            label="Comment" prop="comment" min-width="120px"
 		    :resizable=false
     >
         <template slot-scope="scope">
