@@ -92,13 +92,13 @@ func (pemm *ProjectEditModalModel) Show(p *fm.Project) {
 //////////////////////////////////////////////////////////////////////////////////////////////
 // Milestones Button Methods
 
-func (pemm *ProjectEditModalModel) DeleteMilestone(vm *hvue.VM, ms string) {
-	pemm = &ProjectEditModalModel{Object: vm.Object}
+func (pemm *ProjectEditModalModel) DeleteMilestone(ms string) {
+	//pemm = &ProjectEditModalModel{Object: vm.Object}
 	pemm.CurrentProject.RemoveMileStone(ms)
 }
 
-func (pemm *ProjectEditModalModel) AddMilestone(vm *hvue.VM, ms string) {
-	pemm = &ProjectEditModalModel{Object: vm.Object}
+func (pemm *ProjectEditModalModel) AddMilestone(ms string) {
+	//pemm = &ProjectEditModalModel{Object: vm.Object}
 	pemm.CurrentProject.AddMileStone(ms)
 }
 

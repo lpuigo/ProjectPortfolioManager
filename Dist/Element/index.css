@@ -120,12 +120,18 @@ pre {
 /*
     === Edit Project Modal style ===
  */
-.form-row {
-    padding: 5px 0;
+.el-dialog__header {
+    background: #4abbbd;
+    color: white;
+    border-bottom: 1px solid #e1e4eb
+}
+.el-dialog__body {
+    padding: 5px 15px;
 }
 
-.el-dialog__header {
-    border-bottom: 1px solid #e1e4eb
+.form-row {
+    margin: 5px 5px;
+    padding: 5px 0;
 }
 
 .el-dialog__footer {

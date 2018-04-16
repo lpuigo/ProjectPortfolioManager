@@ -40,8 +40,8 @@ func CreateMilestoneKeys() []*fm.ValText {
 	res = append(res, fm.NewValText("Outline", "C"))
 	res = append(res, fm.NewValText("UAT", "R"))
 	res = append(res, fm.NewValText("Training", "F"))
-	res = append(res, fm.NewValText("Pilot End", "P"))
 	res = append(res, fm.NewValText("RollOut", "M"))
 	res = append(res, fm.NewValText("GoLive", "S"))
+	res = append(res, fm.NewValText("Pilot End", "P"))
 	return res
 }

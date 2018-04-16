@@ -3,7 +3,7 @@ package project_edit_modal
 const template = `
 <el-dialog :visible.sync="visible" width="60%">
     <!--<span slot="title" class="dialog-header">-->
-    <span slot="title">
+    <span slot="title" class="novagile">
         <h2 v-if="currentProject" style="margin: 0 0"><i class="far fa-edit"></i> Edit Project: <span style="color: teal">{{currentProject.client}} - {{currentProject.name}}</span></h2>
     </span>
 
@@ -72,19 +72,41 @@ const template = `
 		</el-col>	
   	</el-row>
     
-	<el-row :gutter="15" class="form-row">
-		<el-col :span="24">
+	<el-row class="form-row">
+        <el-col :span="7">
+            <el-dropdown split-button type="success" plain @command="AddMilestone">
+                <span>Add a Milestone</span>
+                <el-dropdown-menu slot="dropdown">
+                    <el-dropdown-item v-for="ms in unusedMilestoneKeys" :key="ms" :command="ms">{{ms}}</el-dropdown-item>
+                </el-dropdown-menu>
+            </el-dropdown>
+        </el-col>
+		<el-col :span="14">
             <el-table
                 :data="usedMilestoneKeys"
-                height="100%"
                 :border=true
             >
                 <el-table-column 
-                        label="Milestone" min-width="120px" 
+                        label="Action" width="80px" 
+						align="center"	
                         :resizable=false
                 >
                     <template slot-scope="scope">
-                        <span>{{scope.row}}</span>
+                        <el-button 
+                        	type="danger" 
+                        	plain
+                        	size="mini" 
+                        	icon="far fa-calendar-times" 
+                        	@click="DeleteMilestone(scope.row)"
+                        ></el-button>
+                    </template>
+                </el-table-column>
+                <el-table-column 
+                        label="Milestone" width="100px" 
+                        :resizable=false
+                >
+                    <template slot-scope="scope">
+                       <span>{{scope.row}}</span>
                     </template>
                 </el-table-column>
                 <el-table-column 
@@ -92,12 +114,19 @@ const template = `
                         :resizable=false
                 >
                     <template slot-scope="scope">
-                        <span>{{currentProject.milestones[scope.row]}}</span>
+                        <el-date-picker
+                                v-model="currentProject.milestones[scope.row]"
+                                type="date"       
+                                format="dd/MM/yyyy"
+                                value-format="yyyy-MM-dd"
+                                :picker-options="{firstDayOfWeek:1}"
+                                size="mini"
+                        ></el-date-picker>
                     </template>
                 </el-table-column>
             </el-table>
-		</el-col>	
-  	</el-row>
+		</el-col>
+    </el-row>
 	
     <span slot="footer" class="dialog-footer">
         <el-popover
