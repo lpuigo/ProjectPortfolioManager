@@ -14,7 +14,16 @@ const template = `
 		</el-col>	
 		<el-col :span="12">
 			<span><strong>Project Name</strong></span>
-			<el-input placeholder="Project Name" v-model="currentProject.name"></el-input>
+			<el-input placeholder="Project Name" v-model="currentProject.name">
+				<el-dropdown slot="prepend"	trigger="click" @command="SetClientName">
+					<el-button type="primary" :loading="clientNameLookup" @click="GetClientNameList">
+						<i class="fas fa-search icon--right"></i>
+					</el-button>
+					<el-dropdown-menu v-if="HasClientNameList" slot="dropdown">
+						<el-dropdown-item v-for="(vt, index) in clientNameList" :key="index" :command="vt">{{vt.value}} - {{vt.text}}</el-dropdown-item>
+					</el-dropdown-menu>
+				</el-dropdown>
+			</el-input>
 		</el-col>	
   	</el-row>
 
@@ -75,7 +84,7 @@ const template = `
 	<el-row :gutter="15" class="form-row">
         <el-col :span="7">
             <el-dropdown @command="AddMilestone" style="float: right;">
-				<el-button type="primary" type="success" plain size="mini">
+				<el-button type="success" plain size="mini">
 					Add a Milestone<i class="el-icon-arrow-down el-icon--right"></i>
 				</el-button>
                 <el-dropdown-menu slot="dropdown">
@@ -134,14 +143,15 @@ const template = `
 	
     <span slot="footer" class="dialog-footer">
         <el-popover
-                v-if="!isNewProject"
                 ref="confirm_delete_popover"
                 placement="top"
                 width="160"
                 v-model="showconfirmdelete"
-                :disable="!visible"
         >
-            <p>Confirm to delete this project ?</p>
+<!--			:disable="!visible"
+                 v-if="!isNewProject"
+-->
+           <p>Confirm to delete this project ?</p>
             <div style="text-align: left; margin: 0;">
             	<el-button size="mini" type="text" @click="showconfirmdelete = false">Cancel</el-button>
             	<el-button size="mini" type="primary" @click="DeleteProject">Delete</el-button>
@@ -150,15 +160,18 @@ const template = `
         
         <el-tooltip effect="light" :open-delay="500">
             <div slot="content">Delete<br/>current project</div>
-            <el-button v-if="!isNewProject" type="danger" plain icon="far fa-trash-alt" v-popover:confirm_delete_popover tooltip="Delete"></el-button>
+            <el-button :disabled="isNewProject" type="danger" plain icon="far fa-trash-alt" v-popover:confirm_delete_popover></el-button>
+            <!--<el-button v-if="!isNewProject" type="danger" plain icon="far fa-trash-alt" @click="showconfirmdelete = !showconfirmdelete"></el-button>-->
         </el-tooltip>
         <el-tooltip effect="light" :open-delay="500">
             <div slot="content">Create copy of<br/>current project</div>
-            <el-button v-if="!isNewProject" type="info" plain icon="far fa-clone" tooltip="Duplicate" @click="Duplicate"></el-button>
+            <el-button :disabled="isNewProject" type="info" plain icon="far fa-clone" @click="Duplicate"></el-button>
         </el-tooltip>
         <el-button @click="visible = false">Cancel</el-button>
-        <el-button v-if="!isNewProject" type="success" plain @click="ConfirmChange">Confirm Change</el-button>
-        <el-button v-if="isNewProject" type="success" plain @click="NewProject">Create New</el-button>
+        <el-button type="success" plain @click="ConfirmChange">
+        	<span v-if="!isNewProject">Confirm Change</span>
+        	<span v-else>Create New</span>
+        </el-button>
     </span>
 </el-dialog>
 `

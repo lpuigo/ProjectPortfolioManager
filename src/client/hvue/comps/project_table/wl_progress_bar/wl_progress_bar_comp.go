@@ -74,13 +74,10 @@ func (pb *ProjectProgressBarModel) ProgressPct() (pct float64) {
 }
 func (pb *ProjectProgressBarModel) ProgressStatus() (res string) {
 	pp := pb.Project
+	res = "progress-bar"
 	if pp.ForecastWL > 0 && pp.CurrentWL > pp.ForecastWL {
-		res = "over-spent"
-		return
+		res += " over-spent"
 	}
-	//if pp.Status == "6 - Done" {
-	//	res = "sucess"
-	//}
 	return
 }
 

@@ -78,16 +78,25 @@ func (m *MainPageModel) ProcessDeleteProject(p *fm.Project) {
 	}
 }
 
+func (m *MainPageModel) ShowProjectStat(p *fm.Project) {
+	m.EditedProject = p
+	// TODO to be implemented
+	message.InfoStr(m.VM, "Show stat on "+p.Client+"-"+p.Name, true)
+	//m.VM.Refs("ProjectStat").Call("Show", p)
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 const (
-	SuccessMsgDuration = 1000
+	SuccessMsgDuration = 2000
 	WarningMsgDuration = 5000
+	LongTimeOut        = 2000
+	TimeOut            = 1000
 )
 
 func (m *MainPageModel) callGetPtf() {
 	req := xhr.NewRequest("GET", "/ptf")
-	req.Timeout = 2000
+	req.Timeout = LongTimeOut
 	req.ResponseType = xhr.JSON
 	//m.DispPrj = false
 	err := req.Send(nil)
@@ -105,7 +114,7 @@ func (m *MainPageModel) callGetPtf() {
 
 func (m *MainPageModel) callUpdatePrj(uprj *fm.Project) {
 	req := xhr.NewRequest("PUT", "/ptf/"+strconv.Itoa(uprj.Id))
-	req.Timeout = 1000
+	req.Timeout = TimeOut
 	req.ResponseType = xhr.JSON
 	err := req.Send(json.Stringify(uprj))
 	if err != nil {
@@ -124,7 +133,7 @@ func (m *MainPageModel) callUpdatePrj(uprj *fm.Project) {
 
 func (m *MainPageModel) callCreatePrj(uprj *fm.Project) {
 	req := xhr.NewRequest("POST", "/ptf")
-	req.Timeout = 1000
+	req.Timeout = TimeOut
 	req.ResponseType = xhr.JSON
 	err := req.Send(json.Stringify(uprj))
 	if err != nil {
@@ -144,7 +153,7 @@ func (m *MainPageModel) callCreatePrj(uprj *fm.Project) {
 
 func (m *MainPageModel) callDeletePrj(dprj *fm.Project) {
 	req := xhr.NewRequest("DELETE", "/ptf/"+strconv.Itoa(dprj.Id))
-	req.Timeout = 1000
+	req.Timeout = TimeOut
 	req.ResponseType = xhr.JSON
 	err := req.Send(nil)
 	if err != nil {

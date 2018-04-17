@@ -6,6 +6,7 @@ import (
 	"github.com/lpuig/element/model"
 	"github.com/lpuig/novagile/src/client/business"
 	fm "github.com/lpuig/novagile/src/client/frontmodel"
+	"time"
 )
 
 func Register() {
@@ -62,6 +63,9 @@ type ProjectEditModalModel struct {
 	TypeList       []*fm.ValText `js:"typeList"`
 	MilestonesList []*fm.ValText `js:"milestonesList"`
 
+	ClientNameLookUp bool          `js:"clientNameLookup"`
+	ClientNameList   []*fm.ValText `js:"clientNameList"`
+
 	VM *hvue.VM `js:"VM"`
 }
 
@@ -76,6 +80,8 @@ func NewProjectEditModalModel(vm *hvue.VM) *ProjectEditModalModel {
 	pemm.StatusList = business.CreateStatuts()
 	pemm.TypeList = business.CreateTypes()
 	pemm.MilestonesList = business.CreateMilestoneKeys()
+	pemm.ClientNameLookUp = false
+	pemm.ClientNameList = nil
 	pemm.VM = vm
 	return pemm
 }
@@ -86,7 +92,14 @@ func (pemm *ProjectEditModalModel) Show(p *fm.Project) {
 	pemm.CurrentProject.Copy(pemm.EditedProject)
 	pemm.IsNewProject = false
 	pemm.ShowConfirmDelete = false
+	pemm.ClientNameList = nil
+	pemm.ClientNameLookUp = false
 	pemm.Visible = true
+}
+
+func (pemm *ProjectEditModalModel) Hide() {
+	pemm.Visible = false
+	pemm.ShowConfirmDelete = false
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////
@@ -108,7 +121,12 @@ func (pemm *ProjectEditModalModel) AddMilestone(ms string) {
 func (pemm *ProjectEditModalModel) ConfirmChange() {
 	pemm.EditedProject.Copy(pemm.CurrentProject)
 	pemm.VM.Emit("update:edited_project", pemm.EditedProject)
-	pemm.Visible = false
+	pemm.Hide()
+}
+
+func (pemm *ProjectEditModalModel) DeleteProject() {
+	pemm.VM.Emit("delete:edited_project", pemm.EditedProject)
+	pemm.Hide()
 }
 
 func (pemm *ProjectEditModalModel) Duplicate() {
@@ -119,13 +137,34 @@ func (pemm *ProjectEditModalModel) Duplicate() {
 	pemm.IsNewProject = true
 }
 
-func (pemm *ProjectEditModalModel) NewProject() {
-	pemm.VM.Emit("update:edited_project", pemm.EditedProject)
-	pemm.Visible = false
+//////////////////////////////////////////////////////////////////////////////////////////////
+// Get Client-Name List
+
+func (pemm *ProjectEditModalModel) SetClientName(vt *fm.ValText) {
+	pemm.CurrentProject.Client = vt.Value
+	pemm.CurrentProject.Name = vt.Text
 }
 
-func (pemm *ProjectEditModalModel) DeleteProject() {
-	pemm.VM.Emit("delete:edited_project", pemm.EditedProject)
-	pemm.ShowConfirmDelete = false
-	pemm.Visible = false
+func (pemm *ProjectEditModalModel) HasClientNameList() bool {
+	return len(pemm.ClientNameList) > 0
+}
+
+func (pemm *ProjectEditModalModel) GetClientNameList() {
+	if pemm.HasClientNameList() {
+		return
+	}
+	pemm.ClientNameLookUp = true
+	go pemm.callClientNameList()
+}
+
+func (pemm *ProjectEditModalModel) callClientNameList() {
+	// TODO Implement XHR query to retrieve PrjStatList
+	time.Sleep(2 * time.Second)
+	pemm.ClientNameList = []*fm.ValText{
+		fm.NewValText("Client A", "Prj A1"),
+		fm.NewValText("Client A", "Prj A2"),
+		fm.NewValText("Client B", "Prj B1"),
+		fm.NewValText("Client B", "Prj B2"),
+	}
+	pemm.ClientNameLookUp = false
 }

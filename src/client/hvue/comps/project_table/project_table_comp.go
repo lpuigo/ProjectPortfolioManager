@@ -63,11 +63,15 @@ func NewProjectTableModel(vm *hvue.VM) *ProjectTableModel {
 	return ptm
 }
 
-//
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Comp Event Related Methods
 
 func (ptm *ProjectTableModel) SelectRow(vm *hvue.VM, prj *fm.Project, event *js.Object) {
 	vm.Emit("selected_project", prj)
+}
+
+func (ptm *ProjectTableModel) ShowTableProjectStat(vm *hvue.VM, prj *fm.Project) {
+	vm.Emit("show_project_stat", prj)
 }
 
 func (ptm *ProjectTableModel) SetSelectedProject(np *fm.Project) {

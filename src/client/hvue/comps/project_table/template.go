@@ -28,12 +28,19 @@ const template = `
     ></el-table-column>
 
     <el-table-column
-            label="Project Name"	prop="name"	width="200px"
+            label="Project Name"	width="200px"
 			:resizable=true :show-overflow-tooltip=true
-    ></el-table-column>
+    >
+        <template slot-scope="scope">
+            <i v-if="scope.row.hasStat" 
+            		class="fas fa-chart-line icon--left link"
+					@click="ShowTableProjectStat(scope.row)"
+            ></i><span>{{scope.row.name}}</span>
+        </template>
+	</el-table-column>
 
     <el-table-column
-            label="Comment" prop="comment" min-width="120px"
+            label="Comment" min-width="120px"
 		    :resizable=false
     >
         <template slot-scope="scope">
