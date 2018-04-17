@@ -110,11 +110,11 @@ pre {
 }
 
 .over-spent {
-    color: #ff3200;
+    color: #DB2828;
 }
 
 .over-spent .el-progress-bar__inner {
-    background-color: #ff3200;
+    background-color: #DB2828;
 }
 
 /*
@@ -125,13 +125,14 @@ pre {
     color: white;
     border-bottom: 1px solid #e1e4eb
 }
+
 .el-dialog__body {
     padding: 5px 15px;
 }
 
 .form-row {
-    margin: 5px 5px;
-    padding: 5px 0;
+    /*margin: 5px 5px;*/
+    padding: 8px 0;
 }
 
 .el-dialog__footer {

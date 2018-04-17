@@ -72,10 +72,12 @@ const template = `
 		</el-col>	
   	</el-row>
     
-	<el-row class="form-row">
+	<el-row :gutter="15" class="form-row">
         <el-col :span="7">
-            <el-dropdown split-button type="success" plain @command="AddMilestone">
-                <span>Add a Milestone</span>
+            <el-dropdown @command="AddMilestone" style="float: right;">
+				<el-button type="primary" type="success" plain size="mini">
+					Add a Milestone<i class="el-icon-arrow-down el-icon--right"></i>
+				</el-button>
                 <el-dropdown-menu slot="dropdown">
                     <el-dropdown-item v-for="ms in unusedMilestoneKeys" :key="ms" :command="ms">{{ms}}</el-dropdown-item>
                 </el-dropdown-menu>
@@ -102,7 +104,8 @@ const template = `
                     </template>
                 </el-table-column>
                 <el-table-column 
-                        label="Milestone" width="100px" 
+                        label="Milestone" width="100px"
+						align="right"
                         :resizable=false
                 >
                     <template slot-scope="scope">
@@ -121,6 +124,7 @@ const template = `
                                 value-format="yyyy-MM-dd"
                                 :picker-options="{firstDayOfWeek:1}"
                                 size="mini"
+								:clearable="false"
                         ></el-date-picker>
                     </template>
                 </el-table-column>
