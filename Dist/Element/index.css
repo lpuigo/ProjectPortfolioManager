@@ -76,11 +76,11 @@ pre {
     === Project Table style ===
  */
 .icon--right {
-    margin-left: 5px
+    margin-left: .3em
 }
 
 .icon--left {
-    margin-right: 5px
+    margin-right: .3em
 }
 
 .link {

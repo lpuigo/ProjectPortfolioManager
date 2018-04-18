@@ -24,6 +24,10 @@
                 @delete:edited_project="ProcessDeleteProject"
          ></project-edit-modal>
 
+        <project-stat-modal
+                ref="ProjectStat"
+        ></project-stat-modal>
+
 <!--
         <div class="lp_block tip">
             <pre>EditedProject: {{editedProject}}</pre>
@@ -69,12 +73,15 @@
 </body>
 
 
+<!--<script src="/Assets/vue/2.5.16/vue.min.js"></script>*/}}-->
 <script src="/Assets/vue/2.5.16/vue.js"></script>
 <script src="/Assets/element-ui/2.3.3/lib/index.js"></script>
 <script src="/Assets/element-ui/2.3.3/lib/umd/locale/en.js"></script>
 <script>
     ELEMENT.locale(ELEMENT.lang.en)
 </script>
+<script src="/Assets/jquery/jquery-3.1.1.min.js"></script>
+<script src="/Assets/highcharts/highcharts.js"></script>
 <script type="text/javascript" src="prjapp.js"></script>
 
 </html>

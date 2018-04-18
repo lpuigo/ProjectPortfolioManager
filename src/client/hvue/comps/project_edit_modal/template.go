@@ -4,7 +4,7 @@ const template = `
 <el-dialog :visible.sync="visible" width="60%">
     <!--<span slot="title" class="dialog-header">-->
     <span slot="title" class="novagile">
-        <h2 v-if="currentProject" style="margin: 0 0"><i class="far fa-edit"></i> Edit Project: <span style="color: teal">{{currentProject.client}} - {{currentProject.name}}</span></h2>
+        <h2 v-if="currentProject" style="margin: 0 0"><i class="far fa-edit icon--left"></i>Edit Project: <span style="color: teal">{{currentProject.client}} - {{currentProject.name}}</span></h2>
     </span>
 
 	<el-row :gutter="15" class="form-row">

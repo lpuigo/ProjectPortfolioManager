@@ -5,13 +5,11 @@ import (
 
 	"github.com/gopherjs/gopherjs/js"
 	"github.com/huckridgesw/hvue"
-	"github.com/lpuig/element/model"
 	"github.com/lpuig/novagile/src/client/business"
 	fm "github.com/lpuig/novagile/src/client/frontmodel"
 	"github.com/lpuig/novagile/src/client/goel/message"
 	"github.com/lpuig/novagile/src/client/hvue/tools"
 	"honnef.co/go/js/xhr"
-
 )
 
 func Register() {
@@ -75,7 +73,7 @@ type ProjectEditModalModel struct {
 }
 
 func NewProjectEditModalModel(vm *hvue.VM) *ProjectEditModalModel {
-	pemm := &ProjectEditModalModel{Object: model.O()}
+	pemm := &ProjectEditModalModel{Object: tools.O()}
 	pemm.EditedProject = fm.NewProject()
 	pemm.CurrentProject = fm.NewProject()
 	pemm.Visible = false
