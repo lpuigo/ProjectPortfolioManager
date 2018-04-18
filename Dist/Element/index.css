@@ -122,13 +122,12 @@ pre {
 .el-table .project-row-monitoring {
     background: rgba(237, 252, 237, 0.59);
 }
-.risk-icon {
-    margin-right: 5px;
-}
-.risk-icon.low-risk {
+
+.low-risk {
     color: #f29b00;
 }
-.risk-icon.high-risk {
+
+.high-risk {
     color: #ff3200;
 }
 

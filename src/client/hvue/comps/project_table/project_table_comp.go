@@ -107,9 +107,9 @@ func (ptm *ProjectTableModel) RiskIconClass(risk string) string {
 	var res string
 	switch risk {
 	case "2":
-		res = "fas fa-exclamation-triangle risk-icon high-risk"
+		res = "fas fa-exclamation-triangle icon--left high-risk"
 	case "1":
-		res = "fas fa-exclamation-circle risk-icon low-risk"
+		res = "fas fa-exclamation-circle icon--left low-risk"
 	default:
 		//res = "green info circle icon"
 	}
