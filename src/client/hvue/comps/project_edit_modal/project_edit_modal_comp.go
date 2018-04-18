@@ -1,12 +1,17 @@
 package project_edit_modal
 
 import (
+	"strconv"
+
 	"github.com/gopherjs/gopherjs/js"
 	"github.com/huckridgesw/hvue"
 	"github.com/lpuig/element/model"
 	"github.com/lpuig/novagile/src/client/business"
 	fm "github.com/lpuig/novagile/src/client/frontmodel"
-	"time"
+	"github.com/lpuig/novagile/src/client/goel/message"
+	"github.com/lpuig/novagile/src/client/hvue/tools"
+	"honnef.co/go/js/xhr"
+
 )
 
 func Register() {
@@ -153,18 +158,28 @@ func (pemm *ProjectEditModalModel) GetClientNameList() {
 	if pemm.HasClientNameList() {
 		return
 	}
-	pemm.ClientNameLookUp = true
 	go pemm.callClientNameList()
 }
 
 func (pemm *ProjectEditModalModel) callClientNameList() {
-	// TODO Implement XHR query to retrieve PrjStatList
-	time.Sleep(2 * time.Second)
-	pemm.ClientNameList = []*fm.ValText{
-		fm.NewValText("Client A", "Prj A1"),
-		fm.NewValText("Client A", "Prj A2"),
-		fm.NewValText("Client B", "Prj B1"),
-		fm.NewValText("Client B", "Prj B2"),
+	pemm.ClientNameLookUp = true
+	pemm.ClientNameList = nil
+	req := xhr.NewRequest("GET", "/stat/prjlist/"+strconv.Itoa(pemm.CurrentProject.Id))
+	req.Timeout = 2000
+	req.ResponseType = xhr.JSON
+	err := req.Send(nil)
+	if err != nil {
+		message.ErrorStr(pemm.VM, "Oups! "+err.Error(), true)
+		pemm.ClientNameLookUp = false
+		return
+	}
+	var prjStatNames *fm.ProjectStatNames
+	if req.Status == 200 {
+		prjStatNames = fm.NewProjectStatNameFromJS(req.Response)
+		pemm.ClientNameList = prjStatNames.ToClientNameList()
+	} else {
+		message.SetDuration(tools.WarningMsgDuration)
+		message.WarningStr(pemm.VM, "Something went wrong!\nServer returned code "+strconv.Itoa(req.Status), true)
 	}
 	pemm.ClientNameLookUp = false
 }

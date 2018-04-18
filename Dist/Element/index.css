@@ -191,4 +191,7 @@ pre {
     line-height: 1.2em;
 }
 
-
+.el-dropdown-menu.el-popper {
+    max-height: 33vh;
+    overflow: auto;
+}

@@ -87,16 +87,9 @@ func (m *MainPageModel) ShowProjectStat(p *fm.Project) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-const (
-	SuccessMsgDuration = 2000
-	WarningMsgDuration = 5000
-	LongTimeOut        = 2000
-	TimeOut            = 1000
-)
-
 func (m *MainPageModel) callGetPtf() {
 	req := xhr.NewRequest("GET", "/ptf")
-	req.Timeout = LongTimeOut
+	req.Timeout = tools.LongTimeOut
 	req.ResponseType = xhr.JSON
 	//m.DispPrj = false
 	err := req.Send(nil)
@@ -114,7 +107,7 @@ func (m *MainPageModel) callGetPtf() {
 
 func (m *MainPageModel) callUpdatePrj(uprj *fm.Project) {
 	req := xhr.NewRequest("PUT", "/ptf/"+strconv.Itoa(uprj.Id))
-	req.Timeout = TimeOut
+	req.Timeout = tools.TimeOut
 	req.ResponseType = xhr.JSON
 	err := req.Send(json.Stringify(uprj))
 	if err != nil {
@@ -123,17 +116,17 @@ func (m *MainPageModel) callUpdatePrj(uprj *fm.Project) {
 	}
 	if req.Status == 200 {
 		uprj.Copy(fm.ProjectFromJS(req.Response))
-		message.SetDuration(SuccessMsgDuration)
+		message.SetDuration(tools.SuccessMsgDuration)
 		message.SuccesStr(m.VM, "Project updated !", true)
 	} else {
-		message.SetDuration(WarningMsgDuration)
+		message.SetDuration(tools.WarningMsgDuration)
 		message.WarningStr(m.VM, "Something went wrong!\nServer returned code "+strconv.Itoa(req.Status), true)
 	}
 }
 
 func (m *MainPageModel) callCreatePrj(uprj *fm.Project) {
 	req := xhr.NewRequest("POST", "/ptf")
-	req.Timeout = TimeOut
+	req.Timeout = tools.TimeOut
 	req.ResponseType = xhr.JSON
 	err := req.Send(json.Stringify(uprj))
 	if err != nil {
@@ -143,17 +136,17 @@ func (m *MainPageModel) callCreatePrj(uprj *fm.Project) {
 	if req.Status == 201 {
 		m.EditedProject.Copy(fm.ProjectFromJS(req.Response))
 		m.Projects = append(m.Projects, m.EditedProject)
-		message.SetDuration(SuccessMsgDuration)
+		message.SetDuration(tools.SuccessMsgDuration)
 		message.SuccesStr(m.VM, "New project added !", true)
 	} else {
-		message.SetDuration(WarningMsgDuration)
+		message.SetDuration(tools.WarningMsgDuration)
 		message.WarningStr(m.VM, "Something went wrong!\nServer returned code "+strconv.Itoa(req.Status), true)
 	}
 }
 
 func (m *MainPageModel) callDeletePrj(dprj *fm.Project) {
 	req := xhr.NewRequest("DELETE", "/ptf/"+strconv.Itoa(dprj.Id))
-	req.Timeout = TimeOut
+	req.Timeout = tools.TimeOut
 	req.ResponseType = xhr.JSON
 	err := req.Send(nil)
 	if err != nil {
@@ -162,10 +155,10 @@ func (m *MainPageModel) callDeletePrj(dprj *fm.Project) {
 	}
 	if req.Status == 200 {
 		m.deletePrj(dprj)
-		message.SetDuration(SuccessMsgDuration)
+		message.SetDuration(tools.SuccessMsgDuration)
 		message.SuccesStr(m.VM, "Project deleted !", true)
 	} else {
-		message.SetDuration(WarningMsgDuration)
+		message.SetDuration(tools.WarningMsgDuration)
 		message.WarningStr(m.VM, "Something went wrong!\nServer returned code "+strconv.Itoa(req.Status), true)
 	}
 }

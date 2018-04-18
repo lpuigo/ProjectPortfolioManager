@@ -239,7 +239,7 @@ func RegisterEditProjectModalComp() *vue.Component {
 		p := &frontmodel.Project{Object: args[0]}
 		m.EditedPrj.Copy(p)
 
-		m.PrjStatList = frontmodel.NewProjectStatNameFromJS(args[1]).GetProjectStatSignatures()
+		m.PrjStatList = frontmodel.NewProjectStatNameFromJS(args[1]).ToClientNameList()
 
 		vm.Refs.Get("StatutDD").Call("changeSelected", m.EditedPrj.Status)
 		vm.Refs.Get("TypeDD").Call("changeSelected", m.EditedPrj.Type)
