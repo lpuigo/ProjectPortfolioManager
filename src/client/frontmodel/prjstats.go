@@ -74,16 +74,27 @@ func CreateSumStatFromProjectStat(ps *ProjectStat) *IssueStat {
 	sis.StartDate = ps.StartDate
 	sis.Issue = "Project overall"
 
-	for j, _ := range ps.TimeSpent[0] {
-		s, r, e := 0.0, 0.0, 0.0
-		for i, _ := range ps.Issues {
-			s += ps.TimeSpent[i][j]
-			r += ps.TimeRemaining[i][j]
-			e += ps.TimeEstimated[i][j]
+	var so, ro, eo *js.Object
+
+	for i, _ := range ps.Issues {
+		if i == 0 {
+			sis.TimeSpent = append([]float64{},ps.TimeSpent[i]...)
+			sis.TimeRemaining = append([]float64{},ps.TimeRemaining[i]...)
+			sis.TimeEstimated = append([]float64{},ps.TimeEstimated[i]...)
+			so = sis.Object.Get("timeSpent")
+			ro = sis.Object.Get("timeRemaining")
+			eo = sis.Object.Get("timeEstimated")
+			continue
 		}
-		sis.TimeSpent = append(sis.TimeSpent, s)
-		sis.TimeRemaining = append(sis.TimeRemaining, r)
-		sis.TimeEstimated = append(sis.TimeEstimated, e)
+		s, r, e := ps.TimeSpent[i], ps.TimeRemaining[i], ps.TimeEstimated[i]
+		for j, _ := range ps.TimeSpent[0] {
+			//sis.TimeSpent[j] += s[j]
+			//sis.TimeRemaining[j] += r[j]
+			//sis.TimeEstimated[j] += e[j]
+			so.SetIndex(j, so.Index(j).Float()+s[j])
+			ro.SetIndex(j, ro.Index(j).Float()+r[j])
+			eo.SetIndex(j, eo.Index(j).Float()+e[j])
+		}
 	}
 	return sis
 }

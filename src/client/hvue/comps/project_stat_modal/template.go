@@ -17,7 +17,7 @@ const template = `
 			<el-table
 					:data="issueInfoList"
 					:default-sort = "{prop: 'spent', order: 'descending'}"
-					max-height="350"
+					height="60vh"
 			>
 				<el-table-column 
 					label="Issue"	prop="issue"	width="120px"	sortable 
@@ -37,17 +37,12 @@ const template = `
 				></el-table-column>
 			</el-table>
         </el-tab-pane>
-        <el-tab-pane label="Global SRE Chart">
-			<sre-chart v-if="issueStat"
+        <el-tab-pane v-if="issueStat" label="Global SRE Chart">
+			<sre-chart 
 					:issuestat="issueStat"
-					max-height="60vh"
+					style="height: 300px"
 					:border="true"
 			></sre-chart>
-        </el-tab-pane>
-
-        <el-tab-pane label="Role">Role
-        </el-tab-pane>
-        <el-tab-pane label="Task">Task
         </el-tab-pane>
     </el-tabs>
 
