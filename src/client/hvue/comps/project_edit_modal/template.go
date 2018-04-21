@@ -19,8 +19,9 @@ const template = `
 					<el-button type="primary" :loading="clientNameLookup" @click="GetClientNameList">
 						<i class="fas fa-search icon--right"></i>
 					</el-button>
-					<el-dropdown-menu v-if="HasClientNameList" slot="dropdown">
-						<el-dropdown-item v-for="(vt, index) in clientNameList" :key="index" :command="vt">{{vt.value}} - {{vt.text}}</el-dropdown-item>
+                    <el-dropdown-menu slot="dropdown">
+                        <el-dropdown-item v-if="clientNameListEmpty">Retreiving Data ...</el-dropdown-item>
+						<el-dropdown-item v-else v-for="(vt, index) in clientNameList" :key="index" :command="vt">{{vt.value}} - {{vt.text}}</el-dropdown-item>
 					</el-dropdown-menu>
 				</el-dropdown>
 			</el-input>

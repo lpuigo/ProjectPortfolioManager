@@ -48,6 +48,10 @@ func ComponentOptions() []hvue.ComponentOption {
 			})
 			return keyList
 		}),
+		hvue.Computed("clientNameListEmpty", func(vm *hvue.VM) interface{} {
+			m := &ProjectEditModalModel{Object: vm.Object}
+			return !m.hasClientNameList()
+		}),
 	}
 }
 
@@ -148,12 +152,12 @@ func (pemm *ProjectEditModalModel) SetClientName(vt *fm.ValText) {
 	pemm.CurrentProject.Name = vt.Text
 }
 
-func (pemm *ProjectEditModalModel) HasClientNameList() bool {
+func (pemm *ProjectEditModalModel) hasClientNameList() bool {
 	return len(pemm.ClientNameList) > 0
 }
 
 func (pemm *ProjectEditModalModel) GetClientNameList() {
-	if pemm.HasClientNameList() {
+	if pemm.hasClientNameList() {
 		return
 	}
 	go pemm.callClientNameList()
