@@ -85,20 +85,26 @@ func setChart(vm *hvue.VM) {
 				"allowPointSelect": false,
 				"pointStart":       startDate,
 				"pointInterval":    24 * 3600 * 1000, // one day
+				"marker":           js.M{"enabled": false},
+				"animation":        false,
 			},
 		},
 		"series": js.S{
 			js.M{
-				"name": "Spent",
-				"data": is.TimeSpent,
+				"name":      "Spent",
+				"color":     "#51A825",
+				"lineWidth": 5,
+				"data":      is.TimeSpent,
 			},
 			js.M{
-				"name": "Remaining",
-				"data": is.TimeRemaining,
+				"name":  "Remaining",
+				"color": "#EC8E00",
+				"data":  is.TimeRemaining,
 			},
 			js.M{
-				"name": "Estimated",
-				"data": is.TimeEstimated,
+				"name":  "Estimated",
+				"color": "#89AFD7",
+				"data":  is.TimeEstimated,
 			},
 		},
 	}
