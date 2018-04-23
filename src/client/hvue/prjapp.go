@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/gopherjs/gopherjs/js"
 	"github.com/huckridgesw/hvue"
+	"github.com/lpuig/novagile/src/client/business"
 	fm "github.com/lpuig/novagile/src/client/frontmodel"
 	"github.com/lpuig/novagile/src/client/goel/message"
 	"github.com/lpuig/novagile/src/client/hvue/comps/project_edit_modal"
@@ -68,7 +69,11 @@ func (m *MainPageModel) EditProject(p *fm.Project) {
 }
 
 func (m *MainPageModel) CreateNewProject() {
-	m.EditProject(fm.NewProject())
+	p := fm.NewProject()
+	p.Status = business.DefaultStatus()
+	p.Type = business.DefaultType()
+	p.Risk = business.DefaultRisk()
+	m.EditProject(p)
 }
 
 func (m *MainPageModel) ProcessEditedProject(p *fm.Project) {
