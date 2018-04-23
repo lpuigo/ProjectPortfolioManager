@@ -6,7 +6,7 @@ import (
 	fm "github.com/lpuig/novagile/src/client/frontmodel"
 	"github.com/lpuig/novagile/src/client/goel/message"
 	"github.com/lpuig/novagile/src/client/hvue/comps/project_stat_modal/sre_chart"
-	"github.com/lpuig/novagile/src/client/hvue/tools"
+	"github.com/lpuig/novagile/src/client/tools"
 	"honnef.co/go/js/xhr"
 	"strconv"
 )

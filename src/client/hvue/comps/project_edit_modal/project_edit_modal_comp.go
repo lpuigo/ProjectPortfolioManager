@@ -8,7 +8,7 @@ import (
 	"github.com/lpuig/novagile/src/client/business"
 	fm "github.com/lpuig/novagile/src/client/frontmodel"
 	"github.com/lpuig/novagile/src/client/goel/message"
-	"github.com/lpuig/novagile/src/client/hvue/tools"
+	"github.com/lpuig/novagile/src/client/tools"
 	"honnef.co/go/js/xhr"
 )
 
@@ -26,6 +26,11 @@ func ComponentOptions() []hvue.ComponentOption {
 			return NewProjectEditModalModel(vm)
 		}),
 		hvue.MethodsOf(&ProjectEditModalModel{}),
+
+		hvue.Computed("isNewProject", func(vm *hvue.VM) interface{} {
+			m := &ProjectEditModalModel{Object: vm.Object}
+			return m.CurrentProject.Id == -1
+		}),
 		hvue.Computed("unusedMilestoneKeys", func(vm *hvue.VM) interface{} {
 			m := &ProjectEditModalModel{Object: vm.Object}
 			keyList := []string{}
@@ -62,7 +67,6 @@ type ProjectEditModalModel struct {
 	CurrentProject *fm.Project `js:"currentProject"`
 
 	Visible           bool `js:"visible"`
-	IsNewProject      bool `js:"isNewProject"`
 	ShowConfirmDelete bool `js:"showconfirmdelete"`
 
 	RiskList       []*fm.ValText `js:"riskList"`
@@ -81,7 +85,6 @@ func NewProjectEditModalModel(vm *hvue.VM) *ProjectEditModalModel {
 	pemm.EditedProject = fm.NewProject()
 	pemm.CurrentProject = fm.NewProject()
 	pemm.Visible = false
-	pemm.IsNewProject = false
 	pemm.ShowConfirmDelete = false
 	pemm.RiskList = business.CreateRisks()
 	pemm.StatusList = business.CreateStatuts()
@@ -97,7 +100,6 @@ func (pemm *ProjectEditModalModel) Show(p *fm.Project) {
 	pemm.EditedProject = p
 	pemm.CurrentProject = fm.NewProject()
 	pemm.CurrentProject.Copy(pemm.EditedProject)
-	pemm.IsNewProject = false
 	pemm.ShowConfirmDelete = false
 	pemm.ClientNameList = nil
 	pemm.ClientNameLookUp = false
@@ -141,7 +143,6 @@ func (pemm *ProjectEditModalModel) Duplicate() {
 	pemm.CurrentProject.Name += " (Copy)"
 	pemm.CurrentProject.Id = -1
 	pemm.CurrentProject.CurrentWL = 0.0
-	pemm.IsNewProject = true
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////

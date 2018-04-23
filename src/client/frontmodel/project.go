@@ -2,6 +2,8 @@ package frontmodel
 
 import (
 	"github.com/gopherjs/gopherjs/js"
+	"github.com/lpuig/novagile/src/client/business"
+	"github.com/lpuig/novagile/src/client/tools"
 	"github.com/lpuig/novagile/src/server/model"
 	"strconv"
 	"strings"
@@ -25,15 +27,15 @@ type Project struct {
 }
 
 func NewProject() *Project {
-	pf := &Project{Object: js.Global.Get("Object").New()}
+	pf := &Project{Object: tools.O()}
 	pf.Id = -1
-	pf.Client = "Client"
-	pf.Name = "Projet"
-	pf.Risk = "0"
+	pf.Client = "New Client"
+	pf.Name = "New Projet"
+	pf.Risk = business.DefaultRisk()
 	pf.LeadPS = ""
 	pf.LeadDev = ""
-	pf.Status = "1 - Prospect"
-	pf.Type = "Legacy"
+	pf.Status = business.DefaultStatus()
+	pf.Type = business.DefaultType()
 	pf.HasStat = false
 	pf.ForecastWL = 0
 	pf.CurrentWL = 0

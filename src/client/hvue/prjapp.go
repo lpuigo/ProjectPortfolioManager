@@ -8,7 +8,7 @@ import (
 	"github.com/lpuig/novagile/src/client/hvue/comps/project_edit_modal"
 	"github.com/lpuig/novagile/src/client/hvue/comps/project_stat_modal"
 	"github.com/lpuig/novagile/src/client/hvue/comps/project_table"
-	"github.com/lpuig/novagile/src/client/hvue/tools"
+	"github.com/lpuig/novagile/src/client/tools"
 	"github.com/oskca/gopherjs-json"
 	"honnef.co/go/js/xhr"
 	"strconv"
@@ -55,6 +55,9 @@ func NewMainPageModel() *MainPageModel {
 	return mpm
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Action Methods
+
 func (m *MainPageModel) GetPtf() {
 	go m.callGetPtf()
 }
@@ -62,6 +65,10 @@ func (m *MainPageModel) GetPtf() {
 func (m *MainPageModel) EditProject(p *fm.Project) {
 	m.EditedProject = p
 	m.VM.Refs("ProjectEdit").Call("Show", p)
+}
+
+func (m *MainPageModel) CreateNewProject() {
+	m.EditProject(fm.NewProject())
 }
 
 func (m *MainPageModel) ProcessEditedProject(p *fm.Project) {
@@ -86,6 +93,7 @@ func (m *MainPageModel) ShowProjectStat(p *fm.Project) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// WS call Methods
 
 func (m *MainPageModel) callGetPtf() {
 	req := xhr.NewRequest("GET", "/ptf")

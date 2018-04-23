@@ -4,7 +4,7 @@ import (
 	"github.com/gopherjs/gopherjs/js"
 	"github.com/huckridgesw/hvue"
 	fm "github.com/lpuig/novagile/src/client/frontmodel"
-	"github.com/lpuig/novagile/src/client/hvue/tools"
+	"github.com/lpuig/novagile/src/client/tools"
 	"time"
 )
 

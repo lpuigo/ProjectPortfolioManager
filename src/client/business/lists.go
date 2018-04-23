@@ -14,6 +14,10 @@ func CreateStatuts() []*fm.ValText {
 	return res
 }
 
+func DefaultStatus() string {
+	return "1 - Candidate"
+}
+
 func CreateTypes() []*fm.ValText {
 	res := []*fm.ValText{}
 	res = append(res, fm.NewValText("Legacy", "Legacy"))
@@ -26,12 +30,20 @@ func CreateTypes() []*fm.ValText {
 	return res
 }
 
+func DefaultType() string {
+	return "Acti"
+}
+
 func CreateRisks() []*fm.ValText {
 	res := []*fm.ValText{}
 	res = append(res, fm.NewValText("0", "No Risk"))
 	res = append(res, fm.NewValText("1", "Low Risk"))
 	res = append(res, fm.NewValText("2", "High Risk"))
 	return res
+}
+
+func DefaultRisk() string {
+	return "0"
 }
 
 func CreateMilestoneKeys() []*fm.ValText {

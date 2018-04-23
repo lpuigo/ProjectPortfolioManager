@@ -3,7 +3,7 @@ package project_stat_modal
 import (
 	"github.com/gopherjs/gopherjs/js"
 	fm "github.com/lpuig/novagile/src/client/frontmodel"
-	"github.com/lpuig/novagile/src/client/hvue/tools"
+	"github.com/lpuig/novagile/src/client/tools"
 )
 
 type IssueInfo struct {

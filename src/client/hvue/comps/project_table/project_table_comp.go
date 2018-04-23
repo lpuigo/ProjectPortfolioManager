@@ -5,7 +5,7 @@ import (
 	"github.com/huckridgesw/hvue"
 	fm "github.com/lpuig/novagile/src/client/frontmodel"
 	"github.com/lpuig/novagile/src/client/hvue/comps/project_table/wl_progress_bar"
-	"github.com/lpuig/novagile/src/client/hvue/tools"
+	"github.com/lpuig/novagile/src/client/tools"
 	"sort"
 	"strconv"
 )
