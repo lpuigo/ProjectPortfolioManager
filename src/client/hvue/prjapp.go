@@ -107,7 +107,13 @@ func (m *MainPageModel) callGetPtf() {
 	//m.DispPrj = false
 	err := req.Send(nil)
 	if err != nil {
-		println("Req went wrong : ", err, req.Status)
+		message.ErrorStr(m.VM, "Oups! "+err.Error(), true)
+		return
+	}
+	if req.Status != 200 {
+		message.SetDuration(tools.WarningMsgDuration)
+		message.WarningStr(m.VM, "Something went wrong!\nServer returned code "+strconv.Itoa(req.Status), true)
+		return
 	}
 	m.Projects = []*fm.Project{}
 	req.Response.Call("forEach", func(item *js.Object) {
