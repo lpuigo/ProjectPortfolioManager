@@ -3,8 +3,8 @@ package hourstree
 import (
 	"github.com/gopherjs/gopherjs/js"
 	"github.com/huckridgesw/hvue"
-	"github.com/lpuig/novagile/src/client/hvue/comps/jira_stat_modal/node"
 	"github.com/lpuig/novagile/src/client/hvue/comps/jira_stat_modal/hoursrow"
+	"github.com/lpuig/novagile/src/client/hvue/comps/jira_stat_modal/node"
 	"github.com/lpuig/novagile/src/client/tools"
 )
 
@@ -19,6 +19,24 @@ const template = `
     </span>
 </el-tree>
 `
+
+func Register() {
+	hvue.NewComponent("hours-tree",
+		ComponentOptions()...,
+	)
+}
+
+func ComponentOptions() []hvue.ComponentOption {
+	return []hvue.ComponentOption{
+		hvue.Props("nodes"),
+		hvue.Template(template),
+		hvue.Component("hours-row", hoursrow.ComponentOptions()...),
+		hvue.DataFunc(func(vm *hvue.VM) interface{} {
+			return NewHoursTreeCompModel(vm)
+		}),
+		hvue.MethodsOf(&HoursTreeCompModel{}),
+	}
+}
 
 type HoursTreeCompModel struct {
 	*js.Object
@@ -39,18 +57,4 @@ func NewHoursTreeCompModel(vm *hvue.VM) *HoursTreeCompModel {
 	htcm.Nodes = []*node.HoursNode{}
 	htcm.VM = vm
 	return htcm
-}
-
-func RegisterHoursTreeComp() {
-	//RegisterHoursRowComp()
-
-	hvue.NewComponent("hours-tree",
-		hvue.Props("nodes"),
-		hvue.Template(template),
-		hvue.Component("hours-row", hoursrow.DefineHoursRowComp()...),
-		hvue.DataFunc(func(vm *hvue.VM) interface{} {
-			return NewHoursTreeCompModel(vm)
-		}),
-		hvue.MethodsOf(&HoursTreeCompModel{}),
-	)
 }

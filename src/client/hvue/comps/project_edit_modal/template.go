@@ -149,9 +149,6 @@ const template = `
                 width="160"
                 v-model="showconfirmdelete"
         >
-<!--			:disable="!visible"
-                 v-if="!isNewProject"
--->
            <p>Confirm to delete this project ?</p>
             <div style="text-align: left; margin: 0;">
             	<el-button size="mini" type="text" @click="showconfirmdelete = false">Cancel</el-button>
@@ -162,7 +159,6 @@ const template = `
         <el-tooltip effect="light" :open-delay="500">
             <div slot="content">Delete<br/>current project</div>
             <el-button :disabled="isNewProject" type="danger" plain icon="far fa-trash-alt" v-popover:confirm_delete_popover></el-button>
-            <!--<el-button v-if="!isNewProject" type="danger" plain icon="far fa-trash-alt" @click="showconfirmdelete = !showconfirmdelete"></el-button>-->
         </el-tooltip>
         <el-tooltip effect="light" :open-delay="500">
             <div slot="content">Create copy of<br/>current project</div>

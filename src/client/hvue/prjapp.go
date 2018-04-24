@@ -6,6 +6,7 @@ import (
 	"github.com/lpuig/novagile/src/client/business"
 	fm "github.com/lpuig/novagile/src/client/frontmodel"
 	"github.com/lpuig/novagile/src/client/goel/message"
+	"github.com/lpuig/novagile/src/client/hvue/comps/jira_stat_modal"
 	"github.com/lpuig/novagile/src/client/hvue/comps/project_edit_modal"
 	"github.com/lpuig/novagile/src/client/hvue/comps/project_stat_modal"
 	"github.com/lpuig/novagile/src/client/hvue/comps/project_table"
@@ -25,6 +26,7 @@ func main() {
 		hvue.Component("project-table", project_table.ComponentOptions()...),
 		hvue.Component("project-edit-modal", project_edit_modal.ComponentOptions()...),
 		hvue.Component("project-stat-modal", project_stat_modal.ComponentOptions()...),
+		hvue.Component("jira-stat-modal", jira_stat_modal.ComponentOptions()...),
 		hvue.DataS(mpm),
 		hvue.MethodsOf(mpm),
 		hvue.Mounted(func(vm *hvue.VM) {
@@ -95,6 +97,10 @@ func (m *MainPageModel) ProcessDeleteProject(p *fm.Project) {
 func (m *MainPageModel) ShowProjectStat(p *fm.Project) {
 	m.EditedProject = p
 	m.VM.Refs("ProjectStat").Call("Show", p)
+}
+
+func (m *MainPageModel) ShowJiraStat() {
+	m.VM.Refs("JiraStat").Call("Show")
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////

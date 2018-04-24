@@ -12,11 +12,6 @@
 <body>
     <div id="app" style="height: 100%;">
 
-<!--
-@newproject="AddProject"
-@removeproject="RemoveProject"
-
--->
         <project-edit-modal
                 ref="ProjectEdit"
                 :edited_project.sync="editedProject"
@@ -28,11 +23,10 @@
                 ref="ProjectStat"
         ></project-stat-modal>
 
-<!--
-        <div class="lp_block tip">
-            <pre>EditedProject: {{editedProject}}</pre>
-        </div>
--->
+        <jira-stat-modal
+                ref="JiraStat"
+        ></jira-stat-modal>
+
         <el-container style="height: 100%;border: 1px solid #eee">
             <el-header class="novagile">
                 <div class="header-menu-container">
@@ -40,6 +34,7 @@
                         <h2 class="content">Novagile Project Portfolio</h2>
                         <el-button class="content" icon="fas fa-sync-alt" @click="GetPtf" size="mini"></el-button>
                         <el-button class="content" icon="far fa-file-alt" @click="CreateNewProject" size="mini"></el-button>
+                        <el-button class="content" icon="fas fa-indent" @click="ShowJiraStat" size="mini"></el-button>
                     </div>
                     <div>
                         <el-input
@@ -52,6 +47,7 @@
                     </div>
                 </div>
             </el-header>
+
             <el-main style="height:100%; padding: 0px 10px;">
                 <project-table
                     :projects="projects"

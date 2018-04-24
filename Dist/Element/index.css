@@ -195,3 +195,33 @@ pre {
     max-height: 33vh;
     overflow: auto;
 }
+
+/*
+    === Jira Stat Modal style ===
+ */
+.custom-tree-node {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    /*font-size: 14px;*/
+    padding-right: 8px;
+}
+.custom-tree-node .custom-node-name {
+    /*flex: 0 1 20%;*/
+}
+.custom-tree-node .custom-hours-row {
+    width: 45vw;
+}
+.custom-hours-row .hours-table {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    line-height: 1.3em;
+}
+.hours-table .hours-cell {
+    flex: 1 1 0;
+    text-align: center;
+    margin: 0px 1px;
+    padding: 3px;
+}

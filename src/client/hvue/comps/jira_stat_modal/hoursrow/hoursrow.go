@@ -37,11 +37,11 @@ func NewHoursRowModel() *HoursRowModel {
 
 func RegisterHoursRowComp() {
 	hvue.NewComponent("hours-row",
-		DefineHoursRowComp()...,
+		ComponentOptions()...,
 	)
 }
 
-func DefineHoursRowComp() []hvue.ComponentOption {
+func ComponentOptions() []hvue.ComponentOption {
 	return []hvue.ComponentOption{
 		hvue.Props("hours", "hmax"),
 		hvue.Template(template),
