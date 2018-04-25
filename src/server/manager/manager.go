@@ -2,10 +2,10 @@ package manager
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	fm "github.com/lpuig/novagile/src/client/frontmodel"
 	fpr "github.com/lpuig/novagile/src/server/manager/fileprocesser"
+	jm "github.com/lpuig/novagile/src/server/manager/jiramanager"
 	"github.com/lpuig/novagile/src/server/model"
 	"io"
 	"os"
@@ -16,21 +16,28 @@ type Manager struct {
 	Projects *PrjManager
 	Stats    *StatManager
 	Fp       *fpr.FileProcesser
+	Jira     *jm.JiraManager
 }
 
 func NewManager(prjfile, statfile string) (*Manager, error) {
 	m := &Manager{}
 	pm, err := NewPrjManagerFromPersistFile(prjfile)
 	if err != nil {
-		return nil, errors.New(fmt.Sprintf("Unable to retrieve Project Portfolio Data: %s", err.Error()))
+		return nil, fmt.Errorf("Unable to retrieve Project Portfolio Data: %s", err.Error())
 	}
 	m.Projects = pm
 
 	sm, err := NewStatManagerFromFile(statfile)
 	if err != nil {
-		return nil, errors.New(fmt.Sprintf("Unable to retrieve Stat Portfolio Data: %s", err.Error()))
+		return nil, fmt.Errorf("Unable to retrieve Stat Portfolio Data: %s", err.Error())
 	}
 	m.Stats = sm
+
+	jmgr, err := jm.NewJiraManager()
+	if err != nil {
+		return nil, fmt.Errorf("Unable to create JiraManager: %s", err.Error())
+	}
+	m.Jira = jmgr
 
 	m.UpdateProjectsSpentTime()
 	return m, nil
@@ -255,4 +262,13 @@ func (m *Manager) GetProjectStatProjectList(id int, w io.Writer) error {
 	}
 
 	return json.NewEncoder(w).Encode(fm.NewProjectStatNameFromList(prjlist, "!"))
+}
+
+func (m *Manager) GetJiraTeamLogs(w io.Writer) error {
+	jsns, err := m.Jira.TeamLogs()
+	if err != nil {
+		return err
+	}
+	json.NewEncoder(w).Encode(jsns)
+	return nil
 }

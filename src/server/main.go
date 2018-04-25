@@ -84,6 +84,7 @@ func main() {
 	router.HandleFunc("/stat/reinit", withManager(route.GetInitProjectStat)).Methods("GET")
 	router.HandleFunc("/stat/update", withManager(route.GetUpdateProjectStat)).Methods("GET")
 	router.HandleFunc("/stat/{prjid:[0-9]+}", withManager(route.GetProjectStat)).Methods("GET")
+	router.HandleFunc("/jira/teamlogs", withManager(route.GetJiraTeamLogs)).Methods("GET")
 	router.HandleFunc("/xls", withManager(route.GetXLS)).Methods("GET")
 
 	router.PathPrefix(AssetsRoot).Handler(http.StripPrefix(AssetsRoot, http.FileServer(http.Dir(AssetsDir))))

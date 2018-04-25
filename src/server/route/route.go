@@ -186,3 +186,18 @@ func GetXLS(mgr *mgr.Manager, w http.ResponseWriter, r *http.Request) {
 	mgr.GetProjectsPtfXLS(w)
 	logmsg += fmt.Sprintf("ok (%d)", http.StatusOK)
 }
+
+func GetJiraTeamLogs(mgr *mgr.Manager, w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+	logmsg := "Request GetJiraTeamLogs Received from '" + r.Header.Get("Origin") + "' : "
+	defer formatLog(time.Now(), &logmsg)
+
+	w.Header().Set("Content-Type", "application/json")
+
+	err := mgr.GetJiraTeamLogs(w)
+	if err != nil {
+		addError(w, &logmsg, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	logmsg += fmt.Sprintf("ok (%d)", http.StatusOK)
+}

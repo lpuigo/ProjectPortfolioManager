@@ -19,7 +19,7 @@ func TestJiraStat_SpentHourBy(t *testing.T) {
 	js := NewJiraStat()
 
 	if err := js.LoadFromFile(testFile); err != nil {
-		t.Fatal("js.LoadFromFile returns", err.Error())
+		t.Fatal("js.loadFromFile returns", err.Error())
 	}
 
 	keys, values, err := js.SpentHourBy("LotClient")
