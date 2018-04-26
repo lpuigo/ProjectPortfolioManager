@@ -1,11 +1,13 @@
 package teamlogs
 
 import (
-	jsr "github.com/lpuig/novagile/src/client/frontmodel/jirastatrecord"
-	ris "github.com/lpuig/novagile/src/server/manager/recordindexedset"
+	"database/sql"
 	"sort"
 	"strconv"
 	"strings"
+
+	jsr "github.com/lpuig/novagile/src/client/frontmodel/jirastatrecord"
+	ris "github.com/lpuig/novagile/src/server/manager/recordindexedset"
 )
 
 type teamLogs struct {
@@ -50,12 +52,18 @@ func (tl *teamLogs) spentHourBy(indexname string) (keys []string, values []float
 	return
 }
 
-func Request() (jsns []*jsr.JiraStatRecord, err error) {
+func Request(db *sql.DB) (jsns []*jsr.JiraStatRecord, err error) {
 	tl := newTeamLogs()
-	//TODO do Query
-	//panic("implement query")
-	const testFile = `C:\Users\Laurent\Google Drive\Travail\NOVAGILE\Gouvernance\Stat Jira\Stat_Tempo\extract Tempo 2018-04-26 utf8.csv`
-	err = tl.loadFromFile(testFile)
+
+	tlq := newTeamLogsQuery(db)
+
+	/*	const testFile = `C:\Users\Laurent\Google Drive\Travail\NOVAGILE\Gouvernance\Stat Jira\Stat_Tempo\extract Tempo 2018-04-26 utf8.csv`
+		err = tl.loadFromFile(testFile)
+		if err != nil {
+			return
+		}
+	*/
+	err = tl.Stats.AddDataFromQuery(tlq)
 	if err != nil {
 		return
 	}
@@ -93,4 +101,77 @@ func Request() (jsns []*jsr.JiraStatRecord, err error) {
 		jsn.HourLogs[numweek] = hours[i]
 	}
 	return
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Jira Query for Team Logs
+
+const query string = `
+select
+	Team, Author, StartWeek, Issue, Summary,
+	sum(Hours) as Hours
+from (
+	select
+		t.NAME as Team,
+		wl.AUTHOR as Author,
+		date_format(wl.STARTDATE, "%Y-%v") as StartWeek,
+		date(wl.STARTDATE) as StartDay,
+		concat(p.pkey,"-", ji.issuenum) as Issue,
+		ji.SUMMARY as Summary,
+		wl.timeworked / 3600 as Hours
+	from worklog wl
+	inner join AO_AEFED0_TEAM_MEMBER_V2 tm on tm.MEMBER_KEY = wl.AUTHOR
+	inner join AO_AEFED0_TEAM_V2 t on t.ID = tm.TEAM_ID
+	inner join jiraissue ji on ji.ID = wl.issueid
+	inner join project p on p.ID = ji.PROJECT
+	where 
+		t.ID in (25, 26, 27, 28, 33)
+		and wl.STARTDATE >= STR_TO_DATE('01,01,2018','%d,%m,%Y')
+		and date_format(wl.STARTDATE, "%Y-%v") < date_format(CURDATE(), "%Y-%v")
+) tmp
+group by Team, Author, StartWeek, Issue, Summary
+order by Team, Author, StartWeek, Issue, Summary, Hours desc
+;
+`
+
+type teamLogsQuery struct {
+	db *sql.DB
+}
+
+func newTeamLogsQuery(db *sql.DB) *teamLogsQuery {
+	tlq := &teamLogsQuery{db: db}
+	return tlq
+}
+
+func (tlq *teamLogsQuery) Header() []string {
+	return []string{"Team", "Author", "StartWeek", "Issue", "Summary", "Hours"}
+}
+
+func (tlq *teamLogsQuery) Query() (rows *sql.Rows, err error) {
+	rows, err = tlq.db.Query(query)
+	return
+}
+
+func (tlq *teamLogsQuery) Scan(r *sql.Rows) ([]string, error) {
+	var Team, Author, StartWeek, Issue, Summary, Hours string
+
+	err := r.Scan(
+		&Team,
+		&Author,
+		&StartWeek,
+		&Issue,
+		&Summary,
+		&Hours,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return []string{
+		Team,
+		Author,
+		StartWeek,
+		Issue,
+		Summary,
+		Hours,
+	}, nil
 }

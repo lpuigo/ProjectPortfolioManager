@@ -31,6 +31,9 @@ const (
 
 	ConfigFile = `./config.json`
 	LogFile    = `./server.log`
+
+	JiraUsrPwd = `usr:pwd`
+	JiraDBName = `server/dbname`
 )
 
 type Conf struct {
@@ -39,6 +42,8 @@ type Conf struct {
 	ServicePort      string
 	LogFile          string
 	LaunchWebBrowser bool
+	JiraUsrPwd       string
+	JiraDBName       string
 }
 
 func main() {
@@ -50,6 +55,8 @@ func main() {
 		ServicePort:      ServicePort,
 		LogFile:          LogFile,
 		LaunchWebBrowser: LaunchWebBrowser,
+		JiraUsrPwd:       JiraUsrPwd,
+		JiraDBName:       JiraDBName,
 	}
 	if err := config.SetFromFile(ConfigFile, conf); err != nil {
 		log.Fatal(err)
@@ -60,7 +67,7 @@ func main() {
 	defer logfile.Close()
 	log.Println("Server Started =============================================================================")
 
-	mgr, err := manager.NewManager(PrjJSONFile, StatCSVFile)
+	mgr, err := manager.NewManager(PrjJSONFile, StatCSVFile, conf.JiraUsrPwd, conf.JiraDBName)
 	if err != nil {
 		log.Fatal(err)
 	}

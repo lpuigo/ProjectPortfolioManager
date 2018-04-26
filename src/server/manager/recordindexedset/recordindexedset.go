@@ -1,13 +1,22 @@
 package recordindexedset
 
 import (
-	"encoding/csv"
-	"fmt"
-	rs "github.com/lpuig/novagile/src/server/manager/recordset"
-	"io"
-	"os"
-	"path/filepath"
-	"sort"
+"database/sql"
+"encoding/csv"
+"fmt"
+"io"
+"os"
+"path/filepath"
+"sort"
+
+
+
+
+rs "github.com/lpuig/novagile/src/server/manager/recordset"
+
+
+
+
 )
 
 type IndexDesc struct {
@@ -209,6 +218,41 @@ func (c *RecordIndexedSet) AddCSVDataFrom(r io.Reader) error {
 		}
 
 		numline++
+	}
+	return nil
+}
+
+type QueryHandler interface {
+	Header() []string
+	Query() (*sql.Rows, error)
+	Scan(*sql.Rows) ([]string, error)
+}
+
+// AddDataFromQuery populates the RecordIndexedSet with Data from given reader (CSV formated values) (Header and Indexes are populated)
+func (c *RecordIndexedSet) AddDataFromQuery(q QueryHandler) error {
+	err := c.AddHeader(q.Header())
+	if err != nil {
+		return fmt.Errorf("could not add header info: %s", err.Error())
+	}
+
+	qrows, err := q.Query()
+	if err != nil {
+		return fmt.Errorf("could not exec query: %s", err.Error())
+	}
+	defer qrows.Close()
+
+	var numline int = 0
+	for qrows.Next() {
+		record, err := q.Scan(qrows)
+		if err != nil {
+			return fmt.Errorf("could not scan line %d: %s", numline, err.Error())
+		}
+		c.AddRecord(record)
+		numline++
+	}
+	err = qrows.Err()
+	if err != nil {
+		return fmt.Errorf("query returns: %s", err.Error())
 	}
 	return nil
 }

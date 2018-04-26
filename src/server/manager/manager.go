@@ -19,7 +19,7 @@ type Manager struct {
 	Jira     *jm.JiraManager
 }
 
-func NewManager(prjfile, statfile string) (*Manager, error) {
+func NewManager(prjfile, statfile, usrpwd, dbname string) (*Manager, error) {
 	m := &Manager{}
 	pm, err := NewPrjManagerFromPersistFile(prjfile)
 	if err != nil {
@@ -33,7 +33,7 @@ func NewManager(prjfile, statfile string) (*Manager, error) {
 	}
 	m.Stats = sm
 
-	jmgr, err := jm.NewJiraManager()
+	jmgr, err := jm.NewJiraManager(usrpwd, dbname)
 	if err != nil {
 		return nil, fmt.Errorf("Unable to create JiraManager: %s", err.Error())
 	}
