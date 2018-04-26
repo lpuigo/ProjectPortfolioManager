@@ -53,7 +53,12 @@ func (tl *teamLogs) spentHourBy(indexname string) (keys []string, values []float
 func Request() (jsns []*jsr.JiraStatRecord, err error) {
 	tl := newTeamLogs()
 	//TODO do Query
-	panic("implement query")
+	//panic("implement query")
+	const testFile = `C:\Users\Laurent\Google Drive\Travail\NOVAGILE\Gouvernance\Stat Jira\Stat_Tempo\extract Tempo 2018-04-26 utf8.csv`
+	err = tl.loadFromFile(testFile)
+	if err != nil {
+		return
+	}
 
 	weeks := tl.Stats.GetIndexKeys("Weeks")
 	weekrange := map[string]int{}
