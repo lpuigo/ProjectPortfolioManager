@@ -61,6 +61,7 @@ func Request() (jsns []*jsr.JiraStatRecord, err error) {
 	}
 
 	weeks := tl.Stats.GetIndexKeys("Weeks")
+	sort.Strings(weeks)
 	weekrange := map[string]int{}
 	for i, w := range weeks {
 		weekstr := strings.TrimLeft(w, "!")
