@@ -42,10 +42,11 @@ func NewIssueInfoList(ps *fm.ProjectStat) []*IssueInfo {
 	}
 	res := []*IssueInfo{}
 	for i, is := range isl {
+		psi := i + 1
 		s := is.TimeSpent[n]
 		ii := NewIssueInfo(
-			ps.Issues[i],
-			ps.Summaries[i],
+			ps.Issues[psi],
+			ps.Summaries[psi],
 			s,
 			is.TimeRemaining[n],
 			is.TimeEstimated[n],

@@ -57,6 +57,9 @@ func NewIssueStat() *IssueStat {
 func CreateIssueStatsFromProjectStat(ps *ProjectStat) []*IssueStat {
 	res := []*IssueStat{}
 	for i, issue := range ps.Issues {
+		if i == 0 {
+			continue // Skip first Issue as it is project global
+		}
 		is := NewIssueStat()
 		is.Issue = issue + " : " + ps.Summaries[i]
 		is.HRef = "http://jira.acticall.com/browse/" + issue
@@ -73,29 +76,8 @@ func CreateSumStatFromProjectStat(ps *ProjectStat) *IssueStat {
 	sis := NewIssueStat()
 	sis.StartDate = ps.StartDate
 	sis.Issue = "Project overall"
-
-	var so, ro, eo *js.Object
-
-	for i, _ := range ps.Issues {
-		if i == 0 {
-			sis.TimeSpent = append([]float64{},ps.TimeSpent[i]...)
-			sis.TimeRemaining = append([]float64{},ps.TimeRemaining[i]...)
-			sis.TimeEstimated = append([]float64{},ps.TimeEstimated[i]...)
-			so = sis.Object.Get("timeSpent")
-			ro = sis.Object.Get("timeRemaining")
-			eo = sis.Object.Get("timeEstimated")
-			continue
-		}
-		s, r, e := ps.TimeSpent[i], ps.TimeRemaining[i], ps.TimeEstimated[i]
-		for j, _ := range ps.TimeSpent[0] {
-			//sis.TimeSpent[j] += s[j]
-			//sis.TimeRemaining[j] += r[j]
-			//sis.TimeEstimated[j] += e[j]
-			so.SetIndex(j, so.Index(j).Float()+s[j])
-			ro.SetIndex(j, ro.Index(j).Float()+r[j])
-			eo.SetIndex(j, eo.Index(j).Float()+e[j])
-		}
-	}
+	sis.TimeSpent = ps.TimeSpent[0]
+	sis.TimeRemaining = ps.TimeRemaining[0]
+	sis.TimeEstimated = ps.TimeEstimated[0]
 	return sis
 }
-
