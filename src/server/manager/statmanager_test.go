@@ -177,22 +177,34 @@ func TestStatManager_GetProjectStatInfoOnPeriod(t *testing.T) {
 	if err != nil {
 		t.Fatalf("GetProjectStatInfo returns %s", err.Error())
 	}
-	if !recordset.Record(issues).Equals(recordset.Record{"Issue1", "Issue2"}) {
+	if !recordset.Record(issues).Equals(recordset.Record{"", "Issue1", "Issue2"}) {
 		t.Errorf("issues: %s", issues)
 	}
-	if !recordset.Record(summaries).Equals(recordset.Record{"Summary of Issue1", "Summary of Issue2"}) {
+	if !recordset.Record(summaries).Equals(recordset.Record{"", "Summary of Issue1", "Summary of Issue2"}) {
 		t.Errorf("issues: %s", summaries)
 	}
 	if startdate != "2017-01-01" {
 		t.Errorf("startdate: %s", startdate)
 	}
-	if !equals(spent, [][]float64{[]float64{0.0, 0.0, 5.0, 5.0, 5.0, 5.0}, []float64{0.0, 0.0, 1.0, 1.0, 2.0, 2.0}}) {
+	if !equals(spent, [][]float64{
+		[]float64{0.0, 0.0, 6.0, 6.0, 7.0, 7.0},
+		[]float64{0.0, 0.0, 5.0, 5.0, 5.0, 5.0},
+		[]float64{0.0, 0.0, 1.0, 1.0, 2.0, 2.0},
+	}) {
 		t.Errorf("spent %f", spent)
 	}
-	if !equals(remaining, [][]float64{[]float64{5.0, 5.0, 0.0, 0.0, 0.0, 0.0}, []float64{0.0, 0.0, 1.0, 1.0, 0.0, 0.0}}) {
+	if !equals(remaining, [][]float64{
+		[]float64{5.0, 5.0, 1.0, 1.0, 0.0, 0.0},
+		[]float64{5.0, 5.0, 0.0, 0.0, 0.0, 0.0},
+		[]float64{0.0, 0.0, 1.0, 1.0, 0.0, 0.0},
+	}) {
 		t.Errorf("remaining %f", remaining)
 	}
-	if !equals(estimated, [][]float64{[]float64{5.0, 5.0, 5.0, 5.0, 5.0, 5.0}, []float64{0.0, 0.0, 2.0, 2.0, 2.0, 2.0}}) {
+	if !equals(estimated, [][]float64{
+		[]float64{5.0, 5.0, 7.0, 7.0, 7.0, 7.0},
+		[]float64{5.0, 5.0, 5.0, 5.0, 5.0, 5.0},
+		[]float64{0.0, 0.0, 2.0, 2.0, 2.0, 2.0},
+	}) {
 		t.Errorf("estimated: %f", estimated)
 	}
 }

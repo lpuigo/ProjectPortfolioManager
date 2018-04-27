@@ -23,17 +23,19 @@ const (
 	BenchStatFile      = `C:\Users\Laurent\Golang\src\github.com\lpuig\novagile\Ressources\Test\Bench\Stats Projets Novagile.csv`
 	BenchArchiveSREDir = `C:\Users\Laurent\Golang\src\github.com\lpuig\novagile\Ressources\Test\Bench\ArchivedSRE`
 	BenchExtractSREDir = `C:\Users\Laurent\Golang\src\github.com\lpuig\novagile\Ressources\Test\Bench\ExtractSRE`
+	TestDBName         = ``
+	TestDBUsrPwd       = ``
 )
 
 func TestNewManager(t *testing.T) {
-	_, err := NewManager(prjfile, StatFile)
+	_, err := NewManager(prjfile, StatFile, TestDBUsrPwd, TestDBName)
 	if err != nil {
 		t.Fatal("NewManager returned", err.Error())
 	}
 }
 
 func TestInitActualDataOnProdFile(t *testing.T) {
-	m, err := NewManager(prjfile, PrdStatFile)
+	m, err := NewManager(prjfile, PrdStatFile, TestDBUsrPwd, TestDBName)
 	if err != nil {
 		t.Fatalf("NewManager returns %s", err.Error())
 	}
@@ -51,7 +53,7 @@ func TestInitActualDataOnProdFile(t *testing.T) {
 }
 
 func TestManager_GetProjectStatById(t *testing.T) {
-	m, err := NewManager(prjfile, PrdStatFile)
+	m, err := NewManager(prjfile, PrdStatFile, TestDBUsrPwd, TestDBName)
 	if err != nil {
 		t.Fatalf("could not create new manager: %s", err.Error())
 	}
@@ -73,7 +75,7 @@ func TestManager_GetProjectStatById(t *testing.T) {
 }
 
 func BenchmarkManager_GetProjectStatById(b *testing.B) {
-	m, err := NewManager(prjfile, PrdStatFile)
+	m, err := NewManager(prjfile, PrdStatFile, TestDBUsrPwd, TestDBName)
 	if err != nil {
 		b.Fatalf("could not create new manager: %s", err.Error())
 	}
@@ -106,7 +108,7 @@ func BenchmarkManager_GetProjectStatById(b *testing.B) {
 }
 
 func BenchmarkManager_ReinitStats(b *testing.B) {
-	m, err := NewManager(BenchPrjFile, BenchStatFile)
+	m, err := NewManager(BenchPrjFile, BenchStatFile, TestDBUsrPwd, TestDBName)
 	if err != nil {
 		b.Fatalf("NewManager returns %s", err.Error())
 	}

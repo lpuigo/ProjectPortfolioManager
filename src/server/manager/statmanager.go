@@ -253,11 +253,13 @@ func (sm *StatManager) issuesInfosFromProject(client, name string) (issuesKeys [
 // GetProjectStatInfoOnPeriod returns list of issues, dates slices within Given Period, and timeSpent, timeRemaining, timeEstimated doubleslices ([#issue][#date]) for given project client/name
 func (sm *StatManager) GetProjectStatInfoOnPeriod(client, name, startDate, endDate string) (issues, summaries []string, sDate string, spent, remaining, estimated [][]float64, err error) {
 	issuesKeys, nums, err := sm.issuesInfosFromProject(client, name)
-	issues = make([]string, len(issuesKeys))
-	summaries = make([]string, len(issuesKeys))
+	issues = make([]string, len(issuesKeys)+1)
+	issues[0] = ""
+	summaries = make([]string, len(issuesKeys)+1)
+	summaries[0] = ""
 	for i, k := range issuesKeys {
-		issues[i] = strings.TrimLeft(k, "!")
-		summaries[i] = strings.TrimLeft(sm.stat.GetLink("issue-summary").Get(k, "no summary"), "!")
+		issues[i+1] = strings.TrimLeft(k, "!")
+		summaries[i+1] = strings.TrimLeft(sm.stat.GetLink("issue-summary").Get(k, "no summary"), "!")
 	}
 	// On the result RecordSet
 	// Get the available update dates from the project stats
@@ -293,7 +295,12 @@ func (sm *StatManager) GetProjectStatInfoOnPeriod(client, name, startDate, endDa
 	initDS(&remaining, len(issues), len(dates))
 	initDS(&estimated, len(issues), len(dates))
 
-	for ii, ik := range issuesKeys {
+	gspent := spent[0]
+	gremaining := remaining[0]
+	gestimated := estimated[0]
+
+	for iii, ik := range issuesKeys {
+		ii := iii + 1
 		irs, errirs := sm.stat.CreateSubSet(
 			[]ris.IndexDesc{
 				ris.NewIndexDesc("Dates", "EXTRACT_DATE"),
@@ -305,7 +312,7 @@ func (sm *StatManager) GetProjectStatInfoOnPeriod(client, name, startDate, endDa
 			err = errirs
 			return
 		}
-		irs.AddRecords(sm.stat.GetRecordsByNums(nums[ii]))
+		irs.AddRecords(sm.stat.GetRecordsByNums(nums[iii]))
 		dateKeys := irs.GetIndexKeys("Dates")
 		sort.Strings(dateKeys)
 		for di, dk := range dates {
@@ -316,6 +323,9 @@ func (sm *StatManager) GetProjectStatInfoOnPeriod(client, name, startDate, endDa
 					spent[ii][di] = spent[ii][di-1]
 					remaining[ii][di] = remaining[ii][di-1]
 					estimated[ii][di] = estimated[ii][di-1]
+					gspent[di] += spent[ii][di]
+					gremaining[di] += remaining[ii][di]
+					gestimated[di] += estimated[ii][di]
 				} else { // first date : init values
 					if dateKey < dateKeys[0] {
 						//spent[ii][di] = 0.0
@@ -332,6 +342,9 @@ func (sm *StatManager) GetProjectStatInfoOnPeriod(client, name, startDate, endDa
 						spent[ii][di], err = stringToWL(r[0][spentPos])
 						remaining[ii][di], err = stringToWL(r[0][remainingPos])
 						estimated[ii][di], err = stringToWL(r[0][estimatedPos])
+						gspent[di] += spent[ii][di]
+						gremaining[di] += remaining[ii][di]
+						gestimated[di] += estimated[ii][di]
 					}
 				}
 				continue
@@ -339,6 +352,9 @@ func (sm *StatManager) GetProjectStatInfoOnPeriod(client, name, startDate, endDa
 			spent[ii][di], err = stringToWL(r[0][spentPos])
 			remaining[ii][di], err = stringToWL(r[0][remainingPos])
 			estimated[ii][di], err = stringToWL(r[0][estimatedPos])
+			gspent[di] += spent[ii][di]
+			gremaining[di] += remaining[ii][di]
+			gestimated[di] += estimated[ii][di]
 		}
 	}
 	return
