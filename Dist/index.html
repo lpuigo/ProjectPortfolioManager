@@ -1,129 +1,83 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <link rel="stylesheet" href="/Assets/semantic/semantic.min.css">
-    <style>
-        .main.container{
-            padding-top: 60px;
-            padding-left: 10px;
-            padding-right: 10px;
-        }
-        .issuechart{
-            margin-bottom: 14px;
-        }
-    </style>
     <title>Prj Portfolio</title>
-    <script
-        src="https://code.jquery.com/jquery-3.1.1.min.js"
-        integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
-        crossorigin="anonymous">
-    </script>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/Assets/element-ui/2.3.3/lib/theme-chalk/index.css">
+    <link rel="stylesheet" href="/Assets/web-fonts-with-css/css/fontawesome-all.min.css">
+    <link rel="stylesheet" href="index.css">
 </head>
 
 <body>
-<div id="prj-app">
-    <div class="ui teal inverted fixed menu">
-        <div class="item">
-            <h3>Novagile Project Portfolio</h3>
-        </div>
-        <div class="item"></div>
-        <a class="item" @click="GetPtf">
-            <i class="big icons">
-                <i class="cloud icon"></i>
-                <i class="tiny refresh black icon"></i>
-            </i>
-        </a>
-        <a class="item" @click="CreateNewProject">
-            <i class="big icons">
-                <i class="tasks icon"></i>
-                <i class="corner plus black icon"></i>
-            </i>
-        </a>
-        <a class="item" href="/xls">
-            <i class="big file excel outline icon"></i>
-        </a>
-        <div class="right menu">
-            <div class="item">
-                <div class="ui transparent icon input">
-                    <input type="text" placeholder="Filter..." v-model="textfilter">
-                    <i class="filter icon"></i>
+    <div id="app" style="height: 100%;">
+
+        <project-edit-modal
+                ref="ProjectEdit"
+                :edited_project.sync="editedProject"
+                @update:edited_project="ProcessEditedProject"
+                @delete:edited_project="ProcessDeleteProject"
+         ></project-edit-modal>
+
+        <project-stat-modal
+                ref="ProjectStat"
+        ></project-stat-modal>
+
+        <jira-stat-modal
+                ref="JiraStat"
+        ></jira-stat-modal>
+
+        <el-container style="height: 100%;border: 1px solid #eee">
+            <el-header class="novagile">
+                <div class="header-menu-container">
+                    <div class="header-menu-container">
+                        <h2 class="content">Novagile Project Portfolio</h2>
+                        <el-button class="content" icon="fas fa-sync-alt" @click="GetPtf" size="mini"></el-button>
+                        <el-button class="content" icon="far fa-file-alt" @click="CreateNewProject" size="mini"></el-button>
+                        <el-button class="content" icon="fas fa-indent" @click="ShowJiraStat" size="mini"></el-button>
+                    </div>
+                    <div>
+                        <el-input
+                                placeholder="Filter"
+                                prefix-icon="el-icon-search"
+                                v-model="filter"
+                                size="mini"
+                                clearable>
+                        </el-input>
+                    </div>
                 </div>
-            </div>
+            </el-header>
+
+            <el-main style="height:100%; padding: 0px 10px;">
+                <project-table
+                    :projects="projects"
+                    :filter="filter"
+                    :selected_project.sync="editedProject"
+                    @selected_project="EditProject"
+                    @show_project_stat="ShowProjectStat"
+                ></project-table>
+            </el-main>
+            <!--<el-footer>Footer</el-footer>-->
+        </el-container>
+
+
+<!--
+        <div class="lp_block warning">
+            <pre>Projects: {{projects}}</pre>
         </div>
+-->
     </div>
-
-    <editproject-modal
-        :statuts="statuts"
-        :types="types"
-        :risks="risks"
-        :milestonekeys="milestonekeys"
-        :givenprj.sync="editedprj"
-        @update:givenprj="ProcessEditedPrj"
-        @delete:givenprj="DeleteEditedPrj"
-    ></editproject-modal>
-
-
-    <projectstat-modal
-            :givenprj="editedprj"
-            :projectstat="editedprjstat"
-    ></projectstat-modal>
-    <!--<projectstat-modal></projectstat-modal>-->
-
-    <div class="ui main fluid container">
-
-        <div v-if="DispPrj">
-            <table class="ui very compact selectable celled striped sortable table">
-                <thead>
-                    <tr>
-                        <th is="col-title" :sortlist.sync="sortlist" class="one wide" title="Client"></th>
-                        <th is="col-title" :sortlist.sync="sortlist" class="two wide" title="Project"></th>
-                        <th is="col-title" :sortlist.sync="sortlist" class="" title="Information" iclass="sticky note outline icon"></th>
-                        <!--<th is="col-title" :sortlist.sync="sortlist" class="center aligned" title="Kickoff" iclass="checked calendar icon"></th>-->
-                        <th is="col-title" :sortlist.sync="sortlist" class="center aligned" title="Kickoff" iclass="checked calendar icon"></th>
-                        <th is="col-title" :sortlist.sync="sortlist" class="center aligned" title="UAT" iclass="checked calendar icon"></th>
-                        <th is="col-title" :sortlist.sync="sortlist" class="center aligned" title="RollOut" iclass="checked calendar icon"></th>
-                        <th is="col-title" :sortlist.sync="sortlist" class="one wide center aligned"  title="Workload" iclass="hourglass half icon"></th>
-                        <th is="col-title-withfilter" :sortlist.sync="sortlist" :colfilter.sync="colfilters" :projects="projects"
-                            class="one wide" title="PS" iclass="handshake icon"
-                        >
-                        <th is="col-title-withfilter" :sortlist.sync="sortlist" :colfilter.sync="colfilters" :projects="projects"
-                            class="one wide" title="Lead Dev" iclass="laptop icon"
-                        >
-                        <th is="col-title-withfilter" :sortlist.sync="sortlist" :colfilter.sync="colfilters" :projects="projects"
-                            class="center aligned" title="Type"
-                        >
-                        </th>
-                        <th is="col-title-withfilter" :sortlist.sync="sortlist" :colfilter.sync="colfilters" :projects="projects"
-                            class="one wide" title="Status"
-                        >
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="prj in sortedProjects" :key="prj.id" v-if="IsDisplayed(prj)">
-                        <td class="collapsing" @click="EditProject(prj)"><i class="edit link icon"></i>{{prj.client}}</td>
-                        <td class="collapsing"><i v-if="prj.hasStat" class="area chart link icon" @click="ShowProjectStat(prj)"></i>{{prj.name}}</td>
-                        <td style="white-space: pre-wrap;"><i :class="RiskIcon(prj)"></i>{{prj.comment}}</td>
-                        <td is="date-cell" :date="prj.milestones.Kickoff"></td>
-                        <td is="date-cell" :date="prj.milestones.UAT"></td>
-                        <!--<td is="date-cell" :date="prj.milestones.Training"></td>-->
-                        <td is="date-cell" :date="prj.milestones.RollOut"></td>
-                        <!--<td class="collapsing right aligned">{{prj | ChargeFormat}}</td>-->
-                        <td is="workload-cell" :project="prj"></td>
-                        <td class="collapsing">{{prj.lead_ps}}</td>
-                        <td class="collapsing">{{prj.lead_dev}}</td>
-                        <td class="collapsing center aligned">{{prj.type}}</td>
-                        <td class="collapsing">{{prj.status}}</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
 </body>
 
-<script src="/Assets/semantic/semantic.min.js"></script>
+
+<script src="/Assets/vue/2.5.16/vue.min.js"></script>
+<!--<script src="/Assets/vue/2.5.16/vue.js"></script>-->
+<script src="/Assets/element-ui/2.3.3/lib/index.js"></script>
+<script src="/Assets/element-ui/2.3.3/lib/umd/locale/en.js"></script>
+<script>
+    ELEMENT.locale(ELEMENT.lang.en)
+</script>
+<!--<script src="/Assets/jquery/jquery-3.1.1.min.js"></script>-->
 <script src="/Assets/highcharts/highcharts.js"></script>
 <script type="text/javascript" src="prjapp.js"></script>
 
