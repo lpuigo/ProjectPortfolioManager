@@ -11,7 +11,7 @@ import (
 	"github.com/lpuig/novagile/src/client/hvue/comps/project_stat_modal"
 	"github.com/lpuig/novagile/src/client/hvue/comps/project_table"
 	"github.com/lpuig/novagile/src/client/tools"
-	"github.com/oskca/gopherjs-json"
+	"github.com/lpuig/novagile/src/client/tools/json"
 	"honnef.co/go/js/xhr"
 	"strconv"
 )
