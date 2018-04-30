@@ -25,7 +25,11 @@ const template = `
     <el-table-column 
             label="Client"	prop="client"	width="160px" sortable :sort-by="['client','name']" 
             :resizable=true :show-overflow-tooltip=true
-    ></el-table-column>
+    >
+        <template slot-scope="scope">
+            <i v-if="HasAuditInfo(scope.row)"  class="fas fa-check-circle link icon--left" @click="ShowTableProjectAudit(scope.row)"></i><span>{{scope.row.client}}</span>
+        </template>
+    </el-table-column>
 
     <el-table-column
             label="Project Name"	width="200px"

@@ -8,21 +8,36 @@ import (
 	"strings"
 )
 
+type Audit struct {
+	*js.Object
+
+	Title    string `js:"title"`
+	Priority string `js:"priority"`
+}
+
+func NewAudit(prio, title string) *Audit {
+	a := &Audit{Object: tools.O()}
+	a.Priority = prio
+	a.Title = title
+	return a
+}
+
 type Project struct {
 	*js.Object
-	Id         int               `json:"id"             js:"id"`
-	Client     string            `json:"client"         js:"client"`
-	Name       string            `json:"name"           js:"name"`
-	Risk       string            `json:"risk"           js:"risk"`
-	LeadPS     string            `json:"lead_ps"        js:"lead_ps"`
-	LeadDev    string            `json:"lead_dev"       js:"lead_dev"`
-	Status     string            `json:"status"         js:"status"`
-	Type       string            `json:"type"           js:"type"`
-	HasStat    bool              `json:"hasStat"        js:"hasStat"`
-	ForecastWL float64           `json:"forecast_wl"    js:"forecast_wl"`
-	CurrentWL  float64           `json:"current_wl"     js:"current_wl"`
-	Comment    string            `json:"comment"        js:"comment"`
-	MileStones map[string]string `json:"milestones"     js:"milestones"`
+	Id         int               `json:"id"               js:"id"`
+	Client     string            `json:"client"           js:"client"`
+	Name       string            `json:"name"             js:"name"`
+	Risk       string            `json:"risk"             js:"risk"`
+	LeadPS     string            `json:"lead_ps"          js:"lead_ps"`
+	LeadDev    string            `json:"lead_dev"         js:"lead_dev"`
+	Status     string            `json:"status"           js:"status"`
+	Type       string            `json:"type"             js:"type"`
+	HasStat    bool              `json:"hasStat"          js:"hasStat"`
+	ForecastWL float64           `json:"forecast_wl"      js:"forecast_wl"`
+	CurrentWL  float64           `json:"current_wl"       js:"current_wl"`
+	Comment    string            `json:"comment"          js:"comment"`
+	Audits     []*Audit          `json:"audits"           js:"audits"` // not used on server side
+	MileStones map[string]string `json:"milestones"       js:"milestones"`
 }
 
 func NewProject() *Project {
@@ -40,6 +55,7 @@ func NewProject() *Project {
 	pf.CurrentWL = 0
 	pf.Comment = ""
 	pf.MileStones = nil
+	pf.Audits = nil
 	return pf
 }
 
@@ -62,6 +78,7 @@ func (p *Project) Copy(np *Project) {
 	p.ForecastWL = np.ForecastWL
 	p.CurrentWL = np.CurrentWL
 	p.Comment = np.Comment
+	p.Audits = np.Audits
 
 	m := make(map[string]string)
 	mop := np.Get("milestones")
@@ -142,6 +159,10 @@ func (p *Project) AddMileStone(msName string) {
 	p.MileStones = nms
 }
 
+func (p *Project) SetAuditResult(audits []*Audit) {
+	p.Audits = audits[:]
+}
+
 func CloneBEProject(p *model.Project, hasStat bool) *Project {
 	np := &Project{}
 	np.Id = p.Id
@@ -156,6 +177,7 @@ func CloneBEProject(p *model.Project, hasStat bool) *Project {
 	np.ForecastWL = p.ForecastWL
 	np.CurrentWL = p.CurrentWL
 	np.Comment = p.Comment
+	np.Audits = []*Audit{} // set to empty slide in order to force JS initialisation when unmarshalling
 	np.MileStones = make(map[string]string)
 	for m, d := range p.Situation.GetSituationToDate().MileStones {
 		np.MileStones[m] = d.StringJS()

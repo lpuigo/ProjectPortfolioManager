@@ -67,6 +67,9 @@ func (jsmm *JiraStatModalModel) HandleNodeClick() {
 func (jsmm *JiraStatModalModel) GetNodes() {
 	jsmm.Nodes = []*node.HoursNode{}
 	jsns := jsmm.callGetJiraStat()
+	if jsns == nil {
+		return
+	}
 	res := []*node.HoursNode{}
 
 	var teamnode *node.HoursNode

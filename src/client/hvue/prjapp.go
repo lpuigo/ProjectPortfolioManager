@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/gopherjs/gopherjs/js"
 	"github.com/huckridgesw/hvue"
+	"github.com/lpuig/novagile/src/client/auditrules"
 	"github.com/lpuig/novagile/src/client/business"
 	fm "github.com/lpuig/novagile/src/client/frontmodel"
 	"github.com/lpuig/novagile/src/client/goel/message"
@@ -31,6 +32,7 @@ func main() {
 		hvue.MethodsOf(mpm),
 		hvue.Mounted(func(vm *hvue.VM) {
 			mpm := &MainPageModel{Object: vm.Object}
+			mpm.auditer = auditrules.NewAuditer().AddMilestoneRules()
 			mpm.GetPtf()
 		}),
 	)
@@ -46,6 +48,7 @@ type MainPageModel struct {
 	Projects      []*fm.Project `js:"projects"`
 	EditedProject *fm.Project   `js:"editedProject"`
 	Filter        string        `js:"filter"`
+	auditer       *auditrules.Auditer
 
 	VM *hvue.VM `js:"VM"`
 }
@@ -55,6 +58,7 @@ func NewMainPageModel() *MainPageModel {
 	mpm.Projects = nil
 	mpm.EditedProject = nil
 	mpm.Filter = ""
+	mpm.auditer = auditrules.NewAuditer().AddMilestoneRules()
 	return mpm
 }
 
@@ -99,8 +103,22 @@ func (m *MainPageModel) ShowProjectStat(p *fm.Project) {
 	m.VM.Refs("ProjectStat").Call("Show", p)
 }
 
+func (m *MainPageModel) ShowProjectAudit(p *fm.Project) {
+	infos := "Audit for " + p.Client + " - " + p.Name + ":\n"
+	for _, a := range p.Audits {
+		infos += "P" + a.Priority + " " + a.Title + "\n"
+	}
+	message.InfoStr(m.VM, infos, true)
+}
+
 func (m *MainPageModel) ShowJiraStat() {
 	m.VM.Refs("JiraStat").Call("Show")
+}
+
+func (m *MainPageModel) AuditProjects() {
+	for _, p := range m.Projects {
+		p.SetAuditResult(m.auditer.Audit(p))
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -121,11 +139,13 @@ func (m *MainPageModel) callGetPtf() {
 		message.WarningStr(m.VM, "Something went wrong!\nServer returned code "+strconv.Itoa(req.Status), true)
 		return
 	}
-	m.Projects = []*fm.Project{}
+	prjs := []*fm.Project{}
 	req.Response.Call("forEach", func(item *js.Object) {
 		p := fm.ProjectFromJS(item)
-		m.Projects = append(m.Projects, p)
+		p.SetAuditResult(m.auditer.Audit(p))
+		prjs = append(prjs, p)
 	})
+	m.Projects = prjs
 	//m.DispPrj = true
 	//js.Global.Set("resp", m.Resp)
 }
@@ -141,8 +161,7 @@ func (m *MainPageModel) callUpdatePrj(uprj *fm.Project) {
 	}
 	if req.Status == 200 {
 		uprj.Copy(fm.ProjectFromJS(req.Response))
-		message.SetDuration(tools.SuccessMsgDuration)
-		message.SuccesStr(m.VM, "Project updated !", true)
+		uprj.SetAuditResult(m.auditer.Audit(uprj))
 	} else {
 		message.SetDuration(tools.WarningMsgDuration)
 		message.WarningStr(m.VM, "Something went wrong!\nServer returned code "+strconv.Itoa(req.Status), true)
@@ -160,9 +179,8 @@ func (m *MainPageModel) callCreatePrj(uprj *fm.Project) {
 	}
 	if req.Status == 201 {
 		m.EditedProject.Copy(fm.ProjectFromJS(req.Response))
+		m.EditedProject.SetAuditResult(m.auditer.Audit(m.EditedProject))
 		m.Projects = append(m.Projects, m.EditedProject)
-		message.SetDuration(tools.SuccessMsgDuration)
-		message.SuccesStr(m.VM, "New project added !", true)
 	} else {
 		message.SetDuration(tools.WarningMsgDuration)
 		message.WarningStr(m.VM, "Something went wrong!\nServer returned code "+strconv.Itoa(req.Status), true)

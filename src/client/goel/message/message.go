@@ -5,7 +5,10 @@ import (
 	"github.com/huckridgesw/hvue"
 )
 
-var duration int = 3000
+var (
+	duration int    = 3000
+	msgclass string = "message"
+)
 
 func SetDuration(msec int) {
 	duration = msec
@@ -13,15 +16,21 @@ func SetDuration(msec int) {
 
 func messageString(vm *hvue.VM, msgtype, msg string, close bool) {
 	vm.Call("$message", js.M{
-		"showClose": close,
-		"message":   msg,
-		"type":      msgtype,
-		"duration":  duration,
+		"showClose":   close,
+		"message":     msg,
+		"type":        msgtype,
+		"duration":    duration,
+		"customClass": msgclass,
 	})
 }
 
 func InfoStr(vm *hvue.VM, msg string, close bool) {
+	pdur := duration
+	if close {
+		duration = 0
+	}
 	messageString(vm, "info", msg, close)
+	duration = pdur
 }
 
 func SuccesStr(vm *hvue.VM, msg string, close bool) {

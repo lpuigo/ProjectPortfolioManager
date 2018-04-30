@@ -20,7 +20,7 @@ func ComponentOptions() []hvue.ComponentOption {
 	return []hvue.ComponentOption{
 		hvue.Template(template),
 		hvue.Component("project-progress-bar", wl_progress_bar.ComponentOptions()...),
-		hvue.Props("selected_project", "projects", "filter"),
+		hvue.Props("projects", "filter"),
 		hvue.DataFunc(func(vm *hvue.VM) interface{} {
 			return NewProjectTableModel(vm)
 		}),
@@ -74,8 +74,15 @@ func (ptm *ProjectTableModel) ShowTableProjectStat(vm *hvue.VM, prj *fm.Project)
 	vm.Emit("show_project_stat", prj)
 }
 
+func (ptm *ProjectTableModel) ShowTableProjectAudit(vm *hvue.VM, prj *fm.Project) {
+	vm.Emit("show_project_audit", prj)
+}
+
 func (ptm *ProjectTableModel) SetSelectedProject(np *fm.Project) {
 	//ptm = &ProjectTableCompModel{Object: vm.Object}
+	if np.Object == nil { // this can happen when Projects props gets updated
+		return
+	}
 	ptm.SelectedProject = np
 	ptm.VM.Emit("update:selected_project", np)
 }
@@ -112,6 +119,18 @@ func (ptm *ProjectTableModel) RiskIconClass(risk string) string {
 		res = "fas fa-exclamation-circle icon--left low-risk"
 	default:
 		//res = "green info circle icon"
+	}
+	return res
+}
+
+func (ptm *ProjectTableModel) HasAuditInfo(p *fm.Project) bool {
+	return len(p.Audits) > 0
+}
+
+func (ptm *ProjectTableModel) AuditIconClass(audits *js.Object) string {
+	var res string
+	if audits.Length() > 0 {
+		res = "fas fa-check-circle link icon--left"
 	}
 	return res
 }

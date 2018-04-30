@@ -57,3 +57,27 @@ func CreateMilestoneKeys() []*fm.ValText {
 	res = append(res, fm.NewValText("Pilot End", "P"))
 	return res
 }
+
+func InactiveProject(status string) bool {
+	switch status {
+	case "0 - Lost", "6 - Done":
+		return true
+	}
+	return false
+}
+
+func OnGoingProject(status string) bool {
+	switch status {
+	case "3 - On Going", "4 - UAT":
+		return true
+	}
+	return false
+}
+
+func MonitoredProject(status string) bool {
+	switch status {
+	case "5 - Monitoring":
+		return true
+	}
+	return false
+}
