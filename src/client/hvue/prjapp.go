@@ -106,7 +106,7 @@ func (m *MainPageModel) ShowProjectStat(p *fm.Project) {
 func (m *MainPageModel) ShowProjectAudit(p *fm.Project) {
 	infos := "Audit for " + p.Client + " - " + p.Name + ":\n"
 	for _, a := range p.Audits {
-		infos += "P" + a.Priority + " " + a.Title + "\n"
+		infos += a.Priority + " " + a.Title + "\n"
 	}
 	message.InfoStr(m.VM, infos, true)
 }

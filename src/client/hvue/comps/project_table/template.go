@@ -44,7 +44,7 @@ const template = `
 	</el-table-column>
 
     <el-table-column
-            label="Comment" min-width="120px"
+            label="Comment" min-width="120px" sortable :sort-by="['risk', 'client','name']"
 		    :resizable=false
     >
         <template slot-scope="scope">
