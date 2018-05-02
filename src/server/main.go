@@ -101,18 +101,17 @@ func main() {
 	gzipedrouter := handlers.CompressHandler(router)
 	//gzipedrouter := router
 
-	LaunchPageInBrowser(conf.LaunchWebBrowser)
+	LaunchPageInBrowser(conf)
 	log.Print("Listening on ", ServicePort)
 	log.Fatal(http.ListenAndServe(ServicePort, gzipedrouter))
 }
 
-func LaunchPageInBrowser(launchWeb bool) error {
-	if launchWeb {
-		cmd := exec.Command("cmd", "/c", "start", "http://localhost:8080")
-		return cmd.Start()
+func LaunchPageInBrowser(c *Conf) error {
+	if !c.LaunchWebBrowser {
+		return nil
 	}
-	log.Printf("No Web Lock found")
-	return nil
+	cmd := exec.Command("cmd", "/c", "start", "http://localhost"+c.ServicePort)
+	return cmd.Start()
 }
 
 // Done Persist JSON repo after each Route request
