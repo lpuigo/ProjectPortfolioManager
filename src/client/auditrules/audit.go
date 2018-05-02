@@ -66,8 +66,8 @@ func ongoingPrjWithPastDeliveryDate(p *fm.Project) bool {
 }
 
 func (a *Auditer) AddAuditRules() *Auditer {
-	a.Rules = append(a.Rules, rule.NewRule("1", "Ongoing Project with undefined RollOut or GoLive date", ongoingPrjWithoutDeliveryDate))
-	a.Rules = append(a.Rules, rule.NewRule("1", "Ongoing Project without estimated workload", func(p *fm.Project) bool {
+	a.Rules = append(a.Rules, rule.NewRule("P1", "Ongoing Project with undefined RollOut or GoLive date", ongoingPrjWithoutDeliveryDate))
+	a.Rules = append(a.Rules, rule.NewRule("P1", "Ongoing Project without estimated workload", func(p *fm.Project) bool {
 		if !business.OnGoingProject(p.Status) {
 			return false
 		}
@@ -76,8 +76,8 @@ func (a *Auditer) AddAuditRules() *Auditer {
 		}
 		return false
 	}))
-	a.Rules = append(a.Rules, rule.NewRule("2", "Ongoing Project with past RollOut / GoLive date", ongoingPrjWithPastDeliveryDate))
-	a.Rules = append(a.Rules, rule.NewRule("2", "Monitored Project more than 2 weeks after RollOut / GoLive", func(p *fm.Project) bool {
+	a.Rules = append(a.Rules, rule.NewRule("P2", "Ongoing Project with past RollOut / GoLive date", ongoingPrjWithPastDeliveryDate))
+	a.Rules = append(a.Rules, rule.NewRule("P2", "Monitored Project more than 2 weeks after RollOut / GoLive", func(p *fm.Project) bool {
 		if !business.MonitoredProject(p.Status) {
 			return false
 		}
@@ -86,7 +86,7 @@ func (a *Auditer) AddAuditRules() *Auditer {
 		}
 		return false
 	}))
-	a.Rules = append(a.Rules, rule.NewRule("2", "Inactive Project still have risk declared", func(p *fm.Project) bool {
+	a.Rules = append(a.Rules, rule.NewRule("P2", "Inactive Project still have risk declared", func(p *fm.Project) bool {
 		if !business.InactiveProject(p.Status) {
 			return false
 		}
