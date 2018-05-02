@@ -32,7 +32,7 @@ func main() {
 		hvue.MethodsOf(mpm),
 		hvue.Mounted(func(vm *hvue.VM) {
 			mpm := &MainPageModel{Object: vm.Object}
-			mpm.auditer = auditrules.NewAuditer().AddMilestoneRules()
+			mpm.auditer = auditrules.NewAuditer().AddAuditRules()
 			mpm.GetPtf()
 		}),
 	)
@@ -58,7 +58,7 @@ func NewMainPageModel() *MainPageModel {
 	mpm.Projects = nil
 	mpm.EditedProject = nil
 	mpm.Filter = ""
-	mpm.auditer = auditrules.NewAuditer().AddMilestoneRules()
+	mpm.auditer = auditrules.NewAuditer().AddAuditRules()
 	return mpm
 }
 

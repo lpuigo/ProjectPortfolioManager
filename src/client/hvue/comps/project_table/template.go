@@ -27,7 +27,7 @@ const template = `
             :resizable=true :show-overflow-tooltip=true
     >
         <template slot-scope="scope">
-            <i v-if="HasAuditInfo(scope.row)"  class="fas fa-check-circle link icon--left" @click="ShowTableProjectAudit(scope.row)"></i><span>{{scope.row.client}}</span>
+            <i v-if="HasAuditInfo(scope.row)"  class="fas fa-info-circle link icon--left" @click="ShowTableProjectAudit(scope.row)"></i><span>{{scope.row.client}}</span>
         </template>
     </el-table-column>
 

@@ -47,9 +47,10 @@ const template = `
 			<span><strong>Estim. WL</strong></span>
             <el-input-number v-model="currentProject.forecast_wl"
                              :min="0" 
-                             :step="0.5" 
+                             :step="1" 
                              controls-position="right"
 							 class="fluid-input"
+                             @change="AuditProject"
             ></el-input-number>
 		</el-col>	
   	</el-row>
@@ -68,15 +69,28 @@ const template = `
   	</el-row>
 	
 	<el-row :gutter="15" class="form-row">
+		<el-col :span="24">
+            <el-collapse v-model="displayedInfos" accordion>
+                <el-collapse-item name="1">
+                    <template slot="title">
+                        <span><strong><i class="fas fa-info-circle icon--left"></i>Project consistency: {{currentProject.audits.length}}</strong></span>
+                    </template>
+                    <span v-for="(a, index) in currentProject.audits" :key="index">{{a.priority}} - {{a.title}}</span>
+                </el-collapse-item>
+            </el-collapse>
+		</el-col>	
+  	</el-row>
+	
+	<el-row :gutter="15" class="form-row">
 		<el-col :span="12">
 			<span><strong>Status</strong></span>
-            <el-select v-model="currentProject.status" placeholder="Project Status" filterable class="fluid-select">
+            <el-select v-model="currentProject.status" placeholder="Project Status" filterable class="fluid-select" @change="AuditProject">
                 <el-option v-for="vt in statusList" :key="vt.value" :label="vt.text" :value="vt.value"></el-option>
             </el-select>
 		</el-col>	
 		<el-col :span="12">
 			<span><strong>Risk</strong></span>
-            <el-select v-model="currentProject.risk" placeholder="Project Risk" filterable class="fluid-select">
+            <el-select v-model="currentProject.risk" placeholder="Project Risk" filterable class="fluid-select" @change="AuditProject">
                 <el-option v-for="vt in riskList" :key="vt.value" :label="vt.text" :value="vt.value"></el-option>
             </el-select>
 		</el-col>	
@@ -135,6 +149,7 @@ const template = `
                                 :picker-options="{firstDayOfWeek:1}"
                                 size="mini"
 								:clearable="false"
+                                @change="AuditProject"
                         ></el-date-picker>
                     </template>
                 </el-table-column>
@@ -165,7 +180,7 @@ const template = `
             <el-button :disabled="isNewProject" type="info" plain icon="far fa-clone" @click="Duplicate"></el-button>
         </el-tooltip>
         <el-button @click="visible = false">Cancel</el-button>
-        <el-button type="success" plain @click="ConfirmChange">
+        <el-button :type="hasWarning" plain @click="ConfirmChange">
         	<span v-if="!isNewProject">Confirm Change</span>
         	<span v-else>Create New</span>
         </el-button>

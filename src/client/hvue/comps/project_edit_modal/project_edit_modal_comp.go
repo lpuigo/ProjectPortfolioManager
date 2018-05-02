@@ -5,6 +5,7 @@ import (
 
 	"github.com/gopherjs/gopherjs/js"
 	"github.com/huckridgesw/hvue"
+	"github.com/lpuig/novagile/src/client/auditrules"
 	"github.com/lpuig/novagile/src/client/business"
 	fm "github.com/lpuig/novagile/src/client/frontmodel"
 	"github.com/lpuig/novagile/src/client/goel/message"
@@ -57,6 +58,17 @@ func ComponentOptions() []hvue.ComponentOption {
 			m := &ProjectEditModalModel{Object: vm.Object}
 			return !m.hasClientNameList()
 		}),
+		//hvue.Computed("warningNumber", func(vm *hvue.VM) interface{} {
+		//	m := &ProjectEditModalModel{Object: vm.Object}
+		//	return len(m.CurrentProject.Audits)
+		//}),
+		hvue.Computed("hasWarning", func(vm *hvue.VM) interface{} {
+			m := &ProjectEditModalModel{Object: vm.Object}
+			if len(m.CurrentProject.Audits)>0 {
+				return "warning"
+			}
+			return "success"
+		}),
 	}
 }
 
@@ -77,6 +89,9 @@ type ProjectEditModalModel struct {
 	ClientNameLookUp bool          `js:"clientNameLookup"`
 	ClientNameList   []*fm.ValText `js:"clientNameList"`
 
+	DisplayInfos string `js:"displayedInfos"`
+	auditer       *auditrules.Auditer
+
 	VM *hvue.VM `js:"VM"`
 }
 
@@ -92,9 +107,14 @@ func NewProjectEditModalModel(vm *hvue.VM) *ProjectEditModalModel {
 	pemm.MilestonesList = business.CreateMilestoneKeys()
 	pemm.ClientNameLookUp = false
 	pemm.ClientNameList = nil
+	pemm.DisplayInfos = ""
+	pemm.auditer = auditrules.NewAuditer().AddAuditRules()
 	pemm.VM = vm
 	return pemm
 }
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+// Modal Methods
 
 func (pemm *ProjectEditModalModel) Show(p *fm.Project) {
 	pemm.EditedProject = p
@@ -186,3 +206,11 @@ func (pemm *ProjectEditModalModel) callClientNameList() {
 	}
 	pemm.ClientNameLookUp = false
 }
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+// Audit Project Method
+
+func (pemm *ProjectEditModalModel) AuditProject() {
+	pemm.CurrentProject.SetAuditResult(pemm.auditer.Audit(pemm.CurrentProject))
+}
+

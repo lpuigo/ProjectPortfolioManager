@@ -78,7 +78,7 @@ func (p *Project) Copy(np *Project) {
 	p.ForecastWL = np.ForecastWL
 	p.CurrentWL = np.CurrentWL
 	p.Comment = np.Comment
-	p.Audits = np.Audits
+	p.Audits = np.Audits[:]
 
 	m := make(map[string]string)
 	mop := np.Get("milestones")

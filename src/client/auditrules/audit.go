@@ -18,7 +18,7 @@ func NewAuditer() *Auditer {
 
 func before(d, today string) bool {
 	if d == "" {
-		return true
+		return false
 	}
 	if d < today {
 		return true
@@ -58,17 +58,26 @@ func ongoingPrjWithPastDeliveryDate(p *fm.Project) bool {
 		return false
 	}
 	today := model.Today().StringJS()
-	if !ongoingPrjWithoutDeliveryDate(p) && before(p.MileStones["RollOut"], today) && before(p.MileStones["GoLive"], today) {
+	if !ongoingPrjWithoutDeliveryDate(p) && before(max(p.MileStones["RollOut"], p.MileStones["GoLive"]), today) {
 		return true
 	}
 	return false
 
 }
 
-func (a *Auditer) AddMilestoneRules() *Auditer {
+func (a *Auditer) AddAuditRules() *Auditer {
 	a.Rules = append(a.Rules, rule.NewRule("1", "Ongoing Project with undefined RollOut or GoLive date", ongoingPrjWithoutDeliveryDate))
+	a.Rules = append(a.Rules, rule.NewRule("1", "Ongoing Project without estimated workload", func(p *fm.Project) bool {
+		if !business.OnGoingProject(p.Status) {
+			return false
+		}
+		if p.ForecastWL == 0 {
+			return true
+		}
+		return false
+	}))
 	a.Rules = append(a.Rules, rule.NewRule("2", "Ongoing Project with past RollOut / GoLive date", ongoingPrjWithPastDeliveryDate))
-	a.Rules = append(a.Rules, rule.NewRule("2", "Monitored Project for more than 2 weeks", func(p *fm.Project) bool {
+	a.Rules = append(a.Rules, rule.NewRule("2", "Monitored Project more than 2 weeks after RollOut / GoLive", func(p *fm.Project) bool {
 		if !business.MonitoredProject(p.Status) {
 			return false
 		}
