@@ -73,7 +73,7 @@ const template = `
             <el-collapse v-model="displayedInfos" accordion>
                 <el-collapse-item name="1">
                     <template slot="title">
-                        <span><strong><i class="fas fa-info-circle icon--left"></i>Project consistency: {{currentProject.audits.length}}</strong></span>
+                        <span><strong><i class="fas fa-info-circle icon--left"></i>Project warning message(s): {{currentProject.audits.length}}</strong></span>
                     </template>
                     <span v-for="(a, index) in currentProject.audits" :key="index">{{a.priority}} - {{a.title}}</span>
                 </el-collapse-item>
