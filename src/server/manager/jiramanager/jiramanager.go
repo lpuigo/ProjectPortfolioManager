@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/lpuig/novagile/src/server/manager/jiramanager/projectlogs"
 
 	jsr "github.com/lpuig/novagile/src/client/frontmodel/jirastatrecord"
 	"github.com/lpuig/novagile/src/server/manager/jiramanager/teamlogs"
@@ -30,5 +31,10 @@ func NewJiraManager(usrpwd, dbname string) (*JiraManager, error) {
 
 func (jm *JiraManager) TeamLogs() (jsns []*jsr.JiraStatRecord, err error) {
 	jsns, err = teamlogs.Request(jm.db)
+	return
+}
+
+func (jm *JiraManager) ProjectLogs() (jsns []*jsr.JiraProjectLogRecord, err error) {
+	jsns, err = projectlogs.Request(jm.db)
 	return
 }

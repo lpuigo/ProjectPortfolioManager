@@ -272,3 +272,12 @@ func (m *Manager) GetJiraTeamLogs(w io.Writer) error {
 	json.NewEncoder(w).Encode(jsns)
 	return nil
 }
+
+func (m *Manager) GetJiraProjectLogs(w io.Writer) error {
+	jsns, err := m.Jira.ProjectLogs()
+	if err != nil {
+		return err
+	}
+	json.NewEncoder(w).Encode(jsns)
+	return nil
+}

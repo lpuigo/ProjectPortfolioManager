@@ -220,7 +220,7 @@ pre {
     /*flex: 0 1 20%;*/
 }
 .custom-tree-node .custom-hours-row {
-    width: 45vw;
+    width: 55vw;
 }
 .custom-hours-row .hours-table {
     display: flex;
