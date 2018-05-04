@@ -23,6 +23,7 @@ func ComponentOptions() []hvue.ComponentOption {
 	return []hvue.ComponentOption{
 		hvue.Template(template),
 		hvue.Component("hours-tree", hourstree.ComponentOptions()...),
+		//hvue.Component("tab-pane", tabpane.ComponentOptions()...),
 		hvue.DataFunc(func(vm *hvue.VM) interface{} {
 			return NewJiraStatModalModel(vm)
 		}),
@@ -36,7 +37,8 @@ type JiraStatModalModel struct {
 	Visible bool     `js:"visible"`
 	VM      *hvue.VM `js:"VM"`
 
-	Nodes []*node.HoursNode `js:"nodes"`
+	ActiveTabName string            `js:"activeTabName"`
+	Nodes         []*node.HoursNode `js:"nodes"`
 }
 
 func NewJiraStatModalModel(vm *hvue.VM) *JiraStatModalModel {
@@ -44,12 +46,17 @@ func NewJiraStatModalModel(vm *hvue.VM) *JiraStatModalModel {
 	jsmm.Visible = false
 	jsmm.VM = vm
 
+	jsmm.ActiveTabName = ""
 	jsmm.Nodes = []*node.HoursNode{}
 	return jsmm
 }
 
+//////////////////////////////////////////////////////////////////////////////////////////////
+// Modal Methods
+
 func (jsmm *JiraStatModalModel) Show() {
 	go jsmm.GetNodes()
+	jsmm.ActiveTabName = "weeklogs"
 	jsmm.Visible = true
 }
 
@@ -59,6 +66,10 @@ func (jsmm *JiraStatModalModel) Hide() {
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 // Button Methods
+
+func (jsmm *JiraStatModalModel) ActivateTabs(tabname *js.Object) {
+	println("ActivateTabs", tabname.Get("name"))
+}
 
 func (jsmm *JiraStatModalModel) HandleNodeClick() {
 

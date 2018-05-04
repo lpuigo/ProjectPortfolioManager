@@ -12,6 +12,7 @@ const template = `
 <el-tree
     :data="nodes"
     :props="nodeProps"
+	v-loading="nodes.length == 0"
 >
     <span class="custom-tree-node" slot-scope="{ node, data }">
         <span class="custom-node-name">{{ node.label }}</span>
