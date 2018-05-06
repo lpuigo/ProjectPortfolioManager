@@ -5,10 +5,10 @@ import (
 
 	"github.com/gopherjs/gopherjs/js"
 	"github.com/huckridgesw/hvue"
-	jsn "github.com/lpuig/element/model/jirastatnode"
+	jsn "github.com/lpuig/novagile/src/client/frontmodel/jirastatrecord"
 	"github.com/lpuig/novagile/src/client/goel/message"
 	"github.com/lpuig/novagile/src/client/hvue/comps/jira_stat_modal/hourstree"
-	"github.com/lpuig/novagile/src/client/hvue/comps/jira_stat_modal/node"
+	"github.com/lpuig/novagile/src/client/hvue/comps/jira_stat_modal/projecttree"
 	"github.com/lpuig/novagile/src/client/tools"
 	"honnef.co/go/js/xhr"
 )
@@ -23,7 +23,7 @@ func ComponentOptions() []hvue.ComponentOption {
 	return []hvue.ComponentOption{
 		hvue.Template(template),
 		hvue.Component("hours-tree", hourstree.ComponentOptions()...),
-		//hvue.Component("tab-pane", tabpane.ComponentOptions()...),
+		hvue.Component("project-tree", projecttree.ComponentOptions()...),
 		hvue.DataFunc(func(vm *hvue.VM) interface{} {
 			return NewJiraStatModalModel(vm)
 		}),
@@ -37,9 +37,9 @@ type JiraStatModalModel struct {
 	Visible bool     `js:"visible"`
 	VM      *hvue.VM `js:"VM"`
 
-	ActiveTabName    string            `js:"activeTabName"`
-	WeekLogsNodes    []*node.HoursNode `js:"wlnodes"`
-	ProjectLogsNodes []*node.HoursNode `js:"plnodes"`
+	ActiveTabName    string              `js:"activeTabName"`
+	WeekLogsNodes    []*hourstree.Node   `js:"wlnodes"`
+	ProjectLogsNodes []*projecttree.Node `js:"plnodes"`
 }
 
 func NewJiraStatModalModel(vm *hvue.VM) *JiraStatModalModel {
@@ -48,8 +48,8 @@ func NewJiraStatModalModel(vm *hvue.VM) *JiraStatModalModel {
 	jsmm.VM = vm
 
 	jsmm.ActiveTabName = ""
-	jsmm.WeekLogsNodes = []*node.HoursNode{}
-	jsmm.ProjectLogsNodes = []*node.HoursNode{}
+	jsmm.WeekLogsNodes = []*hourstree.Node{}
+	jsmm.ProjectLogsNodes = []*projecttree.Node{}
 	return jsmm
 }
 
@@ -112,33 +112,85 @@ func (jsmm *JiraStatModalModel) ActivateProjectLogsData() {
 // Get Client-Name List
 
 func (jsmm *JiraStatModalModel) GetWeekLogsNodes() {
-	jsmm.WeekLogsNodes = []*node.HoursNode{}
+	jsmm.WeekLogsNodes = []*hourstree.Node{}
 	jsns := jsmm.callGetJiraStat("/jira/teamlogs")
 	if jsns == nil {
 		return
 	}
-	res := []*node.HoursNode{}
+	res := []*hourstree.Node{}
 
-	var teamnode *node.HoursNode
+	var teamNode *hourstree.Node
 	team := ""
 
-	jsns.Call("forEach", func(jsn *jsn.JiraStatNode) {
+	jsns.Call("forEach", func(jsn *jsn.JiraStatRecord) {
 		if jsn.Team != team {
 			team = jsn.Team
-			teamnode = node.NewHoursNode(team, nil, 0)
-			res = append(res, teamnode)
+			teamNode = hourstree.NewNode(team, nil, 0)
+			res = append(res, teamNode)
 		}
-		teamnode.AddChild(node.NewHoursNode(jsn.Author, jsn.HourLogs, 40))
+		teamNode.AddChild(hourstree.NewNode(jsn.Author, jsn.HourLogs, 40))
 	})
 
 	jsmm.WeekLogsNodes = res
 }
 
 func (jsmm *JiraStatModalModel) GetProjectLogsNodes() {
+	jsmm.ProjectLogsNodes = []*projecttree.Node{}
 	jsns := jsmm.callGetJiraStat("/jira/projectlogs")
 	if jsns == nil {
 		return
 	}
+
+	res := []*projecttree.Node{}
+	var teamNode, actorNode, lotClientNode *projecttree.Node
+	team, actor, lotclient := "", "", "-"
+
+	jsns.Call("forEach", func(jsn *jsn.JiraProjectLogRecord) {
+		curTeam := jsn.Infos[0]
+		curActor := jsn.Infos[1]
+		curLotclient := jsn.Infos[3]
+		curIssue := jsn.Infos[4]
+		curSummary := jsn.Infos[5]
+
+		if team != curTeam {
+			if teamNode != nil {
+				teamNode.Update()
+			}
+			team = curTeam
+			actor = ""
+			lotclient = "-"
+			teamNode = projecttree.NewNode(curTeam)
+			res = append(res, teamNode)
+		}
+		if actor != curActor {
+			actor = curActor
+			lotclient = "-"
+			actorNode = projecttree.NewNode(curActor)
+			teamNode.AddChild(actorNode)
+		}
+		if lotclient != curLotclient {
+			lotclient = curLotclient
+			label := curLotclient[:]
+			if label == "" {
+				label = "<Unassigned>"
+			}
+			lotClientNode = projecttree.NewNode(label)
+			lotClientNode.ParentRatio = true
+			actorNode.AddChild(lotClientNode)
+		}
+
+		iNode := projecttree.NewNode(curIssue)
+		iNode.ParentRatio = true
+		iNode.SetIssueInfo(curIssue, curSummary)
+		iNode.SetHour(curLotclient, jsn.Hour)
+		lotClientNode.AddChild(iNode)
+	})
+	if teamNode != nil {
+		teamNode.Update()
+	}
+
+	jsmm.ProjectLogsNodes = res
+
 }
 
 func (jsmm *JiraStatModalModel) callGetJiraStat(route string) *js.Object {

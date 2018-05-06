@@ -18,7 +18,7 @@ type Node struct {
 	Children []NodeChild `js:"children"`
 }
 
-func NewNode(label string, children []NodeChild) *Node {
+func New(label string, children []NodeChild) *Node {
 	n := &Node{Object: tools.O()}
 	n.Id = id
 	n.Label = label

@@ -4,7 +4,6 @@ import (
 	"github.com/gopherjs/gopherjs/js"
 	"github.com/huckridgesw/hvue"
 	"github.com/lpuig/novagile/src/client/hvue/comps/jira_stat_modal/hoursrow"
-	"github.com/lpuig/novagile/src/client/hvue/comps/jira_stat_modal/node"
 	"github.com/lpuig/novagile/src/client/tools"
 )
 
@@ -42,8 +41,8 @@ func ComponentOptions() []hvue.ComponentOption {
 type HoursTreeCompModel struct {
 	*js.Object
 
-	Nodes     []*node.HoursNode `js:"nodes"`
-	NodeProps js.M              `js:"nodeProps"`
+	Nodes     []*Node `js:"nodes"`
+	NodeProps js.M    `js:"nodeProps"`
 
 	VM *hvue.VM `js:"VM"`
 }
@@ -55,7 +54,7 @@ func NewHoursTreeCompModel(vm *hvue.VM) *HoursTreeCompModel {
 		"label":    "label",
 	}
 
-	htcm.Nodes = []*node.HoursNode{}
+	htcm.Nodes = []*Node{}
 	htcm.VM = vm
 	return htcm
 }

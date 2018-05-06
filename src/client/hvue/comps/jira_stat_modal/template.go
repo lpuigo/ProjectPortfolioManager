@@ -12,7 +12,7 @@ const template = `
 
 	<el-tabs
 			v-model="activeTabName" 
-			style="min-height: 300px;max-height: 70vh;"
+			style="min-height: 300px;"
 			@tab-click="ActivateTabs"
 	>
 		<el-tab-pane label="Weekly Log Summary" name="weeklogs">
@@ -23,7 +23,11 @@ const template = `
 			</hours-tree>
 		</el-tab-pane>
 		<el-tab-pane label="Project Log Summary" name="projectlogs">
-			<pre>{{plnodes}}</pre>
+			<project-tree
+					style="max-height: 65vh;overflow: auto;"
+					:nodes="plnodes"
+					@node-click="HandleNodeClick"
+			>
 			</hours-tree>
 		</el-tab-pane>
 	</el-tabs>

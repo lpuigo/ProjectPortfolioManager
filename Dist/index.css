@@ -234,3 +234,11 @@ pre {
     margin: 0px 1px;
     padding: 3px;
 }
+
+.hours-cell.right {
+    text-align: right;
+}
+
+.hours-cell.large {
+    flex: 2 1 0;
+}

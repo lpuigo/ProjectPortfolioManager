@@ -2,6 +2,7 @@ package frontmodel
 
 import (
 	"github.com/gopherjs/gopherjs/js"
+	"github.com/lpuig/novagile/src/client/tools"
 )
 
 //go:generate easyjson.exe prjstats.go
@@ -62,7 +63,7 @@ func CreateIssueStatsFromProjectStat(ps *ProjectStat) []*IssueStat {
 		}
 		is := NewIssueStat()
 		is.Issue = issue + " : " + ps.Summaries[i]
-		is.HRef = "http://jira.acticall.com/browse/" + issue
+		is.HRef = tools.UrlJiraBrowseIssue + issue
 		is.StartDate = ps.StartDate
 		is.TimeSpent = ps.TimeSpent[i]
 		is.TimeRemaining = ps.TimeRemaining[i]

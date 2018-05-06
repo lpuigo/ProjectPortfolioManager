@@ -1,20 +1,22 @@
-package node
+package hourstree
 
-type HoursNode struct {
-	*Node
+import "github.com/lpuig/novagile/src/client/hvue/comps/jira_stat_modal/node"
+
+type Node struct {
+	*node.Node
 	Name    string    `js:"name"`
 	Hours   []float64 `js:"hours"`
 	MaxHour float64   `js:"maxHour"`
 }
 
-func NewHoursNode(label string, hours []float64, maxhour float64) *HoursNode {
-	n := &HoursNode{Node: NewNode(label, nil)}
+func NewNode(label string, hours []float64, maxhour float64) *Node {
+	n := &Node{Node: node.New(label, nil)}
 	n.Hours = hours
 	n.MaxHour = maxhour
 	return n
 }
 
-func (hn *HoursNode) AddChild(c *HoursNode) {
+func (hn *Node) AddChild(c *Node) {
 	hn.Node.AddChild(c)
 
 	if len(hn.Hours) == 0 {
