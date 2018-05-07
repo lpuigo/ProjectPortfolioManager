@@ -140,8 +140,8 @@ func (jsmm *JiraStatModalModel) GetProjectLogsNodes() {
 	}
 
 	res := []*projecttree.Node{}
-	var teamNode, actorNode, lotClientNode *projecttree.Node
-	team, actor, lotclient := "", "", "-"
+	var teamNode, issueNode, lotClientNode *projecttree.Node
+	team, issue, lotclient := "", "", "-"
 
 	jsns.Call("forEach", func(jsn *jsn.JiraProjectLogRecord) {
 		curTeam := jsn.Infos[0]
@@ -155,16 +155,10 @@ func (jsmm *JiraStatModalModel) GetProjectLogsNodes() {
 				teamNode.Update()
 			}
 			team = curTeam
-			actor = ""
 			lotclient = "-"
+			issue = ""
 			teamNode = projecttree.NewNode(curTeam)
 			res = append(res, teamNode)
-		}
-		if actor != curActor {
-			actor = curActor
-			lotclient = "-"
-			actorNode = projecttree.NewNode(curActor)
-			teamNode.AddChild(actorNode)
 		}
 		if lotclient != curLotclient {
 			lotclient = curLotclient
@@ -174,14 +168,20 @@ func (jsmm *JiraStatModalModel) GetProjectLogsNodes() {
 			}
 			lotClientNode = projecttree.NewNode(label)
 			lotClientNode.ParentRatio = true
-			actorNode.AddChild(lotClientNode)
+			teamNode.AddChild(lotClientNode)
+		}
+		if issue != curIssue {
+			issue = curIssue
+			issueNode = projecttree.NewNode(curIssue)
+			issueNode.SetIssueInfo(curIssue, curSummary)
+			issueNode.ParentRatio = true
+			lotClientNode.AddChild(issueNode)
 		}
 
-		iNode := projecttree.NewNode(curIssue)
-		iNode.ParentRatio = true
-		iNode.SetIssueInfo(curIssue, curSummary)
-		iNode.SetHour(curLotclient, jsn.Hour)
-		lotClientNode.AddChild(iNode)
+		aNode := projecttree.NewNode(curActor)
+		aNode.ParentRatio = true
+		aNode.SetHour(curLotclient, jsn.Hour)
+		issueNode.AddChild(aNode)
 	})
 	if teamNode != nil {
 		teamNode.Update()

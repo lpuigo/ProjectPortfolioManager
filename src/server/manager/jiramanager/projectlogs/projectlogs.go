@@ -76,8 +76,8 @@ from (
   and date_format(wl.STARTDATE, "%Y-%v") >= date_format(DATE_SUB(CURDATE(), INTERVAL 7 DAY), "%Y-%v")
   and date_format(wl.STARTDATE, "%Y-%v") <= date_format(CURDATE(), "%Y-%v")
 ) tmp
-group by Team, Author, lot_client, Issue, Summary
-order by Team, Author, lot_client, Issue, Summary, Hours desc
+group by Team, lot_client, Issue, Summary, Author
+order by Team, lot_client, Issue, Summary, Author, Hours desc
 ;
 `
 
