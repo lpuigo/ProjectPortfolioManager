@@ -44,13 +44,13 @@ func Request(db *sql.DB) (jplrs []*jsr.JiraProjectLogRecord, err error) {
 
 const sqlQuery string = `
 select
-  Team, Author, StartWeek, lot_client, Issue, Summary,
+  Team, Author, lot_client, Issue, Summary,
   sum(Hours) as Hours
 from (
   select
     t.NAME as Team,
     wl.AUTHOR as Author,
-    date_format(wl.STARTDATE, "%Y-%v") as StartWeek,
+--     date_format(wl.STARTDATE, "%Y-%v") as StartWeek,
     date(wl.STARTDATE) as StartDay,
     coalesce(lc.lot_client, '') as lot_client,
     concat(p.pkey,"-", ji.issuenum) as Issue,
@@ -73,11 +73,11 @@ from (
   ) lc on lc.issue = wl.issueid
   where 
   t.ID in (25, 26, 27, 28, 33)
-  -- 		and date_format(wl.STARTDATE, "%Y-%v") >= date_format(DATE_SUB(CURDATE(), INTERVAL 7 DAY), "%Y-%v")
-  and date_format(wl.STARTDATE, "%Y-%v") = date_format(CURDATE(), "%Y-%v")
+  and date_format(wl.STARTDATE, "%Y-%v") >= date_format(DATE_SUB(CURDATE(), INTERVAL 7 DAY), "%Y-%v")
+  and date_format(wl.STARTDATE, "%Y-%v") <= date_format(CURDATE(), "%Y-%v")
 ) tmp
-group by Team, Author, StartWeek, lot_client, Issue, Summary
-order by Team, Author, StartWeek, lot_client, Issue, Summary, Hours desc
+group by Team, Author, lot_client, Issue, Summary
+order by Team, Author, lot_client, Issue, Summary, Hours desc
 ;
 `
 
@@ -100,13 +100,12 @@ func (q *query) Query() (rows *sql.Rows, err error) {
 }
 
 func (q *query) Scan(r *sql.Rows) ([]string, float64, error) {
-	var Team, Author, StartWeek, LotClient, Issue, Summary string
+	var Team, Author, LotClient, Issue, Summary string
 	var Hour float64
 
 	err := r.Scan(
 		&Team,
 		&Author,
-		&StartWeek,
 		&LotClient,
 		&Issue,
 		&Summary,
@@ -118,7 +117,6 @@ func (q *query) Scan(r *sql.Rows) ([]string, float64, error) {
 	return []string{
 		Team,
 		Author,
-		StartWeek,
 		LotClient,
 		Issue,
 		Summary,

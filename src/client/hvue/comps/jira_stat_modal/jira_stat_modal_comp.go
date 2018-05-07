@@ -76,14 +76,12 @@ func (jsmm *JiraStatModalModel) ActivateTabs(tab *js.Object) {
 		return
 	}
 	tabname := tab.Get("name").String()
-	println("ActivateTabs", tabname)
 	switch tabname {
 	case "weeklogs":
 		jsmm.ActivateWeekLogsData()
 	case "projectlogs":
 		jsmm.ActivateProjectLogsData()
 	default:
-
 	}
 }
 
@@ -148,9 +146,9 @@ func (jsmm *JiraStatModalModel) GetProjectLogsNodes() {
 	jsns.Call("forEach", func(jsn *jsn.JiraProjectLogRecord) {
 		curTeam := jsn.Infos[0]
 		curActor := jsn.Infos[1]
-		curLotclient := jsn.Infos[3]
-		curIssue := jsn.Infos[4]
-		curSummary := jsn.Infos[5]
+		curLotclient := jsn.Infos[2]
+		curIssue := jsn.Infos[3]
+		curSummary := jsn.Infos[4]
 
 		if team != curTeam {
 			if teamNode != nil {
