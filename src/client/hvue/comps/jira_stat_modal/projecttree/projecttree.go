@@ -20,9 +20,9 @@ const template = `
 		</el-tooltip>
 		<span v-else class="custom-node-name">{{node.label}}</span>
 
-		<span class="custom-hours-row">
+		<span class="custom-hours-row reduce">
 			<span class="hours-table">
-				<span class="hours-cell right">{{data.lhour + data.nlhour | FormatHour(1)}} h</span>
+				<span class="hours-cell right">{{data.lhour + data.nlhour | FormatFloat(1)}} h</span>
 				<span class="hours-cell"></span>
 				<el-progress 
 						v-if="data.parentRatio"
@@ -30,14 +30,14 @@ const template = `
 						color="#4abbbd"
 						:text-inside="true"
 						:stroke-width="15"
-						:percentage="(data.lhour + data.nlhour)*100 / (data.parent.lhour + data.parent.nlhour) | FormatHour"
+						:percentage="(data.lhour + data.nlhour)*100 / (data.parent.lhour + data.parent.nlhour) | FormatFloat"
 				></el-progress>
 				<el-progress 
 						v-else	
 						class="hours-cell large"
 						:text-inside="true"
 						:stroke-width="18"
-						:percentage="data.lhour *100 / (data.lhour + data.nlhour) | FormatHour"
+						:percentage="data.lhour *100 / (data.lhour + data.nlhour) | FormatFloat"
 				></el-progress>
 			</span>
 		</span>
@@ -60,7 +60,7 @@ func ComponentOptions() []hvue.ComponentOption {
 			return NewHoursTreeCompModel(vm)
 		}),
 		hvue.MethodsOf(&ProjectTreeCompModel{}),
-		hvue.Filter("FormatHour", func(vm *hvue.VM, value *js.Object, args ...*js.Object) interface{} {
+		hvue.Filter("FormatFloat", func(vm *hvue.VM, value *js.Object, args ...*js.Object) interface{} {
 			h := value.Float()
 			prec := 0
 			if len(args) > 0 {

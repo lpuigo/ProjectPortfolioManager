@@ -15,14 +15,15 @@ const template = `
 			style="min-height: 300px;"
 			@tab-click="ActivateTabs"
 	>
-		<el-tab-pane label="Weekly Log Summary" name="weeklogs">
+		<el-tab-pane label="Team Log Weekly Summary" name="weeklogs">
 			<hours-tree
+					style="max-height: 65vh;overflow: auto;"
 					:nodes="wlnodes"
 					@node-click="HandleNodeClick"
 			>
 			</hours-tree>
 		</el-tab-pane>
-		<el-tab-pane label="Project Log Summary" name="projectlogs">
+		<el-tab-pane label="Last & Current Weeks Project Log Summary" name="projectlogs">
 			<project-tree
 					style="max-height: 65vh;overflow: auto;"
 					:nodes="plnodes"
