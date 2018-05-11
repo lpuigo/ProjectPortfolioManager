@@ -1,6 +1,7 @@
 package model
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -53,6 +54,11 @@ func (d Date) String() string {
 
 func (d Date) StringJS() string {
 	return d.ToTime().Format(TimeJSLayout)
+}
+
+func (d Date) StringWeek() string {
+	y, w := d.ToTime().ISOWeek()
+	return fmt.Sprintf("%d-%02d", y, w)
 }
 
 func (d Date) GetMonday() Date {
