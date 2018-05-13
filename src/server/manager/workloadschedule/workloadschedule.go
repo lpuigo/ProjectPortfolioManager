@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func CalcWorkloadSchedule(prjs []*model.Project) *wsr.WorkloadSchedule {
+func Calc(prjs []*model.Project) *wsr.WorkloadSchedule {
 	wBefore := 6
 	wAfter := 6
 	nbweeks := wBefore + wAfter + 1

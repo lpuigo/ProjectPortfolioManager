@@ -18,6 +18,21 @@ func DefaultStatus() string {
 	return "1 - Candidate"
 }
 
+func GetColorFromStatus(s string) string {
+	switch s {
+	case "0 - Lost", "6 - Done":
+		return "#CCCCCC"
+	case "5 - Monitoring":
+		return "#51A825"
+	case "3 - On Going", "4 - UAT":
+		return "#409EFF"
+	case "1 - Candidate", "2 - Outlining":
+		return "#ffe08c"
+	default:
+		return "#ff3f00"
+	}
+}
+
 func CreateTypes() []*fm.ValText {
 	res := []*fm.ValText{}
 	res = append(res, fm.NewValText("Legacy", "Legacy"))

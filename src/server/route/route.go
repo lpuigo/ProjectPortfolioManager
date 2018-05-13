@@ -216,3 +216,13 @@ func GetJiraProjectLogs(mgr *mgr.Manager, w http.ResponseWriter, r *http.Request
 	}
 	logmsg += fmt.Sprintf("ok (%d)", http.StatusOK)
 }
+
+func GetWorkload(mgr *mgr.Manager, w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+	logmsg := "Request GetWorkload Received from '" + r.Header.Get("Origin") + "' : "
+	defer formatLog(time.Now(), &logmsg)
+
+	w.Header().Set("Content-Type", "application/json")
+	mgr.GetWorkloadSchedule(w)
+	logmsg += fmt.Sprintf("ok (%d)", http.StatusOK)
+}

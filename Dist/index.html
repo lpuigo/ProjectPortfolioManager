@@ -27,6 +27,10 @@
                 ref="JiraStat"
         ></jira-stat-modal>
 
+        <workloadschedule-modal
+                ref="WorkloadSchedule"
+        ></workloadschedule-modal>
+
         <el-container style="height: 100%;border: 1px solid #eee">
             <el-header class="novagile">
                 <div class="header-menu-container">
@@ -35,6 +39,7 @@
                         <el-button class="content" icon="fas fa-sync-alt" @click="GetPtf" size="mini"></el-button>
                         <el-button class="content" icon="far fa-file-alt" @click="CreateNewProject" size="mini"></el-button>
                         <el-button class="content" icon="fas fa-indent" @click="ShowJiraStat" size="mini"></el-button>
+                        <el-button class="content" icon="fas fa-chart-bar" @click="ShowWorkloadSchedule" size="mini"></el-button>
                         <!--<el-button class="content" icon="fas fa-info-circle" @click="AuditProjects" size="mini"></el-button>-->
                     </div>
                     <div>

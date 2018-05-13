@@ -170,7 +170,7 @@ func createPrjs(t *testing.T) []*model.Project {
 
 func TestCalcWorkloadSchedule(t *testing.T) {
 	prjs := createPrjs(t)
-	res := CalcWorkloadSchedule(prjs)
+	res := Calc(prjs)
 
 	if len(res.Weeks) != 13 {
 		t.Error("Weeks is has not 13 values:%v", res.Weeks)

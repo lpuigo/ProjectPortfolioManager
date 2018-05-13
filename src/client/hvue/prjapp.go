@@ -11,6 +11,7 @@ import (
 	"github.com/lpuig/novagile/src/client/hvue/comps/project_edit_modal"
 	"github.com/lpuig/novagile/src/client/hvue/comps/project_stat_modal"
 	"github.com/lpuig/novagile/src/client/hvue/comps/project_table"
+	"github.com/lpuig/novagile/src/client/hvue/comps/workloadschedule_modal"
 	"github.com/lpuig/novagile/src/client/tools"
 	"github.com/lpuig/novagile/src/client/tools/json"
 	"honnef.co/go/js/xhr"
@@ -28,6 +29,7 @@ func main() {
 		hvue.Component("project-edit-modal", project_edit_modal.ComponentOptions()...),
 		hvue.Component("project-stat-modal", project_stat_modal.ComponentOptions()...),
 		hvue.Component("jira-stat-modal", jira_stat_modal.ComponentOptions()...),
+		hvue.Component("workloadschedule-modal", workloadschedule_modal.ComponentOptions()...),
 		hvue.DataS(mpm),
 		hvue.MethodsOf(mpm),
 		hvue.Mounted(func(vm *hvue.VM) {
@@ -113,6 +115,10 @@ func (m *MainPageModel) ShowProjectAudit(p *fm.Project) {
 
 func (m *MainPageModel) ShowJiraStat() {
 	m.VM.Refs("JiraStat").Call("Show")
+}
+
+func (m *MainPageModel) ShowWorkloadSchedule() {
+	m.VM.Refs("WorkloadSchedule").Call("Show", workloadschedule_modal.NewInfos(m.Projects))
 }
 
 func (m *MainPageModel) AuditProjects() {

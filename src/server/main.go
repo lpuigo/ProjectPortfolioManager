@@ -87,6 +87,7 @@ func main() {
 	router.HandleFunc("/ptf", withManager(route.CreatePrj)).Methods("POST")
 	router.HandleFunc("/ptf/{prjid:[0-9]+}", withManager(route.UpdatePrj)).Methods("PUT")
 	router.HandleFunc("/ptf/{prjid:[0-9]+}", withManager(route.DeletePrj)).Methods("DELETE")
+	router.HandleFunc("/ptf/workload", withManager(route.GetWorkload)).Methods("GET")
 	router.HandleFunc("/stat/prjlist/{prjid:-?[0-9]+}", withManager(route.GetProjectStatProjectList)).Methods("GET")
 	router.HandleFunc("/stat/reinit", withManager(route.GetInitProjectStat)).Methods("GET")
 	router.HandleFunc("/stat/update", withManager(route.GetUpdateProjectStat)).Methods("GET")

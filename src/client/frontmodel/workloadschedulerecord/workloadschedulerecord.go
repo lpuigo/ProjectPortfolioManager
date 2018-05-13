@@ -16,10 +16,14 @@ func NewBEWorkloadScheduleRecord(id, nbweek int) *WorkloadScheduleRecord {
 type WorkloadSchedule struct {
 	*js.Object
 
-	Weeks   []string                  `json:"weeks"        js:"weeks"`
+	Weeks   []string                  `json:"weeks"   js:"weeks"`
 	Records []*WorkloadScheduleRecord `json:"records" js:"records"`
 }
 
 func NewBEWorkloadSchedule(weeks []string) *WorkloadSchedule {
 	return &WorkloadSchedule{Weeks: weeks, Records: []*WorkloadScheduleRecord{}}
+}
+
+func NewWorkloadScheduleFromJS(o *js.Object) *WorkloadSchedule {
+	return &WorkloadSchedule{Object: o}
 }

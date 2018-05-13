@@ -6,6 +6,7 @@ import (
 	fm "github.com/lpuig/novagile/src/client/frontmodel"
 	fpr "github.com/lpuig/novagile/src/server/manager/fileprocesser"
 	jm "github.com/lpuig/novagile/src/server/manager/jiramanager"
+	"github.com/lpuig/novagile/src/server/manager/workloadschedule"
 	"github.com/lpuig/novagile/src/server/model"
 	"io"
 	"os"
@@ -279,5 +280,14 @@ func (m *Manager) GetJiraProjectLogs(w io.Writer) error {
 		return err
 	}
 	json.NewEncoder(w).Encode(jsns)
+	return nil
+}
+
+func (m *Manager) GetWorkloadSchedule(w io.Writer) error {
+	m.Projects.RLock()
+	defer m.Projects.RUnlock()
+
+	ws := workloadschedule.Calc(m.Projects.GetProjectsPtf().Projects)
+	json.NewEncoder(w).Encode(ws)
 	return nil
 }
