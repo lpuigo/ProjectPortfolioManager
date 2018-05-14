@@ -50,14 +50,20 @@ func calcProjectWorkloadSchedule(project *model.Project, beg, end string, nbweek
 		return nil
 	}
 
-	res := wsr.NewBEWorkloadScheduleRecord(project.Id, nbweeks)
+	pStart, _ := model.DateFromJSString(dates[0])
+	pEnd, _ := model.DateFromJSString(dates[len(dates)-1])
+	pDuration := pEnd.DaysSince(pStart) + 1
+	wlFactor := project.ForecastWL / float64(pDuration)
+
+	name := project.Client + " - " + project.Name
+	res := wsr.NewBEWorkloadScheduleRecord(project.Id, nbweeks, name, project.Status, project.LeadDev, project.LeadPS)
 
 	mondayD, _ := model.DateFromJSString(beg)
 	mondayS := mondayD.StringJS()
 	for i := 0; i < nbweeks; i++ {
 		sundayD := mondayD.AddDays(6)
 		sundayS := sundayD.StringJS()
-		res.WorkLoads[i] = calcWeekCoverage(mondayS, sundayS, dates[0], dates[len(dates)-1])
+		res.WorkLoads[i] = calcWeekCoverage(mondayS, sundayS, dates[0], dates[len(dates)-1]) * wlFactor
 		mondayD = mondayD.AddDays(7)
 		mondayS = mondayD.StringJS()
 	}
