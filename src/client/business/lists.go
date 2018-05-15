@@ -73,6 +73,20 @@ func CreateMilestoneKeys() []*fm.ValText {
 	return res
 }
 
+func StartMilestoneKeys() []string {
+	return []string{
+		"Kickoff",
+		"Outline",
+	}
+}
+
+func GoLiveMilestoneKeys() []string {
+	return []string{
+		"RollOut",
+		"GoLive",
+	}
+}
+
 func InactiveProject(status string) bool {
 	switch status {
 	case "0 - Lost", "6 - Done":

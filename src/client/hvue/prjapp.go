@@ -118,7 +118,7 @@ func (m *MainPageModel) ShowJiraStat() {
 }
 
 func (m *MainPageModel) ShowWorkloadSchedule() {
-	m.VM.Refs("WorkloadSchedule").Call("Show", workloadschedule_modal.NewInfos(m.Projects))
+	m.VM.Refs("WorkloadSchedule").Call("Show")
 }
 
 func (m *MainPageModel) AuditProjects() {

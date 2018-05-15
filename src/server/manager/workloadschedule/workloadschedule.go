@@ -1,9 +1,9 @@
 package workloadschedule
 
 import (
+	"github.com/lpuig/novagile/src/client/business"
 	wsr "github.com/lpuig/novagile/src/client/frontmodel/workloadschedulerecord"
 	"github.com/lpuig/novagile/src/server/model"
-	"time"
 )
 
 func Calc(prjs []*model.Project) *wsr.WorkloadSchedule {
@@ -26,17 +26,17 @@ func Calc(prjs []*model.Project) *wsr.WorkloadSchedule {
 }
 
 func calcWeeks(nbBefore, nbAfter int) (beginDate, endDate string, weeks []string) {
-	today := model.Date(time.Now())
+	today := model.Today()
 	lastMonday := today.GetMonday()
 	currentW := lastMonday.AddDays(-nbBefore * 7)
 	beginDate = currentW.StringJS()
 	endDate = lastMonday.AddDays((nbAfter + 1) * 7).StringJS()
 
 	weeks = make([]string, nbBefore+nbAfter+1)
-	weeks[0] = currentW.StringWeek()
+	weeks[0] = currentW.String()
 	for i := 1; i < nbBefore+nbAfter+1; i++ {
 		currentW = currentW.AddDays(7)
-		weeks[i] = currentW.StringWeek()
+		weeks[i] = currentW.String()
 	}
 	return
 }
@@ -44,15 +44,24 @@ func calcWeeks(nbBefore, nbAfter int) (beginDate, endDate string, weeks []string
 // calcProjectWorkloadSchedule returns a WSRecord if given project matches the given (beg <-> end) time span, nil otherwise
 func calcProjectWorkloadSchedule(project *model.Project, beg, end string, nbweeks int) *wsr.WorkloadScheduleRecord {
 	curSit := project.Situation.GetSituationToDate()
-	dates := curSit.DateListJSFormat()
-	if len(dates) == 0 || dates[0] > end || dates[len(dates)-1] < beg {
-		// project has no date defined, or starts after periods, or ends before period => ignore it
+	pStart := model.MaxDate(curSit.GetDatesFromKeys(business.StartMilestoneKeys()...)...)
+	if pStart.IsZero() {
+		// project has no start date defined => ignore it
+		return nil
+	}
+	pEnd := model.MaxDate(curSit.GetDatesFromKeys(business.GoLiveMilestoneKeys()...)...)
+	if pEnd.IsZero() {
+		// project has no end date defined => ignore it
+		return nil
+	}
+	pStartS := pStart.StringJS()
+	pEndS := pEnd.StringJS()
+	if pStartS > end || pEndS < beg {
+		// project starts after periods, or ends before period => ignore it
 		return nil
 	}
 
-	pStart, _ := model.DateFromJSString(dates[0])
-	pEnd, _ := model.DateFromJSString(dates[len(dates)-1])
-	pDuration := pEnd.DaysSince(pStart) + 1
+	pDuration := pEnd.OpenDaysSince(pStart) + 1
 	wlFactor := project.ForecastWL / float64(pDuration)
 
 	name := project.Client + " - " + project.Name
@@ -61,9 +70,9 @@ func calcProjectWorkloadSchedule(project *model.Project, beg, end string, nbweek
 	mondayD, _ := model.DateFromJSString(beg)
 	mondayS := mondayD.StringJS()
 	for i := 0; i < nbweeks; i++ {
-		sundayD := mondayD.AddDays(6)
-		sundayS := sundayD.StringJS()
-		res.WorkLoads[i] = calcWeekCoverage(mondayS, sundayS, dates[0], dates[len(dates)-1]) * wlFactor
+		fridayD := mondayD.AddDays(4)
+		fridayS := fridayD.StringJS()
+		res.WorkLoads[i] = calcWeekCoverage(mondayS, fridayS, pStartS, pEndS) * wlFactor
 		mondayD = mondayD.AddDays(7)
 		mondayS = mondayD.StringJS()
 	}
@@ -75,19 +84,19 @@ func calcWeekCoverage(wBeg, wEnd, pBeg, pEnd string) float64 {
 		return 0
 	}
 	if wBeg >= pBeg && wEnd <= pEnd {
-		return 7
+		return 5
 	}
 	wBd, _ := model.DateFromJSString(wBeg)
 	pBd, _ := model.DateFromJSString(pBeg)
 	ndB := pBd.DaysSince(wBd)
 	if wBeg < pBeg && wEnd <= pEnd {
-		return float64(7 - ndB)
+		return float64(5 - ndB)
 	}
 	wEd, _ := model.DateFromJSString(wEnd)
 	pEd, _ := model.DateFromJSString(pEnd)
 	ndE := wEd.DaysSince(pEd)
 	if wBeg >= pBeg && wEnd > pEnd {
-		return float64(7 - ndE)
+		return float64(5 - ndE)
 	}
-	return float64(7 - ndB - ndE)
+	return float64(5 - ndB - ndE)
 }

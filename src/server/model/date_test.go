@@ -119,3 +119,23 @@ func TestDate_DaysSince(t *testing.T) {
 		t.Errorf("Date_DaysSince: '%s'.DaysSince('%s') returns %d instead of 1", d1.String(), d2.String(), diff)
 	}
 }
+
+func TestDate_OpenDaysSince(t *testing.T) {
+	for _, c := range []struct{
+		beg string
+		end string
+		expect int
+	}{
+		{"14/05/2018", "21/05/2018", 5},
+		{"14/05/2018", "20/05/2018", 6},
+		{"14/05/2018", "23/05/2018", 7},
+		{"11/05/2018", "25/05/2018", 10},
+	} {
+		d1 := todate(c.beg)
+		d2 := todate(c.end)
+		diff := d2.OpenDaysSince(d1)
+		if diff != c.expect {
+			t.Errorf("Date_OpenDaysSince: '%s'.OpenDaysSince('%s') returns %d instead of %d", d2.String(), d1.String(), diff, c.expect)
+		}
+	}
+}

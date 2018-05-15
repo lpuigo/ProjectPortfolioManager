@@ -78,6 +78,14 @@ func (d Date) DaysSince(d2 Date) int {
 	return int(d.ToTime().Sub(d2.ToTime()) / time.Duration(24*time.Hour))
 }
 
+func (d Date) OpenDaysSince(d2 Date) int {
+	sMonday := d2.GetMonday()
+	eMonday := d.GetMonday()
+	nbWeeks := eMonday.DaysSince(sMonday) / 7
+
+	return nbWeeks*5 + d.DaysSince(eMonday) - d2.DaysSince(sMonday)
+}
+
 func (d Date) After(d2 Date) bool {
 	return d.ToTime().After(time.Time(d2))
 }
@@ -96,4 +104,34 @@ func (d Date) IsZero() bool {
 
 func Today() Date {
 	return Date(time.Now().Truncate(24 * time.Hour))
+}
+
+func MinDate(d ...Date) Date {
+	if len(d) == 0 {
+		return Date(time.Time{})
+	}
+
+	mind := d[0]
+	for i:=1; i<len(d); i++ {
+		if mind.After(d[i]) {
+			mind = d[i]
+		}
+	}
+
+	return mind
+}
+
+func MaxDate(d ...Date) Date {
+	if len(d) == 0 {
+		return Date(time.Time{})
+	}
+
+	maxd := d[0]
+	for i:=1; i<len(d); i++ {
+		if maxd.Before(d[i]) {
+			maxd = d[i]
+		}
+	}
+
+	return maxd
 }

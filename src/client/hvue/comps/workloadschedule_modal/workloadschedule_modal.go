@@ -4,7 +4,6 @@ import (
 	"github.com/gopherjs/gopherjs/js"
 	"github.com/huckridgesw/hvue"
 	"github.com/lpuig/novagile/src/client/business"
-	fm "github.com/lpuig/novagile/src/client/frontmodel"
 	wsr "github.com/lpuig/novagile/src/client/frontmodel/workloadschedulerecord"
 	"github.com/lpuig/novagile/src/client/goel/message"
 	"github.com/lpuig/novagile/src/client/hvue/comps/workloadschedule_modal/bars_chart"
@@ -36,7 +35,6 @@ type WSModalModel struct {
 	Visible bool     `js:"visible"`
 	VM      *hvue.VM `js:"VM"`
 
-	Projects        []*fm.Project         `js:"projects"`
 	WrkSched        *wsr.WorkloadSchedule `js:"wrkSched"`
 	WrkSchedLoading bool                  `js:"wrkSchedLoading"`
 	Series          []*bars_chart.Serie   `js:"series"`
@@ -47,7 +45,6 @@ func NewWSModalModel(vm *hvue.VM) *WSModalModel {
 	wsmm.Visible = false
 	wsmm.VM = vm
 
-	wsmm.Projects = nil
 	wsmm.WrkSched = nil
 	wsmm.WrkSchedLoading = false
 	wsmm.Series = nil
@@ -58,20 +55,8 @@ func NewWSModalModel(vm *hvue.VM) *WSModalModel {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Show Hide Methods
 
-type Infos struct {
-	*js.Object
-	Projects []*fm.Project `js:"projects"`
-}
-
-func NewInfos(prjs []*fm.Project) *Infos {
-	i := &Infos{Object: tools.O()}
-	i.Projects = prjs
-	return i
-}
-
-func (wsmm *WSModalModel) Show(info *Infos) {
+func (wsmm *WSModalModel) Show() {
 	wsmm.Visible = true
-	wsmm.Projects = info.Projects
 	go wsmm.callGetWorkloadSchedule()
 }
 
@@ -96,28 +81,19 @@ func (wsmm *WSModalModel) callGetWorkloadSchedule() {
 	}
 	if req.Status == 200 {
 		wsmm.WrkSched = wsr.NewWorkloadScheduleFromJS(req.Response)
-		wsmm.calcSeries()
+		wsmm.calcBarsData()
 	} else {
 		message.SetDuration(tools.WarningMsgDuration)
 		message.WarningStr(wsmm.VM, "Something went wrong!\nServer returned code "+strconv.Itoa(req.Status), true)
 	}
 }
 
-func (wsmm *WSModalModel) calcSeries() {
+func (wsmm *WSModalModel) calcBarsData() {
 	wsmm.Series = []*bars_chart.Serie{}
 	for _, r := range wsmm.WrkSched.Records {
-		println("looking for", r.Id)
-		name := "Not Found"
 		color := "#ff3f00"
-		for _, p := range wsmm.Projects {
-			print(p.Id, " ")
-			if p.Id == r.Id {
-				name = p.Client + " - " + p.Name
-				color = business.GetColorFromStatus(p.Status)
-				break
-			}
-		}
-		s := bars_chart.NewSerie(name, color, r.WorkLoads)
+		color = business.GetColorFromStatus(r.Status)
+		s := bars_chart.NewSerie(r.Name, color, r.WorkLoads)
 		wsmm.Series = append(wsmm.Series, s)
 	}
 	return

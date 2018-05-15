@@ -103,3 +103,13 @@ func (s *SituationToDate) DateListJSFormat() []string {
 	sort.Strings(res)
 	return res
 }
+
+func (s *SituationToDate) GetDatesFromKeys(keys ...string) []Date {
+	res := []Date{}
+	for _, k := range keys {
+		if d, found := s.MileStones[k]; found {
+			res = append(res, d)
+		}
+	}
+	return res
+}
