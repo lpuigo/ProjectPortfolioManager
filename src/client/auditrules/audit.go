@@ -43,6 +43,16 @@ func max(d1, d2 string) string {
 	return d2
 }
 
+func ongoingPrjWithoutStartDate(p *fm.Project) bool {
+	if !business.OnGoingProject(p.Status) {
+		return false
+	}
+	if p.MileStones["Kickoff"] == "" && p.MileStones["Outline"] == "" {
+		return true
+	}
+	return false
+}
+
 func ongoingPrjWithoutDeliveryDate(p *fm.Project) bool {
 	if !business.OnGoingProject(p.Status) {
 		return false
@@ -66,6 +76,7 @@ func ongoingPrjWithPastDeliveryDate(p *fm.Project) bool {
 }
 
 func (a *Auditer) AddAuditRules() *Auditer {
+	a.Rules = append(a.Rules, rule.NewRule("P1", "Ongoing Project with undefined KickOff or Outline date", ongoingPrjWithoutStartDate))
 	a.Rules = append(a.Rules, rule.NewRule("P1", "Ongoing Project with undefined RollOut or GoLive date", ongoingPrjWithoutDeliveryDate))
 	a.Rules = append(a.Rules, rule.NewRule("P1", "Ongoing Project without estimated workload", func(p *fm.Project) bool {
 		if !business.OnGoingProject(p.Status) {
