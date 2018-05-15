@@ -83,7 +83,7 @@ func setChart(vm *hvue.VM) {
 		},
 		"yAxis": js.M{
 			"title": js.M{
-				"text": "Days",
+				"text": "Full-Time Equivalent",
 			},
 		},
 		"legend": js.M{

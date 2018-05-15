@@ -69,6 +69,8 @@ func (wsmm *WSModalModel) Hide() {
 
 func (wsmm *WSModalModel) callGetWorkloadSchedule() {
 	wsmm.WrkSchedLoading = true
+	wsmm.WrkSched = nil
+	wsmm.Series = nil
 	defer func() { wsmm.WrkSchedLoading = false }()
 
 	req := xhr.NewRequest("GET", "/ptf/workload")
@@ -91,8 +93,7 @@ func (wsmm *WSModalModel) callGetWorkloadSchedule() {
 func (wsmm *WSModalModel) calcBarsData() {
 	wsmm.Series = []*bars_chart.Serie{}
 	for _, r := range wsmm.WrkSched.Records {
-		color := "#ff3f00"
-		color = business.GetColorFromStatus(r.Status)
+		color := business.GetColorFromStatus(r.Status)
 		s := bars_chart.NewSerie(r.Name, color, r.WorkLoads)
 		wsmm.Series = append(wsmm.Series, s)
 	}
