@@ -62,7 +62,7 @@ func calcProjectWorkloadSchedule(project *model.Project, beg, end string, nbweek
 	}
 
 	pDuration := pEnd.OpenDaysSince(pStart) + 1
-	wlFactor := project.ForecastWL / float64(pDuration)
+	wlFactor := project.ForecastWL / float64(pDuration) / 5
 
 	name := project.Client + " - " + project.Name
 	res := wsr.NewBEWorkloadScheduleRecord(project.Id, nbweeks, name, project.Status, project.LeadDev, project.LeadPS)
