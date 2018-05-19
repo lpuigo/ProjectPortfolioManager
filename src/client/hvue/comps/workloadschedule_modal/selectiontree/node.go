@@ -41,6 +41,22 @@ func (n *Node) checkedNodesList() (list []int) {
 	return
 }
 
+func (n *Node) updateCheckState() (selected []int) {
+	if n.WrkSchedRec == nil || n.WrkSchedRec.Object == nil {
+		return
+	}
+	if n.WrkSchedRec.Display {
+		selected = append(selected, n.Id)
+	}
+	if len(n.Children) == 0 {
+		return
+	}
+	for _, cn := range n.Children {
+		selected = append(selected, cn.updateCheckState()...)
+	}
+	return
+}
+
 func GetNodeProps() js.M {
 	return js.M{
 		"children": "children",

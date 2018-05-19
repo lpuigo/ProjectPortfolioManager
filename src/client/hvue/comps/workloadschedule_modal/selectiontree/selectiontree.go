@@ -9,12 +9,14 @@ import (
 
 const template = `
 <el-tree
+	ref="tree"
     :data="nodes"
     :props="nodeProps"
 	node-key="id"
 	:default-checked-keys="checkedNodes"
 	:render-after-expand="false"
     show-checkbox
+	accordion
 	@check-change="HandleCheckChange"
 >
 </el-tree>
@@ -65,16 +67,64 @@ func (stcm *SelectionTreeCompModel) Init(wsr *wsr.WorkloadSchedule) {
 }
 
 func (stcm *SelectionTreeCompModel) updateNodes() {
-	projectNode := NewNode("Projects", nil)
-	stcm.Nodes = []*Node{projectNode}
 	nl := []int{}
+	stcm.Nodes = []*Node{}
+
+	nl = append(nl, stcm.createNodeProject()...)
+	nl = append(nl, stcm.createNodeByCrit(
+		NewNode("By Lead Dev", nil),
+		func(r *wsr.WorkloadScheduleRecord) string {
+			return r.LeadDev
+		})...)
+	nl = append(nl, stcm.createNodeByCrit(
+		NewNode("By Lead PS", nil),
+		func(r *wsr.WorkloadScheduleRecord) string {
+			return r.LeadPS
+		})...)
+	nl = append(nl, stcm.createNodeByCrit(
+		NewNode("By Status", nil),
+		func(r *wsr.WorkloadScheduleRecord) string {
+			return r.Status
+		})...)
+	//nl = append(nl, stcm.createNodeProject()...)
+
+	stcm.CheckedNodes = nl
+}
+
+func (stcm *SelectionTreeCompModel) createNodeProject() (list []int) {
+	projectNode := NewNode("Projects List", nil)
 	for _, wr := range stcm.WrkSched.Records {
 		wr.Display = true
 		n := NewNode(wr.Name, wr)
 		projectNode.AddChild(n)
-		nl = append(nl, n.Id)
+		list = append(list, n.Id)
 	}
-	stcm.CheckedNodes = nl
+	stcm.Nodes = append(stcm.Nodes, projectNode)
+	return
+}
+
+type groupBy func(r *wsr.WorkloadScheduleRecord) string
+
+func (stcm *SelectionTreeCompModel) createNodeByCrit(parent *Node, crit groupBy) (list []int) {
+	nodesBy := map[string]*Node{}
+
+	for _, wr := range stcm.WrkSched.Records {
+		chldNode := NewNode(wr.Name, wr)
+		curCrit := crit(wr)
+		if curCrit == "" {
+			curCrit = "<Blank>"
+		}
+		critNode, found := nodesBy[curCrit]
+		if !found {
+			critNode = NewNode(curCrit, nil)
+			nodesBy[curCrit] = critNode
+			parent.AddChild(critNode)
+		}
+		critNode.AddChild(chldNode)
+		list = append(list, chldNode.Id)
+	}
+	stcm.Nodes = append(stcm.Nodes, parent)
+	return
 }
 
 func (stcm *SelectionTreeCompModel) HandleCheckChange(node *Node, checked, indeterminate bool) {
@@ -82,5 +132,16 @@ func (stcm *SelectionTreeCompModel) HandleCheckChange(node *Node, checked, indet
 		return
 	}
 	node.WrkSchedRec.Display = checked
-	stcm.VM.Emit("update:wrkSched", stcm.WrkSched)
+
+	stcm.updateNodesCheckState()
+	//stcm.VM.Emit("update:wrkSched", stcm.WrkSched)
+}
+
+func (stcm *SelectionTreeCompModel) updateNodesCheckState() {
+	println("updateNodesCheckState")
+	selectedNodes := []int{}
+	for _, n := range stcm.Nodes {
+		selectedNodes = append(selectedNodes, n.updateCheckState()...)
+	}
+	stcm.VM.Refs("tree").Call("setCheckedKeys", selectedNodes)
 }
