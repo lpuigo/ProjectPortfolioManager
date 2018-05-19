@@ -12,6 +12,7 @@ type WorkloadScheduleRecord struct {
 	Status    string    `json:"status"    js:"status"`
 	LeadDev   string    `json:"leadDev"   js:"leadDev"`
 	LeadPS    string    `json:"leadPS"    js:"leadPS"`
+	Display   bool      `json:"-"         js:"display"`
 	WorkLoads []float64 `json:"workloads" js:"workloads"`
 }
 

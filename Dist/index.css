@@ -251,3 +251,16 @@ pre {
 .hours-cell.large {
     flex: 4 1 0;
 }
+
+/*
+    === Workload Schedule Modal style ===
+ */
+.workload-schedule {
+    min-height: 400px;
+    max-height: 65vh;
+}
+
+.workload-schedule .el-aside {
+    width: 30%;
+    overflow: auto;
+}

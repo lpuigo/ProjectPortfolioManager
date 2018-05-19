@@ -9,14 +9,26 @@ const template = `
     <span slot="title" class="novagile">
         <h2 style="margin: 0 0"><i class="fas fa-chart-bar icon--left"></i>Workload Schedule</h2>
     </span>
-
-    <div style="min-height: 400px;max-height: 65vh;overflow: auto;">
-		<bars-chart
-				v-if="wrkSched"
-				:weeks="wrkSched.weeks"
-				:series="series"
-		></bars-chart>
-    </div>
-
+    <el-container 	
+			v-loading="wrkSchedLoading"
+			class="workload-schedule"
+	>
+        <el-aside>
+            <selection-tree
+                    ref="selection-tree"
+					:wrkSched.sync="wrkSched"
+					@update:wrkSched="UpdateBarChart"
+            ></selection-tree>
+        </el-aside>
+        <el-main>
+            <div>
+                <bars-chart
+						v-if="wrkSched"
+						ref="bars-chart"
+                        :infos="barchartInfos"
+                ></bars-chart>
+            </div>
+        </el-main>
+    </el-container>
 </el-dialog>
 `

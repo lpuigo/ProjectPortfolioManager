@@ -3,7 +3,6 @@ package bars_chart
 import (
 	"github.com/gopherjs/gopherjs/js"
 	"github.com/huckridgesw/hvue"
-	wsr "github.com/lpuig/novagile/src/client/frontmodel/workloadschedulerecord"
 	"github.com/lpuig/novagile/src/client/tools"
 )
 
@@ -16,13 +15,14 @@ func Register() {
 func ComponentOptions() []hvue.ComponentOption {
 	return []hvue.ComponentOption{
 		hvue.Template(template),
-		hvue.Props("weeks", "series"),
+		hvue.Props("infos"),
 		hvue.DataFunc(func(vm *hvue.VM) interface{} {
 			return NewBarsChartModel(vm)
 		}),
 		hvue.MethodsOf(&BarsChartModel{}),
 		hvue.Mounted(func(vm *hvue.VM) {
-			setChart(vm)
+			bcm := &BarsChartModel{Object: vm.Object}
+			bcm.showChart()
 		}),
 	}
 }
@@ -42,30 +42,43 @@ func NewSerie(name, color string, data []float64) *Serie {
 	return s
 }
 
+type Infos struct {
+	*js.Object
+	Weeks  []string `js:"weeks"`
+	Series []*Serie `js:"series"`
+}
+
+func NewInfos(weeks []string, series []*Serie) *Infos {
+	i := &Infos{Object: tools.O()}
+	i.Weeks = weeks
+	i.Series = series
+	return i
+}
+
 type BarsChartModel struct {
 	*js.Object
-	VM       *hvue.VM              `js:"VM"`
-	Weeks    []string              `js:"weeks"`
-	Series   []*Serie              `js:"series"`
-	WrkSched *wsr.WorkloadSchedule `js:"wrkSched"`
+	VM    *hvue.VM `js:"VM"`
+	Infos *Infos   `js:"infos"`
 }
 
 func NewBarsChartModel(vm *hvue.VM) *BarsChartModel {
 	bcm := &BarsChartModel{Object: tools.O()}
 	bcm.VM = vm
 
-	bcm.Weeks = nil
-	bcm.Series = nil
+	bcm.Infos = nil
 	return bcm
 }
 
-func (scm *BarsChartModel) SetStyle() string {
+func (bcm *BarsChartModel) SetStyle() string {
 	return "width:100%; height:550px;"
 }
 
-func setChart(vm *hvue.VM) {
-	bcm := &BarsChartModel{Object: vm.Object}
+func (bcm *BarsChartModel) Refresh(infos *Infos) {
+	bcm.Infos = infos
+	bcm.showChart()
+}
 
+func (bcm *BarsChartModel) showChart() {
 	chartdesc := js.M{
 		"chart": js.M{
 			"backgroundColor": "#F7F7F7",
@@ -79,7 +92,7 @@ func setChart(vm *hvue.VM) {
 		//	"tickPixelInterval" : 400,
 		//},
 		"xAxis": js.M{
-			"categories": bcm.Weeks,
+			"categories": bcm.Infos.Weeks,
 		},
 		"yAxis": js.M{
 			"title": js.M{
@@ -105,7 +118,7 @@ func setChart(vm *hvue.VM) {
 				"pointPadding": -0.25,
 			},
 		},
-		"series": bcm.Series,
+		"series": bcm.Infos.Series,
 	}
-	js.Global.Get("Highcharts").Call("chart", vm.Refs("container"), chartdesc)
+	js.Global.Get("Highcharts").Call("chart", bcm.VM.Refs("container"), chartdesc)
 }
