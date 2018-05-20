@@ -99,6 +99,7 @@ func (stcm *SelectionTreeCompModel) createNodeProject() (list []int) {
 		projectNode.AddChild(n)
 		list = append(list, n.Id)
 	}
+	projectNode.sortChildren(byLabel)
 	stcm.Nodes = append(stcm.Nodes, projectNode)
 	return
 }
@@ -123,6 +124,7 @@ func (stcm *SelectionTreeCompModel) createNodeByCrit(parent *Node, crit groupBy)
 		critNode.AddChild(chldNode)
 		list = append(list, chldNode.Id)
 	}
+	parent.sortChildren(byLabel)
 	stcm.Nodes = append(stcm.Nodes, parent)
 	return
 }

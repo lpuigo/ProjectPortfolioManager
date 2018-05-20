@@ -70,6 +70,26 @@ func (n *Node) getRelatedNodeId(projectId int) (list []int) {
 	return
 }
 
+func byLabel(a, b *Node) int {
+	if a.Label < b.Label {
+		return -1
+	}
+	if a.Label > b.Label {
+		return 1
+	}
+	return 0
+}
+
+func (n *Node) sortChildren(comp func(a, b *Node) int) {
+	if len(n.Children) == 0 {
+		return
+	}
+	n.Object.Get("children").Call("sort", comp)
+	for _, cn := range n.Children {
+		cn.sortChildren(comp)
+	}
+}
+
 func GetNodeProps() js.M {
 	return js.M{
 		"children": "children",
