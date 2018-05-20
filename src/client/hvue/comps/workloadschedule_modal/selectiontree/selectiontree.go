@@ -17,7 +17,7 @@ const template = `
 	:render-after-expand="false"
     show-checkbox
 	accordion
-	@check-change="HandleCheckChange"
+	@check="HandleCheck"
 >
 </el-tree>
 `
@@ -127,21 +127,39 @@ func (stcm *SelectionTreeCompModel) createNodeByCrit(parent *Node, crit groupBy)
 	return
 }
 
-func (stcm *SelectionTreeCompModel) HandleCheckChange(node *Node, checked, indeterminate bool) {
-	if node.WrkSchedRec.Object == nil {
-		return
-	}
-	node.WrkSchedRec.Display = checked
+func (stcm *SelectionTreeCompModel) HandleCheck(node *Node, obj *js.Object) {
+	checked := obj.Get("checkedKeys").Call("includes", node.Id).Bool()
 
-	stcm.updateNodesCheckState()
-	//stcm.VM.Emit("update:wrkSched", stcm.WrkSched)
+	stcm.handleCheck(node, checked)
+	stcm.VM.Emit("update:wrkSched", stcm.WrkSched)
 }
 
-func (stcm *SelectionTreeCompModel) updateNodesCheckState() {
-	println("updateNodesCheckState")
-	selectedNodes := []int{}
-	for _, n := range stcm.Nodes {
-		selectedNodes = append(selectedNodes, n.updateCheckState()...)
+func (stcm *SelectionTreeCompModel) handleCheck(node *Node, checkstate bool) {
+	if node.WrkSchedRec.Object == nil { // Non Leaf Node
+		for _, cn := range node.Children {
+			stcm.handleCheck(cn, checkstate)
+		}
+		return
 	}
-	stcm.VM.Refs("tree").Call("setCheckedKeys", selectedNodes)
+
+	// Leaf Node
+	if node.WrkSchedRec.Display == checkstate { // already in correct state, skip
+		return
+	}
+
+	node.WrkSchedRec.Display = checkstate
+	this := stcm.VM.Refs("tree")
+	for _, nodeId := range stcm.getRelatedNodeId(node.WrkSchedRec.Id) {
+		if node.Id == nodeId {
+			continue
+		}
+		this.Call("setChecked", nodeId, node.WrkSchedRec.Display, false)
+	}
+}
+
+func (stcm *SelectionTreeCompModel) getRelatedNodeId(projectId int) (list []int) {
+	for _, n := range stcm.Nodes {
+		list = append(list, n.getRelatedNodeId(projectId)...)
+	}
+	return
 }

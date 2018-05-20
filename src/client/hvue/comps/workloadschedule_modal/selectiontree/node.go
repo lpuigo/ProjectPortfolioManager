@@ -57,6 +57,19 @@ func (n *Node) updateCheckState() (selected []int) {
 	return
 }
 
+func (n *Node) getRelatedNodeId(projectId int) (list []int) {
+	if n.WrkSchedRec.Object != nil { // its a leaf node
+		if n.WrkSchedRec.Id == projectId {
+			list = append(list, n.Id)
+		}
+		return
+	}
+	for _, cn := range n.Children {
+		list = append(list, cn.getRelatedNodeId(projectId)...)
+	}
+	return
+}
+
 func GetNodeProps() js.M {
 	return js.M{
 		"children": "children",
