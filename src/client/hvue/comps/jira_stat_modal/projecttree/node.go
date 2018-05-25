@@ -14,6 +14,7 @@ type Node struct {
 	Label    string  `js:"label"`
 	Children []*Node `js:"children"`
 	Parent   *Node   `js:"parent"`
+	Level    int     `js:"level"`
 
 	HRef    string `js:"href"`
 	Summary string `js:"summary"`
@@ -21,6 +22,7 @@ type Node struct {
 	ParentRatio  bool    `js:"parentRatio"`
 	LinkedHour   float64 `js:"lhour"`
 	UnlinkedHour float64 `js:"nlhour"`
+	TotalHour    float64 `js:"tothour"`
 }
 
 func NewNode(label string) *Node {
@@ -30,20 +32,24 @@ func NewNode(label string) *Node {
 	n.Label = label
 	n.Children = []*Node{}
 	n.Parent = nil
+	n.Level = 0
 	n.HRef = ""
 	n.Summary = ""
 	n.ParentRatio = false
 	n.LinkedHour = 0
 	n.UnlinkedHour = 0
+	n.TotalHour = 0
 	return n
 }
 
 func (n *Node) AddChild(c *Node) {
 	n.Children = append(n.Children, c)
+	c.Level = n.Level + 1
 	c.Parent = n
 }
 
-func (n *Node) SetIssueInfo(issue, summary string) {
+func (n *Node) SetIssueInfo(issue, summary string, tothour float64) {
+	n.TotalHour = tothour
 	n.HRef = tools.UrlJiraBrowseIssue + issue
 	n.Summary = summary
 }
@@ -67,6 +73,7 @@ func (n *Node) Update() {
 		n.UnlinkedHour += cn.UnlinkedHour
 	}
 
+	// sort methods for children
 	compHour := func(ci, cj *Node) int {
 		a := ci.LinkedHour + ci.UnlinkedHour
 		b := cj.LinkedHour + cj.UnlinkedHour

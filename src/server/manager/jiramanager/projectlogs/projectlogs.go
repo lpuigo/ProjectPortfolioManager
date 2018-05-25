@@ -21,13 +21,13 @@ func Request(db *sql.DB) (jplrs []*jsr.JiraProjectLogRecord, err error) {
 
 	var numline int = 0
 	for qrows.Next() {
-		info, h, e := q.Scan(qrows)
+		info, th, h, e := q.Scan(qrows)
 		if e != nil {
 			err = fmt.Errorf("could not scan line %d: %s", numline, err.Error())
 			return
 		}
 
-		res = append(res, jsr.NewBEJiraProjectLogRecord(info, h))
+		res = append(res, jsr.NewBEJiraProjectLogRecord(info, th, h))
 		numline++
 	}
 	err = qrows.Err()
@@ -44,7 +44,7 @@ func Request(db *sql.DB) (jplrs []*jsr.JiraProjectLogRecord, err error) {
 
 const sqlQuery string = `
 select
-  Team, Author, lot_client, Issue, Summary,
+  Team, Author, lot_client, Issue, Summary, TotalHours,
   sum(Hours) as Hours
 from (
   select
@@ -55,7 +55,8 @@ from (
     coalesce(lc.lot_client, '') as lot_client,
     concat(p.pkey,"-", ji.issuenum) as Issue,
     ji.SUMMARY as Summary,
-    wl.timeworked / 3600 as Hours
+    wl.timeworked / 3600 as Hours,
+    ji.TIMESPENT / 3600 as TotalHours
   from worklog wl
   inner join AO_AEFED0_TEAM_MEMBER_V2 tm on tm.MEMBER_KEY = wl.AUTHOR
   inner join AO_AEFED0_TEAM_V2 t on t.ID = tm.TEAM_ID
@@ -91,7 +92,7 @@ func newQuery(db *sql.DB) *query {
 }
 
 func (q *query) Header() []string {
-	return []string{"Team", "Author", "StartWeek", "LotClient", "Issue", "Summary", "Hours"}
+	return []string{"Team", "Author", "StartWeek", "LotClient", "Issue", "Summary", "TotalHours", "Hours"}
 }
 
 func (q *query) Query() (rows *sql.Rows, err error) {
@@ -99,20 +100,21 @@ func (q *query) Query() (rows *sql.Rows, err error) {
 	return
 }
 
-func (q *query) Scan(r *sql.Rows) ([]string, float64, error) {
+func (q *query) Scan(r *sql.Rows) (infos []string, totalHour float64, logHour float64, err error) {
 	var Team, Author, LotClient, Issue, Summary string
-	var Hour float64
+	var Hour, TotalHour float64
 
-	err := r.Scan(
+	err = r.Scan(
 		&Team,
 		&Author,
 		&LotClient,
 		&Issue,
 		&Summary,
+		&TotalHour,
 		&Hour,
 	)
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, 0, err
 	}
 	return []string{
 		Team,
@@ -120,5 +122,5 @@ func (q *query) Scan(r *sql.Rows) ([]string, float64, error) {
 		LotClient,
 		Issue,
 		Summary,
-	}, Hour, nil
+	}, TotalHour, Hour, nil
 }

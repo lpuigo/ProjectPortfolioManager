@@ -17,10 +17,11 @@ func NewBEJiraStatRecord(t, a string, nbweek int) *JiraStatRecord {
 type JiraProjectLogRecord struct {
 	*js.Object
 
-	Infos []string `json:"infos"    js:"infos"`
-	Hour  float64  `json:"hour_log" js:"hour_log"`
+	Infos     []string `json:"infos"      js:"infos"`
+	TotalHour float64  `json:"hour_total" js:"hour_total"`
+	Hour      float64  `json:"hour_log"   js:"hour_log"`
 }
 
-func NewBEJiraProjectLogRecord(infos []string, hour float64) *JiraProjectLogRecord {
-	return &JiraProjectLogRecord{Infos: infos, Hour: hour}
+func NewBEJiraProjectLogRecord(infos []string, totalhour, hour float64) *JiraProjectLogRecord {
+	return &JiraProjectLogRecord{Infos: infos, TotalHour: totalhour, Hour: hour}
 }

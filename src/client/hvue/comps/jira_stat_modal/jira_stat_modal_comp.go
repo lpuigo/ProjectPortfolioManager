@@ -173,7 +173,7 @@ func (jsmm *JiraStatModalModel) GetProjectLogsNodes() {
 		if issue != curIssue {
 			issue = curIssue
 			issueNode = projecttree.NewNode(curIssue)
-			issueNode.SetIssueInfo(curIssue, curSummary)
+			issueNode.SetIssueInfo(curIssue, curSummary, jsn.TotalHour)
 			issueNode.ParentRatio = true
 			lotClientNode.AddChild(issueNode)
 		}
