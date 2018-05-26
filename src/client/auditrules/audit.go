@@ -92,7 +92,23 @@ func (a *Auditer) AddAuditRules() *Auditer {
 		if !business.MonitoredProject(p.Status) {
 			return false
 		}
+		if p.MileStones["Pilot End"] != "" {
+			return false
+		}
 		if before(max(p.MileStones["RollOut"], p.MileStones["GoLive"]), model.Today().AddDays(-14).StringJS()) {
+			return true
+		}
+		return false
+	}))
+	a.Rules = append(a.Rules, rule.NewRule("P2", "Monitored Project more than 1 week after Pilot End", func(p *fm.Project) bool {
+		if !business.MonitoredProject(p.Status) {
+			return false
+		}
+		pilotEndDate, found := p.MileStones["Pilot End"]
+		if !found {
+			return false
+		}
+		if before(pilotEndDate, model.Today().AddDays(-7).StringJS()) {
 			return true
 		}
 		return false

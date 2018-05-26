@@ -110,7 +110,8 @@ func (m *MainPageModel) ShowProjectAudit(p *fm.Project) {
 	for _, a := range p.Audits {
 		infos += a.Priority + " " + a.Title + "\n"
 	}
-	message.InfoStr(m.VM, infos, true)
+	message.SetDuration(tools.WarningMsgDuration)
+	message.InfoStr(m.VM, infos, false)
 }
 
 func (m *MainPageModel) ShowJiraStat() {
