@@ -256,11 +256,28 @@ pre {
     === Workload Schedule Modal style ===
  */
 .workload-schedule {
-    min-height: 400px;
-    max-height: 65vh;
+    height: 65vh;
 }
 
 .workload-schedule .el-aside {
     width: 30%;
     overflow: auto;
+}
+/*
+    === TimeLine Modal style ===
+ */
+.timeline {
+    height: 70vh;
+}
+
+.timeline .project-line {
+    display:inline-flex;
+    width: 100%;
+    margin: 0px 0px;
+    background-color: #50bfff;
+}
+
+.timeline .el-table .cell {
+    padding-top: 1px;
+    padding-bottom: 1px;
 }

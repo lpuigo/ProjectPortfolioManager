@@ -11,6 +11,7 @@ import (
 	"github.com/lpuig/novagile/src/client/hvue/comps/project_edit_modal"
 	"github.com/lpuig/novagile/src/client/hvue/comps/project_stat_modal"
 	"github.com/lpuig/novagile/src/client/hvue/comps/project_table"
+	"github.com/lpuig/novagile/src/client/hvue/comps/timeline_modal"
 	"github.com/lpuig/novagile/src/client/hvue/comps/workloadschedule_modal"
 	"github.com/lpuig/novagile/src/client/tools"
 	"github.com/lpuig/novagile/src/client/tools/json"
@@ -30,6 +31,7 @@ func main() {
 		hvue.Component("project-stat-modal", project_stat_modal.ComponentOptions()...),
 		hvue.Component("jira-stat-modal", jira_stat_modal.ComponentOptions()...),
 		hvue.Component("workloadschedule-modal", workloadschedule_modal.ComponentOptions()...),
+		hvue.Component("timeline-modal", timeline_modal.ComponentOptions()...),
 		hvue.DataS(mpm),
 		hvue.MethodsOf(mpm),
 		hvue.Mounted(func(vm *hvue.VM) {
@@ -122,10 +124,8 @@ func (m *MainPageModel) ShowWorkloadSchedule() {
 	m.VM.Refs("WorkloadSchedule").Call("Show")
 }
 
-func (m *MainPageModel) AuditProjects() {
-	for _, p := range m.Projects {
-		p.SetAuditResult(m.auditer.Audit(p))
-	}
+func (m *MainPageModel) ShowTimeLine() {
+	m.VM.Refs("TimeLine").Call("Show", timeline_modal.NewInfos(m.Projects))
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
