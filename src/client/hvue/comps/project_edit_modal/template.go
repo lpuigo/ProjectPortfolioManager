@@ -1,6 +1,6 @@
 package project_edit_modal
 
-const template = `
+const template string = `
 <el-dialog :visible.sync="visible" width="60%">
     <!--<span slot="title" class="dialog-header">-->
     <span slot="title" class="novagile">
@@ -10,11 +10,11 @@ const template = `
 	<el-row :gutter="15" class="form-row">
 		<el-col :span="12">
 			<span><strong>Client</strong></span>
-			<el-input placeholder="Client Name" v-model="currentProject.client"></el-input>
+			<el-input placeholder="Client Name" v-model.trim="currentProject.client"></el-input>
 		</el-col>	
 		<el-col :span="12">
 			<span><strong>Project Name</strong></span>
-			<el-input placeholder="Project Name" v-model="currentProject.name">
+			<el-input placeholder="Project Name" v-model.trim="currentProject.name">
 				<el-dropdown slot="prepend"	trigger="click" @command="SetClientName">
 					<el-button type="primary" :loading="clientNameLookup" @click="GetClientNameList">
 						<i class="fas fa-search icon--right"></i>
@@ -31,11 +31,11 @@ const template = `
 	<el-row :gutter="15" class="form-row">
 		<el-col :span="7">
 			<span><strong>PS Actor</strong></span>
-			<el-input placeholder="PS Name" v-model="currentProject.lead_ps"></el-input>
+			<el-input placeholder="PS Name" v-model.trim="currentProject.lead_ps"></el-input>
 		</el-col>	
 		<el-col :span="7">
 			<span><strong>Lead Dev</strong></span>
-			<el-input placeholder="Dev Name" v-model="currentProject.lead_dev"></el-input>
+			<el-input placeholder="Dev Name" v-model.trim="currentProject.lead_dev"></el-input>
 		</el-col>	
 		<el-col :span="6">
 			<span><strong>Project Type</strong></span>
@@ -62,7 +62,7 @@ const template = `
                     type="textarea" 
                     placeholder="Project comment" 
                     :autosize="{ minRows: 2, maxRows: 8}"
-                    v-model="currentProject.comment"
+                    v-model.lazy="currentProject.comment"
 					class="form-textarea"
             ></el-input>
 		</el-col>	
@@ -180,7 +180,7 @@ const template = `
             <el-button :disabled="isNewProject" type="info" plain icon="far fa-clone" @click="Duplicate"></el-button>
         </el-tooltip>
         <el-button @click="visible = false">Cancel</el-button>
-        <el-button :type="hasWarning" plain @click="ConfirmChange">
+        <el-button :type="hasWarning" :disabled="!hasChanged" plain @click="ConfirmChange">
         	<span v-if="!isNewProject">Confirm Change</span>
         	<span v-else>Create New</span>
         </el-button>

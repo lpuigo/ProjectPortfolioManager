@@ -64,10 +64,17 @@ func ComponentOptions() []hvue.ComponentOption {
 		//}),
 		hvue.Computed("hasWarning", func(vm *hvue.VM) interface{} {
 			m := &ProjectEditModalModel{Object: vm.Object}
-			if len(m.CurrentProject.Audits)>0 {
+			if len(m.CurrentProject.Audits) > 0 {
 				return "warning"
 			}
 			return "success"
+		}),
+		hvue.Computed("hasChanged", func(vm *hvue.VM) interface{} {
+			m := &ProjectEditModalModel{Object: vm.Object}
+			if m.EditedProject.Object == nil {
+				return true
+			}
+			return m.CurrentProject.String() != m.EditedProject.String()
 		}),
 	}
 }
@@ -90,7 +97,7 @@ type ProjectEditModalModel struct {
 	ClientNameList   []*fm.ValText `js:"clientNameList"`
 
 	DisplayInfos string `js:"displayedInfos"`
-	auditer       *auditrules.Auditer
+	auditer      *auditrules.Auditer
 
 	VM *hvue.VM `js:"VM"`
 }
@@ -213,4 +220,3 @@ func (pemm *ProjectEditModalModel) callClientNameList() {
 func (pemm *ProjectEditModalModel) AuditProject() {
 	pemm.CurrentProject.SetAuditResult(pemm.auditer.Audit(pemm.CurrentProject))
 }
-
