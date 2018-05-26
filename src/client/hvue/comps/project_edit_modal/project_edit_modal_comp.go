@@ -74,7 +74,7 @@ func ComponentOptions() []hvue.ComponentOption {
 			if m.EditedProject.Object == nil {
 				return true
 			}
-			return m.CurrentProject.String() != m.EditedProject.String()
+			return m.CurrentProject.SearchInString() != m.EditedProject.SearchInString()
 		}),
 	}
 }

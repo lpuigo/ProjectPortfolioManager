@@ -121,11 +121,17 @@ func DateString(v string) string {
 	return "-"
 }
 
-func (p *Project) searchInString() string {
+func (p *Project) SearchInString() string {
 	// HasStat is skipped on purpose
-	res := p.Client + "\n" + p.Name + "\n" + p.LeadPS + "\n" + p.LeadDev + "\n" + p.Status + "\n" + p.Type + "\n" + p.Comment + "\n"
-	for _, v := range p.MileStones {
-		res += DateString(v) + "\n"
+	res := "Client:" + p.Client + "\n"
+	res += "Name:" + p.Name + "\n"
+	res += "PS:" + p.LeadPS + "\n"
+	res += "Dev:" + p.LeadDev + "\n"
+	res += "Status:" + p.Status + "\n"
+	res += "Type:" + p.Type + "\n"
+	res += p.Comment + "\n"
+	for m, v := range p.MileStones {
+		res += m + ":" + DateString(v) + "\n"
 	}
 	return res
 }
@@ -134,7 +140,7 @@ func (p *Project) Contains(str string) bool {
 	if str == "" {
 		return true
 	}
-	return strings.Contains(strings.ToLower(p.searchInString()), strings.ToLower(str))
+	return strings.Contains(strings.ToLower(p.SearchInString()), strings.ToLower(str))
 }
 
 func (p *Project) RemoveMileStone(msName string) {
@@ -177,7 +183,7 @@ func CloneBEProject(p *model.Project, hasStat bool) *Project {
 	np.ForecastWL = p.ForecastWL
 	np.CurrentWL = p.CurrentWL
 	np.Comment = p.Comment
-	np.Audits = []*Audit{} // set to empty slide in order to force JS initialisation when unmarshalling
+	np.Audits = []*Audit{} // set to empty slice in order to force JS initialisation when unmarshalling
 	np.MileStones = make(map[string]string)
 	for m, d := range p.Situation.GetSituationToDate().MileStones {
 		np.MileStones[m] = d.StringJS()
