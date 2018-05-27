@@ -5,15 +5,19 @@ import (
 	"github.com/lpuig/novagile/src/client/tools"
 )
 
-type Phase struct {
+type TimeLine struct {
 	*js.Object
-	Name  string `js:"name"`
-	Style string `js:"style"`
+	Name   string   `js:"name"`
+	Phases []*Phase `js:"phase"`
 }
 
-func NewPhase(name string) *Phase {
-	p := &Phase{Object: tools.O()}
-	p.Name = name
-	p.Style = ""
-	return p
+func NewTimeLine(name string) *TimeLine {
+	t := &TimeLine{Object: tools.O()}
+	t.Name = name
+	t.Phases = []*Phase{}
+	return t
+}
+
+func (t *TimeLine) AddPhase(p *Phase) {
+	t.Phases = append(t.Phases, p)
 }
