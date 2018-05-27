@@ -32,7 +32,11 @@ const template string = `
             >
                 <template slot-scope="scope">
                     <div class="project-line">
-                        <div v-for="(d, m) in scope.row.milestones">{{m}}: {{d}}</div>
+                        <div 
+                                v-for="(d, m) in scope.row.milestones" 
+                                class="item" 
+                                style="margin-left: 3%; width: 10%"
+                        ></div>
                     </div>
                 </template>
             </el-table-column>

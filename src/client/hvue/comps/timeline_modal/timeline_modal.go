@@ -30,7 +30,8 @@ type TimeLineModalModel struct {
 	VM      *hvue.VM `js:"VM"`
 	Visible bool     `js:"visible"`
 
-	Projects []*fm.Project `js:"projects"`
+	Projects  []*fm.Project `js:"projects"`
+	TimeLines []*TimeLine   `js:"timelines"`
 }
 
 func NewTimeLineModalModel(vm *hvue.VM) *TimeLineModalModel {
@@ -71,3 +72,6 @@ func (tlmm *TimeLineModalModel) Hide() {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Others
+func (tlmm *TimeLineModalModel) GetPhases(p *fm.Project) []*TimeLine {
+
+}
