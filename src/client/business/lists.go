@@ -87,6 +87,14 @@ func GoLiveMilestoneKeys() []string {
 	}
 }
 
+func LeadProject(status string) bool {
+	switch status {
+	case "1 - Candidate", "2 - Outlining":
+		return true
+	}
+	return false
+}
+
 func InactiveProject(status string) bool {
 	switch status {
 	case "0 - Lost", "6 - Done":

@@ -3,6 +3,7 @@ package timeline_modal
 import (
 	"github.com/gopherjs/gopherjs/js"
 	"github.com/huckridgesw/hvue"
+	"github.com/lpuig/novagile/src/client/business"
 	fm "github.com/lpuig/novagile/src/client/frontmodel"
 	"github.com/lpuig/novagile/src/client/tools"
 	"github.com/lpuig/novagile/src/client/tools/dates"
@@ -44,6 +45,7 @@ func NewTimeLineModalModel(vm *hvue.VM) *TimeLineModalModel {
 	tlmm.VM = vm
 	tlmm.Visible = false
 	tlmm.Projects = nil
+	tlmm.TimeLines = nil
 	tlmm.BeginDate = ""
 	tlmm.EndDate = ""
 	tlmm.SlotLength = 0
@@ -69,7 +71,7 @@ func NewInfos(prjs []*fm.Project) *Infos {
 func (tlmm *TimeLineModalModel) Show(infos *Infos) {
 	tlmm.Projects = infos.Projects
 	tlmm.SetTimePeriod("2018-01-01", "2018-12-31")
-
+	tlmm.CalcTimeLines()
 	//go tlmm.callGetProjectStat()
 	tlmm.Visible = true
 }
@@ -88,9 +90,20 @@ func (tlmm *TimeLineModalModel) SetTimePeriod(beg, end string) {
 	tlmm.SlotLength = date.NbDaysBetween(beg, end)
 }
 
+func (tlmm *TimeLineModalModel) CalcTimeLines() {
+	tlmm.TimeLines = []*TimeLine{}
+	for _, p := range tlmm.Projects {
+		t := tlmm.GetTimeLineFrom(p)
+		if t == nil {
+			continue
+		}
+		tlmm.TimeLines = append(tlmm.TimeLines, t)
+	}
+}
+
 func (tlmm *TimeLineModalModel) DateOffset(d string) float64 {
 	do := date.NbDaysBetween(tlmm.BeginDate, d)
-	return do / tlmm.SlotLength
+	return do / tlmm.SlotLength * 100
 }
 
 func (tlmm *TimeLineModalModel) IsInSlot(beg, end string) bool {
@@ -98,11 +111,15 @@ func (tlmm *TimeLineModalModel) IsInSlot(beg, end string) bool {
 }
 
 func (tlmm *TimeLineModalModel) Length(beg, end string) float64 {
-	return date.NbDaysBetween(beg, end) / tlmm.SlotLength
+	//if beg < tlmm.BeginDate {
+	//	beg = tlmm.BeginDate
+	//}
+	return date.NbDaysBetween(beg, end) / tlmm.SlotLength * 100
 }
 
 func (tlmm *TimeLineModalModel) GetTimeLineFrom(p *fm.Project) *TimeLine {
 	t := NewTimeLine(p.Client + " - " + p.Name)
+	t.MileStones = p.MileStones
 
 	kickoffDate, kickoffFound := p.MileStones["Kickoff"]
 	outlineDate, outlineFound := p.MileStones["Outline"]
@@ -111,6 +128,27 @@ func (tlmm *TimeLineModalModel) GetTimeLineFrom(p *fm.Project) *TimeLine {
 	rolloutDate, rolloutFound := p.MileStones["RollOut"]
 	goliveDate, goliveFound := p.MileStones["GoLive"]
 	pilotendDate, pilotendFound := p.MileStones["Pilot End"]
+
+	lastStylePhase := func() {
+		nbPhase := len(t.Phases)
+		if nbPhase >= 1 {
+			t.Phases[nbPhase-1].Name += " last"
+		}
+	}
+
+	className := func(phaseName string, isFirst bool) string {
+		res := phaseName
+		if isFirst {
+			res += " first"
+		}
+		if business.InactiveProject(p.Status) {
+			res += " done"
+		}
+		if business.LeadProject(p.Status) {
+			res += " lead"
+		}
+		return res
+	}
 
 	if !(kickoffFound || outlineFound || uatFound || trainingFound || rolloutFound || goliveFound || pilotendFound) {
 		return nil
@@ -121,8 +159,8 @@ func (tlmm *TimeLineModalModel) GetTimeLineFrom(p *fm.Project) *TimeLine {
 		return nil
 	}
 	firstPhase := true
-	if kickoffFound && outlineFound && tlmm.IsInSlot(kickoffDate, outlineDate) {
-		p := NewPhase("study")
+	if kickoffFound && outlineFound && tlmm.IsInSlot(kickoffDate, outlineDate) && kickoffDate != outlineDate {
+		p := NewPhase(className("study", true))
 		p.SetStyle(tlmm.DateOffset(kickoffDate), tlmm.Length(kickoffDate, outlineDate))
 		t.AddPhase(p)
 		firstPhase = false
@@ -130,11 +168,17 @@ func (tlmm *TimeLineModalModel) GetTimeLineFrom(p *fm.Project) *TimeLine {
 	if kickoffFound && !outlineFound {
 		outlineDate = kickoffDate
 	}
+	if uatFound && !outlineFound {
+		outlineDate = uatDate
+	}
+	if trainingFound && !outlineFound {
+		outlineDate = trainingDate
+	}
 	if goliveFound && !rolloutFound {
 		rolloutDate = goliveDate
 	}
-	if outlineDate != "" && rolloutDate != "" && tlmm.IsInSlot(outlineDate, rolloutDate) {
-		p := NewPhase("real")
+	if outlineDate != "" && rolloutDate != "" && tlmm.IsInSlot(outlineDate, rolloutDate) && outlineDate != rolloutDate {
+		p := NewPhase(className("real", true))
 		offset := 0.0
 		if firstPhase {
 			offset = tlmm.DateOffset(outlineDate)
@@ -143,8 +187,8 @@ func (tlmm *TimeLineModalModel) GetTimeLineFrom(p *fm.Project) *TimeLine {
 		t.AddPhase(p)
 		firstPhase = false
 	}
-	if rolloutFound && goliveFound && tlmm.IsInSlot(rolloutDate, goliveDate) {
-		p := NewPhase("service")
+	if rolloutFound && goliveFound && tlmm.IsInSlot(rolloutDate, goliveDate) && rolloutDate != goliveDate {
+		p := NewPhase(className("service", firstPhase))
 		offset := 0.0
 		if firstPhase {
 			offset = tlmm.DateOffset(rolloutDate)
@@ -156,8 +200,9 @@ func (tlmm *TimeLineModalModel) GetTimeLineFrom(p *fm.Project) *TimeLine {
 	if rolloutFound && !goliveFound {
 		goliveDate = rolloutDate
 	}
-	if goliveDate != "" && pilotendFound && tlmm.IsInSlot(goliveDate, pilotendDate) {
-		p := NewPhase("real")
+	if goliveDate != "" && pilotendFound && tlmm.IsInSlot(goliveDate, pilotendDate) && goliveDate != pilotendDate {
+		lastStylePhase()
+		p := NewPhase(className("pilot", firstPhase))
 		offset := 0.0
 		if firstPhase {
 			offset = tlmm.DateOffset(goliveDate)
@@ -166,6 +211,8 @@ func (tlmm *TimeLineModalModel) GetTimeLineFrom(p *fm.Project) *TimeLine {
 		t.AddPhase(p)
 		firstPhase = false
 	}
+
+	lastStylePhase()
 
 	return t
 }

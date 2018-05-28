@@ -12,7 +12,7 @@ const template string = `
 
     <div class="timeline">
         <el-table
-                :data="projects"
+                :data="timelines"
                 :default-sort="{prop: 'id', order: 'ascending'}"
                 height="100%"
                 :border="false"
@@ -23,7 +23,7 @@ const template string = `
                     sortable    :sort-by="['milestones.RollOut', 'milestones.GoLive', 'milestones.UAT', 'milestones.Outline', 'milestones.Kickoff', 'client', 'name']"
             >
                 <template slot-scope="scope">
-                    <span>{{scope.row.client}} - {{scope.row.name}}</span>
+                    <span>{{scope.row.name}}</span>
                 </template>
             </el-table-column>
 
@@ -33,9 +33,9 @@ const template string = `
                 <template slot-scope="scope">
                     <div class="project-line">
                         <div 
-                                v-for="(d, m) in scope.row.milestones" 
-                                class="item" 
-                                style="margin-left: 3%; width: 10%"
+                                v-for="p in scope.row.phases" 
+                                class="item" :class="p.name"
+                                :style="p.style"
                         ></div>
                     </div>
                 </template>

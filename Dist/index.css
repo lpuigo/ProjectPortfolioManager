@@ -294,3 +294,59 @@ pre {
     /*text-align: center;*/
     background-color: #DB2828;
 }
+
+
+.item.first {
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+.item.last {
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+
+.item.study {
+    height: 50%;
+    background-color: #9fe3e3;
+}
+.item.study.lead {
+    background-color: #f0e8a5;
+}
+.item.study.done {
+    background-color: #e3e3e3;
+}
+
+
+.item.real {
+    background-color: #4abbbd;
+}
+.item.real.lead {
+    background-color: #ded159;
+}
+.item.real.done {
+    background-color: #bdbdbd;
+}
+
+
+.item.service {
+    background-color: #9fe3e3;
+}
+.item.service.lead {
+    background-color: #f0e8a5;
+}
+.item.service.done {
+    background-color: #e3e3e3;
+}
+
+
+.item.pilot {
+    height: 50%;
+    background-color: #9fe3e3;
+}
+.item.pilot.lead {
+    background-color: #f0e8a5;
+}
+.item.pilot.done {
+    background-color: #e3e3e3;
+}

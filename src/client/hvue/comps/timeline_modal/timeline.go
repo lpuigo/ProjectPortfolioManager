@@ -7,14 +7,16 @@ import (
 
 type TimeLine struct {
 	*js.Object
-	Name   string   `js:"name"`
-	Phases []*Phase `js:"phase"`
+	Name       string            `js:"name"`
+	Phases     []*Phase          `js:"phases"`
+	MileStones map[string]string `js:"milestones"`
 }
 
 func NewTimeLine(name string) *TimeLine {
 	t := &TimeLine{Object: tools.O()}
 	t.Name = name
 	t.Phases = []*Phase{}
+	t.MileStones = map[string]string{}
 	return t
 }
 

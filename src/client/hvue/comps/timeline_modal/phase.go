@@ -21,7 +21,7 @@ func NewPhase(name string) *Phase {
 
 func (p *Phase) SetStyle(offset, length float64) {
 	s := ""
-	if offset > 0 {
+	if offset != 0 {
 		s += "margin-left: " + strconv.FormatFloat(offset, 'f', 1, 64) + "%; "
 	}
 	s += "width: " + strconv.FormatFloat(length, 'f', 1, 64) + "%"
