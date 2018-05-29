@@ -37,3 +37,8 @@ func MinMax(date ...string) (min, max string) {
 	}
 	return
 }
+
+func TodayAfter(d int) string {
+	t := time.Now().Truncate(24 * time.Hour).Add(time.Duration(d * 24) * time.Hour)
+	return t.Format(TimeJSLayout)
+}

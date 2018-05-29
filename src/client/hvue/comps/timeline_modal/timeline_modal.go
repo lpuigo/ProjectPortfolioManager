@@ -38,6 +38,7 @@ type TimeLineModalModel struct {
 	BeginDate  string  `js:"beginDate"`
 	EndDate    string  `js:"endDate"`
 	SlotLength float64 `js:"slotLength"`
+	SlotType   string  `js:"slotType"`
 }
 
 func NewTimeLineModalModel(vm *hvue.VM) *TimeLineModalModel {
@@ -49,6 +50,7 @@ func NewTimeLineModalModel(vm *hvue.VM) *TimeLineModalModel {
 	tlmm.BeginDate = ""
 	tlmm.EndDate = ""
 	tlmm.SlotLength = 0
+	tlmm.SlotType = "2Q"
 
 	return tlmm
 }
@@ -70,17 +72,43 @@ func NewInfos(prjs []*fm.Project) *Infos {
 
 func (tlmm *TimeLineModalModel) Show(infos *Infos) {
 	tlmm.Projects = infos.Projects
-	tlmm.SetTimePeriod("2018-01-01", "2018-12-31")
-	tlmm.CalcTimeLines(func(p *fm.Project) bool {
-		return p.Name == "Run"
-	})
-	//go tlmm.callGetProjectStat()
+	//tlmm.SetTimePeriod("2018-01-01", "2018-12-31")
+	tlmm.HandleSlotType(tlmm.SlotType)
+
 	tlmm.Visible = true
 }
 
 func (tlmm *TimeLineModalModel) Hide() {
 	tlmm.Visible = false
 	tlmm.Projects = nil
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// SlotType methods
+
+func (tlmm *TimeLineModalModel) HandleSlotType(slotType string) {
+	tlmm.SlotType = slotType
+	tlmm.setSlotDates()
+	tlmm.CalcTimeLines(func(p *fm.Project) bool {
+		return p.Name == "Run"
+	})
+}
+
+func (tlmm *TimeLineModalModel) setSlotDates() {
+	var halfPeriodLength int
+	switch tlmm.SlotType {
+	case "4Q":
+		halfPeriodLength = 182
+	case "2Q":
+		halfPeriodLength = 91
+	default:
+		halfPeriodLength = 46
+	}
+
+	tlmm.SetTimePeriod(
+		date.TodayAfter(-halfPeriodLength),
+		date.TodayAfter(halfPeriodLength+1),
+	)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -93,7 +121,7 @@ func (tlmm *TimeLineModalModel) SetTimePeriod(beg, end string) {
 }
 
 func (tlmm *TimeLineModalModel) CalcTimeLines(exclude func(*fm.Project) bool) {
-	tlmm.TimeLines = []*TimeLine{}
+	timelines := []*TimeLine{}
 	for _, p := range tlmm.Projects {
 		if exclude(p) {
 			continue
@@ -102,8 +130,9 @@ func (tlmm *TimeLineModalModel) CalcTimeLines(exclude func(*fm.Project) bool) {
 		if t == nil {
 			continue
 		}
-		tlmm.TimeLines = append(tlmm.TimeLines, t)
+		timelines = append(timelines, t)
 	}
+	tlmm.TimeLines = timelines
 }
 
 func (tlmm *TimeLineModalModel) DateOffset(d string) float64 {
