@@ -71,7 +71,9 @@ func NewInfos(prjs []*fm.Project) *Infos {
 func (tlmm *TimeLineModalModel) Show(infos *Infos) {
 	tlmm.Projects = infos.Projects
 	tlmm.SetTimePeriod("2018-01-01", "2018-12-31")
-	tlmm.CalcTimeLines()
+	tlmm.CalcTimeLines(func(p *fm.Project) bool {
+		return p.Name == "Run"
+	})
 	//go tlmm.callGetProjectStat()
 	tlmm.Visible = true
 }
@@ -90,9 +92,12 @@ func (tlmm *TimeLineModalModel) SetTimePeriod(beg, end string) {
 	tlmm.SlotLength = date.NbDaysBetween(beg, end)
 }
 
-func (tlmm *TimeLineModalModel) CalcTimeLines() {
+func (tlmm *TimeLineModalModel) CalcTimeLines(exclude func(*fm.Project) bool) {
 	tlmm.TimeLines = []*TimeLine{}
 	for _, p := range tlmm.Projects {
+		if exclude(p) {
+			continue
+		}
 		t := tlmm.GetTimeLineFrom(p)
 		if t == nil {
 			continue

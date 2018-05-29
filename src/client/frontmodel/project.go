@@ -128,6 +128,7 @@ func (p *Project) SearchInString() string {
 	res += "PS:" + p.LeadPS + "\n"
 	res += "Dev:" + p.LeadDev + "\n"
 	res += "Status:" + p.Status + "\n"
+	res += "Risk:" + p.Risk + "\n"
 	res += "Type:" + p.Type + "\n"
 	res += p.Comment + "\n"
 	for m, v := range p.MileStones {

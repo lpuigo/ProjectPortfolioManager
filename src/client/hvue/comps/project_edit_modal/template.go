@@ -75,7 +75,7 @@ const template string = `
                     <template slot="title">
                         <span><strong><i class="fas fa-info-circle icon--left"></i>Project warning message(s): {{currentProject.audits.length}}</strong></span>
                     </template>
-                    <span v-for="(a, index) in currentProject.audits" :key="index">{{a.priority}} - {{a.title}}</span>
+                    <div v-for="(a, index) in currentProject.audits" :key="index">{{a.priority}} - {{a.title}}</div>
                 </el-collapse-item>
             </el-collapse>
 		</el-col>	

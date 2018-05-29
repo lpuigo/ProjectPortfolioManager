@@ -13,14 +13,15 @@ const template string = `
     <div class="timeline">
         <el-table
                 :data="timelines"
-                :default-sort="{prop: 'id', order: 'ascending'}"
+                :default-sort="{prop: 'milestones', order: 'ascending'}"
                 height="100%"
                 :border="false"
                 size="mini"
+				highlight-current-row
         >
             <el-table-column
-                    label="Project" prop="id" width="240px" :show-overflow-tooltip=true
-                    sortable    :sort-by="['milestones.RollOut', 'milestones.GoLive', 'milestones.UAT', 'milestones.Outline', 'milestones.Kickoff', 'client', 'name']"
+                    label="Project" prop="name" width="240px" :show-overflow-tooltip=true
+					sortable
             >
                 <template slot-scope="scope">
                     <span>{{scope.row.name}}</span>
@@ -28,7 +29,8 @@ const template string = `
             </el-table-column>
 
             <el-table-column
-                    label="Phases" 
+                    label="Phases" prop="milestones" 
+                    sortable    :sort-by="['milestones.RollOut', 'milestones.GoLive', 'milestones.UAT', 'milestones.Outline', 'milestones.Kickoff', 'name']"
             >
                 <template slot-scope="scope">
                     <div class="project-line">
