@@ -189,7 +189,7 @@ func (tlmm *TimeLineModalModel) GetTimeLineFrom(p *fm.Project) *TimeLine {
 	}
 
 	pBeg, pEnd := date.MinMax(kickoffDate, outlineDate, uatDate, trainingDate, rolloutDate, goliveDate, pilotendDate)
-	if !tlmm.IsInSlot(pBeg, pEnd) {
+	if pBeg == pEnd || !tlmm.IsInSlot(pBeg, pEnd) {
 		return nil
 	}
 	firstPhase := true
@@ -199,14 +199,14 @@ func (tlmm *TimeLineModalModel) GetTimeLineFrom(p *fm.Project) *TimeLine {
 		t.AddPhase(p)
 		firstPhase = false
 	}
-	if kickoffFound && !outlineFound {
-		outlineDate = kickoffDate
+	if trainingFound && !outlineFound {
+		outlineDate = trainingDate
 	}
 	if uatFound && !outlineFound {
 		outlineDate = uatDate
 	}
-	if trainingFound && !outlineFound {
-		outlineDate = trainingDate
+	if kickoffFound && !outlineFound {
+		outlineDate = kickoffDate
 	}
 	if goliveFound && !rolloutFound {
 		rolloutDate = goliveDate
