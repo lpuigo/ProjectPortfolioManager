@@ -1,3 +1,3 @@
-# Novagile
+# Project Portfolio Manager
 
-This is a local website server dedicated to project portfolio management
+This is a website server dedicated to project portfolio management
