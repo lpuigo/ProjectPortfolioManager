@@ -4,6 +4,8 @@ Dist/*.js.map
 Dist/Element/*.js
 Dist/Element/*.js.map
 Ressources/*
+config.json
+*.log
 *.exe
 src/server/migratedata/*.json
 src/server/migratedata/*.translated
