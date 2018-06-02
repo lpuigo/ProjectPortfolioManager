@@ -5,3 +5,5 @@ Dist/Element/*.js
 Dist/Element/*.js.map
 Ressources/*
 *.exe
+src/server/migratedata/*.json
+src/server/migratedata/*.translated
