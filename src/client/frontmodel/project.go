@@ -130,6 +130,7 @@ func (p *Project) SearchInString() string {
 	res += "Status:" + p.Status + "\n"
 	res += "Risk:" + p.Risk + "\n"
 	res += "Type:" + p.Type + "\n"
+	res += "EWL:" + strconv.FormatFloat(p.ForecastWL, 'f', 1, 64) + "\n"
 	res += p.Comment + "\n"
 	for m, v := range p.MileStones {
 		res += m + ":" + DateString(v) + "\n"
