@@ -2,8 +2,8 @@ package manager
 
 import (
 	"fmt"
-	"github.com/lpuig/novagile/src/server/manager/datamanager"
-	"github.com/lpuig/novagile/src/server/manager/recordset"
+	"github.com/lpuig/prjptf/src/server/manager/datamanager"
+	"github.com/lpuig/prjptf/src/server/manager/recordset"
 	"os"
 	"sort"
 	"strings"

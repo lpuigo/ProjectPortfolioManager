@@ -2,7 +2,7 @@ package node
 
 import (
 	"github.com/gopherjs/gopherjs/js"
-	"github.com/lpuig/novagile/src/client/tools"
+	"github.com/lpuig/prjptf/src/client/tools"
 )
 
 var id int

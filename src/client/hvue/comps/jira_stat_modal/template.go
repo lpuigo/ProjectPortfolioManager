@@ -6,7 +6,7 @@ const template = `
 		width="70%"
 		:before-close="Hide"
 >
-    <span slot="title" class="novagile">
+    <span slot="title" class="prjptf">
         <h2 style="margin: 0 0"><i class="fas fa-indent icon--left"></i>Jira Stats</h2>
     </span>
 

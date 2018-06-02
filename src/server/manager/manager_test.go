@@ -3,7 +3,7 @@ package manager
 import (
 	"bytes"
 	"fmt"
-	"github.com/lpuig/novagile/src/server/manager/fileprocesser"
+	"github.com/lpuig/prjptf/src/server/manager/fileprocesser"
 	"os"
 	"runtime/pprof"
 	"testing"
@@ -12,7 +12,7 @@ import (
 
 const (
 	prjfile = `C:\Users\Laurent\Golang\src\github.com\lpuig\novagile\Ressources\Projets Novagile.xlsx.json`
-	//StatFile = `C:\Users\Laurent\Google Drive\Golang\src\github.com\lpuig\novagile\Ressources\Test Stats Projets Novagile.json`
+	//StatFile = `C:\Users\Laurent\Google Drive\Golang\src\github.com\lpuig\prjptf\Ressources\Test Stats Projets Novagile.json`
 	csvfile = `C:\Users\Laurent\Golang\src\github.com\lpuig\novagile\Ressources\export Jira\extract 2018-01-03.csv`
 
 	PrdStatFile        = `C:\Users\Laurent\Golang\src\github.com\lpuig\novagile\Ressources\Stats Projets Novagile.csv`

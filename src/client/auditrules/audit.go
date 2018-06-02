@@ -1,10 +1,10 @@
 package auditrules
 
 import (
-	"github.com/lpuig/novagile/src/client/auditrules/rule"
-	"github.com/lpuig/novagile/src/client/business"
-	fm "github.com/lpuig/novagile/src/client/frontmodel"
-	"github.com/lpuig/novagile/src/server/model"
+	"github.com/lpuig/prjptf/src/client/auditrules/rule"
+	"github.com/lpuig/prjptf/src/client/business"
+	fm "github.com/lpuig/prjptf/src/client/frontmodel"
+	"github.com/lpuig/prjptf/src/server/model"
 )
 
 type Auditer struct {

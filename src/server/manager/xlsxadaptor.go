@@ -3,7 +3,7 @@ package manager
 import (
 	"errors"
 	"fmt"
-	"github.com/lpuig/novagile/src/server/model"
+	"github.com/lpuig/prjptf/src/server/model"
 	"github.com/tealeg/xlsx"
 	"io"
 )

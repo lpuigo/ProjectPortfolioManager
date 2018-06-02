@@ -12,7 +12,7 @@ import (
 
 
 
-rs "github.com/lpuig/novagile/src/server/manager/recordset"
+rs "github.com/lpuig/prjptf/src/server/manager/recordset"
 
 
 

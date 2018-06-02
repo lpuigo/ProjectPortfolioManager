@@ -2,9 +2,9 @@ package manager
 
 import (
 	"fmt"
-	"github.com/lpuig/novagile/src/server/manager/datamanager"
-	ris "github.com/lpuig/novagile/src/server/manager/recordindexedset"
-	"github.com/lpuig/novagile/src/server/model"
+	"github.com/lpuig/prjptf/src/server/manager/datamanager"
+	ris "github.com/lpuig/prjptf/src/server/manager/recordindexedset"
+	"github.com/lpuig/prjptf/src/server/model"
 	"github.com/xrash/smetrics"
 	"io"
 	"log"

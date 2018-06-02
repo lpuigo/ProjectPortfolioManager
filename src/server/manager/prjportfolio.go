@@ -2,8 +2,8 @@ package manager
 
 import (
 	"encoding/json"
-	"github.com/lpuig/novagile/src/server/model"
-	"github.com/lpuig/novagile/src/server/model/idindex"
+	"github.com/lpuig/prjptf/src/server/model"
+	"github.com/lpuig/prjptf/src/server/model/idindex"
 	"os"
 )
 

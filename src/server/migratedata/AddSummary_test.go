@@ -1,7 +1,7 @@
 package migratedata
 
 import (
-	ris "github.com/lpuig/novagile/src/server/manager/recordindexedset"
+	ris "github.com/lpuig/prjptf/src/server/manager/recordindexedset"
 	"io"
 	"os"
 	"path/filepath"

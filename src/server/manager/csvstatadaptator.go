@@ -3,8 +3,8 @@ package manager
 import (
 	"encoding/csv"
 	"fmt"
-	fw "github.com/lpuig/novagile/src/server/manager/filewarnings"
-	"github.com/lpuig/novagile/src/server/model"
+	fw "github.com/lpuig/prjptf/src/server/manager/filewarnings"
+	"github.com/lpuig/prjptf/src/server/model"
 	"io"
 	"os"
 	"strconv"

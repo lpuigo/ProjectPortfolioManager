@@ -1,6 +1,6 @@
 package business
 
-import fm "github.com/lpuig/novagile/src/client/frontmodel"
+import fm "github.com/lpuig/prjptf/src/client/frontmodel"
 
 func CreateStatuts() []*fm.ValText {
 	res := []*fm.ValText{}

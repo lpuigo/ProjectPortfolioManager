@@ -1,7 +1,7 @@
 package manager
 
 import (
-	"github.com/lpuig/novagile/src/server/model"
+	"github.com/lpuig/prjptf/src/server/model"
 	"sort"
 	"strings"
 )

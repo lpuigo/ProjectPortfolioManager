@@ -1,6 +1,6 @@
 package hourstree
 
-import "github.com/lpuig/novagile/src/client/hvue/comps/jira_stat_modal/node"
+import "github.com/lpuig/prjptf/src/client/hvue/comps/jira_stat_modal/node"
 
 type Node struct {
 	*node.Node

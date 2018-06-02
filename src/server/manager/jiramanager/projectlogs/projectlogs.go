@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	jsr "github.com/lpuig/novagile/src/client/frontmodel/jirastatrecord"
+	jsr "github.com/lpuig/prjptf/src/client/frontmodel/jirastatrecord"
 )
 
 func Request(db *sql.DB) (jplrs []*jsr.JiraProjectLogRecord, err error) {

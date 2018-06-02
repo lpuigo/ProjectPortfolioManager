@@ -1,7 +1,7 @@
 package manager
 
 import (
-	"github.com/lpuig/novagile/src/server/manager/datamanager"
+	"github.com/lpuig/prjptf/src/server/manager/datamanager"
 	"log"
 )
 

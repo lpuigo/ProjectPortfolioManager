@@ -6,7 +6,7 @@ const template string = `
 		width="80%"
 		:before-close="Hide"
 >
-    <span slot="title" class="novagile">
+    <span slot="title" class="prjptf">
         <h2 style="margin: 0 0"><i class="fas fa-stream icon--left"></i>Projects Time Line</h2>
     </span>
 

@@ -3,10 +3,10 @@ package timeline_modal
 import (
 	"github.com/gopherjs/gopherjs/js"
 	"github.com/huckridgesw/hvue"
-	"github.com/lpuig/novagile/src/client/business"
-	fm "github.com/lpuig/novagile/src/client/frontmodel"
-	"github.com/lpuig/novagile/src/client/tools"
-	"github.com/lpuig/novagile/src/client/tools/dates"
+	"github.com/lpuig/prjptf/src/client/business"
+	fm "github.com/lpuig/prjptf/src/client/frontmodel"
+	"github.com/lpuig/prjptf/src/client/tools"
+	"github.com/lpuig/prjptf/src/client/tools/dates"
 )
 
 func Register() {

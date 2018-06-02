@@ -2,7 +2,7 @@ package model
 
 import (
 	"fmt"
-	"github.com/lpuig/novagile/src/server/model/stats"
+	"github.com/lpuig/prjptf/src/server/model/stats"
 	"sort"
 )
 

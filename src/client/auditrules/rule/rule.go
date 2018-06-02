@@ -1,7 +1,7 @@
 package rule
 
 import (
-	fm "github.com/lpuig/novagile/src/client/frontmodel"
+	fm "github.com/lpuig/prjptf/src/client/frontmodel"
 )
 
 type Rule struct {

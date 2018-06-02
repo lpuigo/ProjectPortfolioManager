@@ -3,7 +3,7 @@ package migratedata
 import (
 	"archive/zip"
 	"fmt"
-	ris "github.com/lpuig/novagile/src/server/manager/recordindexedset"
+	ris "github.com/lpuig/prjptf/src/server/manager/recordindexedset"
 	"io"
 	"io/ioutil"
 	"strings"

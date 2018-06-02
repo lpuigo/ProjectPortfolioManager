@@ -6,7 +6,7 @@ const template = `
 		width="60%"
 		:before-close="Hide"
 >
-    <span slot="title" class="novagile">
+    <span slot="title" class="prjptf">
         <h2 v-if="project" style="margin: 0 0">
             <i class="fas fa-chart-line icon--left"></i>Project: <span style="color: teal">{{project.client}} - {{project.name}}</span>
         </h2>

@@ -5,11 +5,11 @@ import (
 
 	"github.com/gopherjs/gopherjs/js"
 	"github.com/huckridgesw/hvue"
-	jsn "github.com/lpuig/novagile/src/client/frontmodel/jirastatrecord"
-	"github.com/lpuig/novagile/src/client/goel/message"
-	"github.com/lpuig/novagile/src/client/hvue/comps/jira_stat_modal/hourstree"
-	"github.com/lpuig/novagile/src/client/hvue/comps/jira_stat_modal/projecttree"
-	"github.com/lpuig/novagile/src/client/tools"
+	jsn "github.com/lpuig/prjptf/src/client/frontmodel/jirastatrecord"
+	"github.com/lpuig/prjptf/src/client/goel/message"
+	"github.com/lpuig/prjptf/src/client/hvue/comps/jira_stat_modal/hourstree"
+	"github.com/lpuig/prjptf/src/client/hvue/comps/jira_stat_modal/projecttree"
+	"github.com/lpuig/prjptf/src/client/tools"
 	"honnef.co/go/js/xhr"
 )
 

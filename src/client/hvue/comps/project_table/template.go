@@ -14,7 +14,7 @@ package project_table
 const template = `
 <el-table
     :data="filteredProjects"
-	header-row-class-name="novagile-light"
+	header-row-class-name="prjptf-light"
     :row-class-name="TableRowClassName"
 	:default-sort = "{prop: 'client', order: 'ascending'}"
     @current-change="SetSelectedProject"

@@ -2,8 +2,8 @@ package selectiontree
 
 import (
 	"github.com/gopherjs/gopherjs/js"
-	wsr "github.com/lpuig/novagile/src/client/frontmodel/workloadschedulerecord"
-	"github.com/lpuig/novagile/src/client/tools"
+	wsr "github.com/lpuig/prjptf/src/client/frontmodel/workloadschedulerecord"
+	"github.com/lpuig/prjptf/src/client/tools"
 )
 
 var id int

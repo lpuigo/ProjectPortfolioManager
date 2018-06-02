@@ -2,8 +2,8 @@ package project_stat_modal
 
 import (
 	"github.com/gopherjs/gopherjs/js"
-	fm "github.com/lpuig/novagile/src/client/frontmodel"
-	"github.com/lpuig/novagile/src/client/tools"
+	fm "github.com/lpuig/prjptf/src/client/frontmodel"
+	"github.com/lpuig/prjptf/src/client/tools"
 )
 
 type IssueInfo struct {

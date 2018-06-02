@@ -3,8 +3,8 @@ package hourstree
 import (
 	"github.com/gopherjs/gopherjs/js"
 	"github.com/huckridgesw/hvue"
-	"github.com/lpuig/novagile/src/client/hvue/comps/jira_stat_modal/hoursrow"
-	"github.com/lpuig/novagile/src/client/tools"
+	"github.com/lpuig/prjptf/src/client/hvue/comps/jira_stat_modal/hoursrow"
+	"github.com/lpuig/prjptf/src/client/tools"
 )
 
 const template = `

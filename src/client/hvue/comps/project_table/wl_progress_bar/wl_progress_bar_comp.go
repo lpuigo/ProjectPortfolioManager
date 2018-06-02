@@ -3,8 +3,8 @@ package wl_progress_bar
 import (
 	"github.com/gopherjs/gopherjs/js"
 	"github.com/huckridgesw/hvue"
-	fm "github.com/lpuig/novagile/src/client/frontmodel"
-	"github.com/lpuig/novagile/src/client/tools"
+	fm "github.com/lpuig/prjptf/src/client/frontmodel"
+	"github.com/lpuig/prjptf/src/client/tools"
 	"strconv"
 )
 

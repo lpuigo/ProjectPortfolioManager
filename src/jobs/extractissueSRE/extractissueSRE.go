@@ -8,8 +8,8 @@ import (
 
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/lpuig/novagile/src/server/logger"
-	"github.com/lpuig/novagile/src/server/manager/config"
+	"github.com/lpuig/prjptf/src/server/logger"
+	"github.com/lpuig/prjptf/src/server/manager/config"
 	"io/ioutil"
 	"net/http"
 	"path"

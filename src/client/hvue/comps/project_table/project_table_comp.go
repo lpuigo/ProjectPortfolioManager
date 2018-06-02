@@ -3,9 +3,9 @@ package project_table
 import (
 	"github.com/gopherjs/gopherjs/js"
 	"github.com/huckridgesw/hvue"
-	fm "github.com/lpuig/novagile/src/client/frontmodel"
-	"github.com/lpuig/novagile/src/client/hvue/comps/project_table/wl_progress_bar"
-	"github.com/lpuig/novagile/src/client/tools"
+	fm "github.com/lpuig/prjptf/src/client/frontmodel"
+	"github.com/lpuig/prjptf/src/client/hvue/comps/project_table/wl_progress_bar"
+	"github.com/lpuig/prjptf/src/client/tools"
 	"sort"
 	"strconv"
 )

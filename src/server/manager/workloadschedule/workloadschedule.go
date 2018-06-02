@@ -1,9 +1,9 @@
 package workloadschedule
 
 import (
-	"github.com/lpuig/novagile/src/client/business"
-	wsr "github.com/lpuig/novagile/src/client/frontmodel/workloadschedulerecord"
-	"github.com/lpuig/novagile/src/server/model"
+	"github.com/lpuig/prjptf/src/client/business"
+	wsr "github.com/lpuig/prjptf/src/client/frontmodel/workloadschedulerecord"
+	"github.com/lpuig/prjptf/src/server/model"
 )
 
 func Calc(prjs []*model.Project) *wsr.WorkloadSchedule {

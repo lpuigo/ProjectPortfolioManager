@@ -3,7 +3,7 @@ package bars_chart
 import (
 	"github.com/gopherjs/gopherjs/js"
 	"github.com/huckridgesw/hvue"
-	"github.com/lpuig/novagile/src/client/tools"
+	"github.com/lpuig/prjptf/src/client/tools"
 )
 
 func Register() {

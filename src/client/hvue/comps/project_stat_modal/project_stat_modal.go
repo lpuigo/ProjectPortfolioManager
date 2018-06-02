@@ -3,10 +3,10 @@ package project_stat_modal
 import (
 	"github.com/gopherjs/gopherjs/js"
 	"github.com/huckridgesw/hvue"
-	fm "github.com/lpuig/novagile/src/client/frontmodel"
-	"github.com/lpuig/novagile/src/client/goel/message"
-	"github.com/lpuig/novagile/src/client/hvue/comps/project_stat_modal/sre_chart"
-	"github.com/lpuig/novagile/src/client/tools"
+	fm "github.com/lpuig/prjptf/src/client/frontmodel"
+	"github.com/lpuig/prjptf/src/client/goel/message"
+	"github.com/lpuig/prjptf/src/client/hvue/comps/project_stat_modal/sre_chart"
+	"github.com/lpuig/prjptf/src/client/tools"
 	"honnef.co/go/js/xhr"
 	"strconv"
 )

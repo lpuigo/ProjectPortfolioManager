@@ -4,10 +4,10 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/lpuig/novagile/src/server/manager/jiramanager/projectlogs"
+	"github.com/lpuig/prjptf/src/server/manager/jiramanager/projectlogs"
 
-	jsr "github.com/lpuig/novagile/src/client/frontmodel/jirastatrecord"
-	"github.com/lpuig/novagile/src/server/manager/jiramanager/teamlogs"
+	jsr "github.com/lpuig/prjptf/src/client/frontmodel/jirastatrecord"
+	"github.com/lpuig/prjptf/src/server/manager/jiramanager/teamlogs"
 )
 
 type JiraManager struct {

@@ -3,12 +3,12 @@ package workloadschedule_modal
 import (
 	"github.com/gopherjs/gopherjs/js"
 	"github.com/huckridgesw/hvue"
-	"github.com/lpuig/novagile/src/client/business"
-	wsr "github.com/lpuig/novagile/src/client/frontmodel/workloadschedulerecord"
-	"github.com/lpuig/novagile/src/client/goel/message"
-	"github.com/lpuig/novagile/src/client/hvue/comps/workloadschedule_modal/bars_chart"
-	"github.com/lpuig/novagile/src/client/hvue/comps/workloadschedule_modal/selectiontree"
-	"github.com/lpuig/novagile/src/client/tools"
+	"github.com/lpuig/prjptf/src/client/business"
+	wsr "github.com/lpuig/prjptf/src/client/frontmodel/workloadschedulerecord"
+	"github.com/lpuig/prjptf/src/client/goel/message"
+	"github.com/lpuig/prjptf/src/client/hvue/comps/workloadschedule_modal/bars_chart"
+	"github.com/lpuig/prjptf/src/client/hvue/comps/workloadschedule_modal/selectiontree"
+	"github.com/lpuig/prjptf/src/client/tools"
 	"honnef.co/go/js/xhr"
 	"strconv"
 )

@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"strings"
 
-	jsr "github.com/lpuig/novagile/src/client/frontmodel/jirastatrecord"
-	ris "github.com/lpuig/novagile/src/server/manager/recordindexedset"
+	jsr "github.com/lpuig/prjptf/src/client/frontmodel/jirastatrecord"
+	ris "github.com/lpuig/prjptf/src/server/manager/recordindexedset"
 )
 
 type teamLogs struct {

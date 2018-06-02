@@ -6,7 +6,7 @@ const template = `
 		width="70%"
 		:before-close="Hide"
 >
-    <span slot="title" class="novagile">
+    <span slot="title" class="prjptf">
         <h2 style="margin: 0 0"><i class="fas fa-chart-bar icon--left"></i>Workload Schedule</h2>
     </span>
     <el-container 	

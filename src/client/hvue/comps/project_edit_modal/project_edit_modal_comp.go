@@ -5,11 +5,11 @@ import (
 
 	"github.com/gopherjs/gopherjs/js"
 	"github.com/huckridgesw/hvue"
-	"github.com/lpuig/novagile/src/client/auditrules"
-	"github.com/lpuig/novagile/src/client/business"
-	fm "github.com/lpuig/novagile/src/client/frontmodel"
-	"github.com/lpuig/novagile/src/client/goel/message"
-	"github.com/lpuig/novagile/src/client/tools"
+	"github.com/lpuig/prjptf/src/client/auditrules"
+	"github.com/lpuig/prjptf/src/client/business"
+	fm "github.com/lpuig/prjptf/src/client/frontmodel"
+	"github.com/lpuig/prjptf/src/client/goel/message"
+	"github.com/lpuig/prjptf/src/client/tools"
 	"honnef.co/go/js/xhr"
 )
 

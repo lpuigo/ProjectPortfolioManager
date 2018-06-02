@@ -3,7 +3,7 @@ package project_edit_modal
 const template string = `
 <el-dialog :visible.sync="visible" width="60%">
     <!--<span slot="title" class="dialog-header">-->
-    <span slot="title" class="novagile">
+    <span slot="title" class="prjptf">
         <h2 v-if="currentProject" style="margin: 0 0"><i class="far fa-edit icon--left"></i>Edit Project: <span style="color: teal">{{currentProject.client}} - {{currentProject.name}}</span></h2>
     </span>
 

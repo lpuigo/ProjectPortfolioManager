@@ -3,7 +3,7 @@ package recordindexedset
 import (
 	"encoding/csv"
 	"fmt"
-	rs "github.com/lpuig/novagile/src/server/manager/recordset"
+	rs "github.com/lpuig/prjptf/src/server/manager/recordset"
 	"io"
 	"os"
 )
