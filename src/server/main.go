@@ -21,8 +21,8 @@ const (
 
 	ServicePort = ":8080"
 
-	StatCSVFile = `./Ressources/Stats Projets Novagile.csv`
-	PrjJSONFile = `./Ressources/Projets Novagile.xlsx.json`
+	StatCSVFile = `./Ressources/StatsProjets.csv`
+	PrjJSONFile = `./Ressources/Projets.json`
 
 	LaunchWebBrowser = true
 

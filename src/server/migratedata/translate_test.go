@@ -9,7 +9,7 @@ import (
 const (
 	Dico     = "french2english.csv"
 	PrjFile1 = "Projets Novagile formatted.json"
-	PrjFile2 = "C:/Users/Laurent/Google Drive/Travail/NOVAGILE/Gouvernance/Ptf Projets/NovagileProjectManager/Ressources/Projets Novagile.xlsx.json"
+	PrjFile2 = "C:\Users/Laurent/Golang/src/github.com/lpuig/prjptf/Ressources/Projets.json"
 )
 
 func NewDico(t *testing.T) *Dictionnary {
