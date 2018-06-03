@@ -166,15 +166,12 @@ func (tlmm *TimeLineModalModel) GetTimeLineFrom(p *fm.Project) *TimeLine {
 	lastStylePhase := func() {
 		nbPhase := len(t.Phases)
 		if nbPhase >= 1 {
-			t.Phases[nbPhase-1].Name += " last"
+			t.Phases[nbPhase-1].IsLast = true
 		}
 	}
 
-	className := func(phaseName string, isFirst bool) string {
+	className := func(phaseName string) string {
 		res := phaseName
-		if isFirst {
-			res += " first"
-		}
 		if business.InactiveProject(p.Status) {
 			res += " done"
 		}
@@ -182,6 +179,10 @@ func (tlmm *TimeLineModalModel) GetTimeLineFrom(p *fm.Project) *TimeLine {
 			res += " lead"
 		}
 		return res
+	}
+
+	setComment := func(begDate, endDate string) string {
+		return begDate + " to " + endDate
 	}
 
 	if !(kickoffFound || outlineFound || uatFound || trainingFound || rolloutFound || goliveFound || pilotendFound) {
@@ -192,13 +193,16 @@ func (tlmm *TimeLineModalModel) GetTimeLineFrom(p *fm.Project) *TimeLine {
 	if pBeg == pEnd || !tlmm.IsInSlot(pBeg, pEnd) {
 		return nil
 	}
+	// Study phase
 	firstPhase := true
 	if kickoffFound && outlineFound && tlmm.IsInSlot(kickoffDate, outlineDate) && kickoffDate != outlineDate {
-		p := NewPhase(className("study", true))
-		p.SetStyle(tlmm.DateOffset(kickoffDate), tlmm.Length(kickoffDate, outlineDate))
-		t.AddPhase(p)
+		ph := NewPhase(setComment(kickoffDate, outlineDate), className("study"))
+		ph.SetPositionInfo(tlmm.DateOffset(kickoffDate), tlmm.Length(kickoffDate, outlineDate))
+		ph.IsFirst = true
+		t.AddPhase(ph)
 		firstPhase = false
 	}
+	// Real phase
 	if trainingFound && !outlineFound {
 		outlineDate = trainingDate
 	}
@@ -212,41 +216,50 @@ func (tlmm *TimeLineModalModel) GetTimeLineFrom(p *fm.Project) *TimeLine {
 		rolloutDate = goliveDate
 	}
 	if outlineDate != "" && rolloutDate != "" && tlmm.IsInSlot(outlineDate, rolloutDate) && outlineDate != rolloutDate {
-		p := NewPhase(className("real", true))
+		ph := NewPhase(setComment(outlineDate, rolloutDate), className("real"))
+		ph.IsFirst = true
 		offset := 0.0
 		if firstPhase {
 			offset = tlmm.DateOffset(outlineDate)
 		}
-		p.SetStyle(offset, tlmm.Length(outlineDate, rolloutDate))
-		t.AddPhase(p)
+		ph.SetPositionInfo(offset, tlmm.Length(outlineDate, rolloutDate))
+		t.AddPhase(ph)
 		firstPhase = false
 	}
+	// Service phase
 	if rolloutFound && goliveFound && tlmm.IsInSlot(rolloutDate, goliveDate) && rolloutDate != goliveDate {
-		p := NewPhase(className("service", firstPhase))
+		ph := NewPhase(setComment(rolloutDate, goliveDate), className("service"))
+		ph.IsFirst = firstPhase
 		offset := 0.0
 		if firstPhase {
 			offset = tlmm.DateOffset(rolloutDate)
 		}
-		p.SetStyle(offset, tlmm.Length(rolloutDate, goliveDate))
-		t.AddPhase(p)
+		ph.SetPositionInfo(offset, tlmm.Length(rolloutDate, goliveDate))
+		t.AddPhase(ph)
 		firstPhase = false
 	}
+	// Pilot phase
 	if rolloutFound && !goliveFound {
 		goliveDate = rolloutDate
 	}
 	if goliveDate != "" && pilotendFound && tlmm.IsInSlot(goliveDate, pilotendDate) && goliveDate != pilotendDate {
 		lastStylePhase()
-		p := NewPhase(className("pilot", firstPhase))
+		ph := NewPhase(setComment(goliveDate, pilotendDate), className("pilot"))
+		ph.IsFirst = firstPhase
 		offset := 0.0
 		if firstPhase {
 			offset = tlmm.DateOffset(goliveDate)
 		}
-		p.SetStyle(offset, tlmm.Length(goliveDate, pilotendDate))
-		t.AddPhase(p)
+		ph.SetPositionInfo(offset, tlmm.Length(goliveDate, pilotendDate))
+		t.AddPhase(ph)
 		firstPhase = false
 	}
-
 	lastStylePhase()
+
+	offset := 0.0
+	for _, ph := range t.Phases {
+		offset = ph.SetStyleClass(offset)
+	}
 
 	return t
 }

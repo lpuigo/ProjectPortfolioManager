@@ -8,22 +8,52 @@ import (
 
 type Phase struct {
 	*js.Object
-	Name  string `js:"name"`
-	Style string `js:"style"`
+	Comment string  `js:"comment"`
+	Class   string  `js:"class"`
+	Style   string  `js:"style"`
+	IsFirst bool    `js:"first"`
+	IsLast  bool    `js:"last"`
+	Offset  float64 `js:"offset"`
+	Length  float64 `js:"lenght"`
 }
 
-func NewPhase(name string) *Phase {
+func NewPhase(comment, class string) *Phase {
 	p := &Phase{Object: tools.O()}
-	p.Name = name
+	p.Comment = comment
+	p.Class = class
 	p.Style = ""
+	p.IsFirst = false
+	p.IsLast = false
 	return p
 }
 
-func (p *Phase) SetStyle(offset, length float64) {
+func (p *Phase) SetPositionInfo(offset, length float64) {
+	p.Offset = offset
+	p.Length = length
+}
+
+func (p *Phase) SetStyleClass(currentOffset float64) float64 {
 	s := ""
-	if offset != 0 {
-		s += "margin-left: " + strconv.FormatFloat(offset, 'f', 1, 64) + "%; "
+	switch {
+	case p.Offset > 0:
+		s += "margin-left: " + strconv.FormatFloat(p.Offset, 'f', 1, 64) + "%; "
+	case p.Offset < 0:
+		p.Length += p.Offset
+		p.Offset = 0
+		p.IsFirst = false
 	}
-	s += "width: " + strconv.FormatFloat(length, 'f', 1, 64) + "%"
+	if currentOffset+p.Offset+p.Length > 100 {
+		p.Length = 100 - p.Offset - currentOffset
+		p.IsLast = false
+	}
+	s += "width: " + strconv.FormatFloat(p.Length, 'f', 1, 64) + "%"
 	p.Style = s
+
+	if p.IsFirst {
+		p.Class += " first"
+	}
+	if p.IsLast {
+		p.Class += " last"
+	}
+	return currentOffset+p.Offset+p.Length
 }

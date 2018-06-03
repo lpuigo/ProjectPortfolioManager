@@ -7,7 +7,7 @@ const template string = `
 		:before-close="Hide"
 >
     <span slot="title" class="prjptf">
-        <h2 style="margin: 0 0"><i class="fas fa-stream icon--left"></i>Projects Time Line</h2>
+        <h2 style="margin: 0 0"><i class="fas fa-stream icon--left"></i>Projects Time Line: {{beginDate}} to {{endDate}}</h2>
     </span>
 
 	<el-container>
@@ -43,11 +43,17 @@ const template string = `
 					>
 						<template slot-scope="scope">
 							<div class="project-line">
-								<div
-										v-for="p in scope.row.phases"
-										class="item" :class="p.name"
-										:style="p.style"
-								></div>
+                                <el-tooltip
+                                        v-for="p in scope.row.phases"
+                                        placement="top" effect="light"
+                                        :open-delay="250"
+                                >
+                                    <div slot="content">{{p.comment}}</div>
+                                    <div
+                                            class="item" :class="p.class"
+                                            :style="p.style"
+                                    ></div>
+                                </el-tooltip>
 							</div>
 						</template>
 					</el-table-column>
