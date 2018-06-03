@@ -1,6 +1,6 @@
 package project_stat_modal
 
-const template = `
+const template string = `
 <el-dialog 
 		:visible.sync="visible" 
 		width="60%"
@@ -42,11 +42,11 @@ const template = `
 				></el-table-column>
 				<el-table-column 
 					label="Spent"	prop="spent"	width="120px"	sortable 
-					:resizable=false :show-overflow-tooltip=true
+					:resizable=false :formatter="FormatFloat" align="right"
 				></el-table-column>
 				<el-table-column 
 					label="Remaining"	prop="remaining"	width="120px"	sortable 
-					:resizable=false :show-overflow-tooltip=true
+					:resizable=false :formatter="FormatFloat" align="right"
 				></el-table-column>
 				<el-table-column 
 					label="% Total Spent"	width="180px" 

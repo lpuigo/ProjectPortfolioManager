@@ -7,7 +7,7 @@ const template string = `
 		:before-close="Hide"
 >
     <span slot="title" class="prjptf">
-        <h2 style="margin: 0 0"><i class="fas fa-stream icon--left"></i>Projects Time Line: {{beginDate}} to {{endDate}}</h2>
+        <h2 style="margin: 0 0"><i class="fas fa-stream icon--left"></i>Projects Time Line: <span style="color: teal">{{beginDate}} to {{endDate}}</span></h2>
     </span>
 
 	<el-container>

@@ -9,6 +9,7 @@ import (
 	"github.com/lpuig/prjptf/src/client/tools"
 	"honnef.co/go/js/xhr"
 	"strconv"
+	"github.com/lpuig/prjptf/src/client/tools/dates"
 )
 
 func Register() {
@@ -94,3 +95,7 @@ func (psmm *ProjectStatModalModel) callGetProjectStat() {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Others
+
+func (psmm *ProjectStatModalModel) FormatFloat(r, c *js.Object, v float64) string {
+	return date.FormatHour(v)
+}
