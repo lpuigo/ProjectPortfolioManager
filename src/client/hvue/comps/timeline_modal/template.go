@@ -27,6 +27,7 @@ const template string = `
 						:border="false"
 						size="mini"
 						highlight-current-row
+						@row-dblclick="SelectRow"
 				>
 					<el-table-column
 							label="Project" prop="name" width="240px" :show-overflow-tooltip=true

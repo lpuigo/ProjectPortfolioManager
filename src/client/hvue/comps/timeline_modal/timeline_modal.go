@@ -80,7 +80,6 @@ func (tlmm *TimeLineModalModel) Show(infos *Infos) {
 
 func (tlmm *TimeLineModalModel) Hide() {
 	tlmm.Visible = false
-	tlmm.Projects = nil
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -98,11 +97,11 @@ func (tlmm *TimeLineModalModel) setSlotDates() {
 	var halfPeriodLength int
 	switch tlmm.SlotType {
 	case "4Q":
-		halfPeriodLength = 182
+		halfPeriodLength = 182 // half a year
 	case "2Q":
-		halfPeriodLength = 91
+		halfPeriodLength = 91 // halt a semester
 	default:
-		halfPeriodLength = 46
+		halfPeriodLength = 46 // half a quarter
 	}
 
 	tlmm.SetTimePeriod(
@@ -112,7 +111,16 @@ func (tlmm *TimeLineModalModel) setSlotDates() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Others
+// Action Methods
+
+func (tlmm *TimeLineModalModel) SelectRow(vm *hvue.VM, t *TimeLine, event *js.Object) {
+	vm.Call("Hide")
+	vm.Emit("edit-project", t.Project)
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// TimeLine Methods
 
 func (tlmm *TimeLineModalModel) SetTimePeriod(beg, end string) {
 	tlmm.BeginDate = beg
@@ -152,8 +160,7 @@ func (tlmm *TimeLineModalModel) Length(beg, end string) float64 {
 }
 
 func (tlmm *TimeLineModalModel) GetTimeLineFrom(p *fm.Project) *TimeLine {
-	t := NewTimeLine(p.Client + " - " + p.Name)
-	t.MileStones = p.MileStones
+	t := NewTimeLine(p)
 
 	kickoffDate, kickoffFound := p.MileStones["Kickoff"]
 	outlineDate, outlineFound := p.MileStones["Outline"]
@@ -177,6 +184,9 @@ func (tlmm *TimeLineModalModel) GetTimeLineFrom(p *fm.Project) *TimeLine {
 		}
 		if business.LeadProject(p.Status) {
 			res += " lead"
+		}
+		if business.MonitoredProject(p.Status) {
+			res += " monitor"
 		}
 		return res
 	}

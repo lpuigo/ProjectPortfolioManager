@@ -2,21 +2,24 @@ package timeline_modal
 
 import (
 	"github.com/gopherjs/gopherjs/js"
+	fm "github.com/lpuig/prjptf/src/client/frontmodel"
 	"github.com/lpuig/prjptf/src/client/tools"
 )
 
 type TimeLine struct {
 	*js.Object
 	Name       string            `js:"name"`
+	Project    *fm.Project       `js:"project"`
 	Phases     []*Phase          `js:"phases"`
 	MileStones map[string]string `js:"milestones"`
 }
 
-func NewTimeLine(name string) *TimeLine {
+func NewTimeLine(p *fm.Project) *TimeLine {
 	t := &TimeLine{Object: tools.O()}
-	t.Name = name
+	t.Project = p
+	t.Name = p.Client + " - " + p.Name
 	t.Phases = []*Phase{}
-	t.MileStones = map[string]string{}
+	t.MileStones = p.MileStones
 	return t
 }
 

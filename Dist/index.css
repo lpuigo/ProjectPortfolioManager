@@ -297,12 +297,12 @@ pre {
 
 
 .item.first {
-    border-top-left-radius: 5px;
-    border-bottom-left-radius: 5px;
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
 }
 .item.last {
-    border-top-right-radius: 5px;
-    border-bottom-right-radius: 5px;
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
 }
 
 
@@ -312,6 +312,9 @@ pre {
 }
 .item.study.lead {
     background-color: #f0e8a5;
+}
+.item.study.monitor {
+    background-color: #c0e6bc;
 }
 .item.study.done {
     background-color: #e3e3e3;
@@ -324,6 +327,9 @@ pre {
 .item.real.lead {
     background-color: #ded159;
 }
+.item.real.monitor {
+    background-color: #9ecc99;
+}
 .item.real.done {
     background-color: #bdbdbd;
 }
@@ -334,6 +340,9 @@ pre {
 }
 .item.service.lead {
     background-color: #f0e8a5;
+}
+.item.service.monitor {
+    background-color: #c0e6bc;
 }
 .item.service.done {
     background-color: #e3e3e3;
@@ -346,6 +355,9 @@ pre {
 }
 .item.pilot.lead {
     background-color: #f0e8a5;
+}
+.item.pilot.monitor {
+    background-color: #c0e6bc;
 }
 .item.pilot.done {
     background-color: #e3e3e3;
