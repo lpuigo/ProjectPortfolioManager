@@ -14,7 +14,7 @@ func Request(db *sql.DB) (jplrs []*jsr.JiraProjectLogRecord, err error) {
 
 	qrows, e := q.Query()
 	if e != nil {
-		err = fmt.Errorf("could not exec query: %s", err.Error())
+		err = fmt.Errorf("could not exec query: %s", e.Error())
 		return
 	}
 	defer qrows.Close()
@@ -23,7 +23,7 @@ func Request(db *sql.DB) (jplrs []*jsr.JiraProjectLogRecord, err error) {
 	for qrows.Next() {
 		info, th, h, e := q.Scan(qrows)
 		if e != nil {
-			err = fmt.Errorf("could not scan line %d: %s", numline, err.Error())
+			err = fmt.Errorf("could not scan line %d: %s", numline, e.Error())
 			return
 		}
 
@@ -40,7 +40,7 @@ func Request(db *sql.DB) (jplrs []*jsr.JiraProjectLogRecord, err error) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Jira Query for Team Logs
+// Jira Query for Project Logs
 
 const sqlQuery string = `
 select

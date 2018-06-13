@@ -283,6 +283,20 @@ func (m *Manager) GetJiraProjectLogs(w io.Writer) error {
 	return nil
 }
 
+func (m *Manager) GetJiraProjectHistoryLogs(id int, w io.Writer) error {
+	prj := m.Projects.GetProjectsPtf().GetPrjById(id)
+	if prj == nil {
+		return fmt.Errorf("project id %d not found", id)
+	}
+
+	jsns, err := m.Jira.ProjectHistoryLogs(prj)
+	if err != nil {
+		return err
+	}
+	json.NewEncoder(w).Encode(jsns)
+	return nil
+}
+
 func (m *Manager) GetWorkloadSchedule(w io.Writer) error {
 	m.Projects.RLock()
 	defer m.Projects.RUnlock()

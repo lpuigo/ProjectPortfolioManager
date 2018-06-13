@@ -217,6 +217,28 @@ func GetJiraProjectLogs(mgr *mgr.Manager, w http.ResponseWriter, r *http.Request
 	logmsg += fmt.Sprintf("ok (%d)", http.StatusOK)
 }
 
+func GetJiraProjectHistoryLogs(mgr *mgr.Manager, w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+	logmsg := "Request GetJiraProjectHistoryLogs Received from '" + r.Header.Get("Origin") + "' : "
+	defer formatLog(time.Now(), &logmsg)
+
+	vars := mux.Vars(r)
+	prjid, err := strconv.Atoi(vars["prjid"])
+	if err != nil {
+		addError(w, &logmsg, "misformated project id '"+vars["prjid"]+"'", http.StatusBadRequest)
+		return
+	}
+	mgr.Projects.GetProjectsPtf().GetPrjById(prjid)
+	w.Header().Set("Content-Type", "application/json")
+
+	err = mgr.GetJiraProjectHistoryLogs(prjid, w)
+	if err != nil {
+		addError(w, &logmsg, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	logmsg += fmt.Sprintf("ok (%d)", http.StatusOK)
+}
+
 func GetWorkload(mgr *mgr.Manager, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	logmsg := "Request GetWorkload Received from '" + r.Header.Get("Origin") + "' : "

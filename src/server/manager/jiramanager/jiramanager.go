@@ -3,8 +3,11 @@ package jiramanager
 import (
 	"database/sql"
 	"fmt"
+
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/lpuig/prjptf/src/server/manager/jiramanager/projecthistorylogs"
 	"github.com/lpuig/prjptf/src/server/manager/jiramanager/projectlogs"
+	"github.com/lpuig/prjptf/src/server/model"
 
 	jsr "github.com/lpuig/prjptf/src/client/frontmodel/jirastatrecord"
 	"github.com/lpuig/prjptf/src/server/manager/jiramanager/teamlogs"
@@ -36,5 +39,10 @@ func (jm *JiraManager) TeamLogs() (jsns []*jsr.JiraStatRecord, err error) {
 
 func (jm *JiraManager) ProjectLogs() (jsns []*jsr.JiraProjectLogRecord, err error) {
 	jsns, err = projectlogs.Request(jm.db)
+	return
+}
+
+func (jm *JiraManager) ProjectHistoryLogs(p *model.Project) (jsns []*jsr.JiraProjectLogRecord, err error) {
+	jsns, err = projecthistorylogs.Request(jm.db, p)
 	return
 }
