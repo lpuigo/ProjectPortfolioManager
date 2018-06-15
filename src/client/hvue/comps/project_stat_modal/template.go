@@ -12,8 +12,12 @@ const template string = `
         </h2>
     </span>
 
-    <el-tabs tab-position="top" style="min-height: 300px;">
-        <el-tab-pane label="Issues List">
+    <el-tabs 			
+			v-model="activeTabName" 
+			style="min-height: 300px;"
+			@tab-click="ActivateTabs"
+	>
+        <el-tab-pane label="Issues List" name="issuelist">
 			<el-table
 					:data="issueInfoList"
 					:default-sort = "{prop: 'spent', order: 'descending'}"
@@ -62,13 +66,21 @@ const template string = `
                 </el-table-column>
 			</el-table>
         </el-tab-pane>
-        <el-tab-pane label="Global SRE Chart">
+        <el-tab-pane label="Global SRE Chart" name="sre">
             <sre-chart
                     v-if="issueStat"
                     :issuestat="issueStat"
                     style="height: 300px"
                     :border="true"
             ></sre-chart>
+        </el-tab-pane>
+        <el-tab-pane label="Jira Logs" name="projectlogs">
+			<project-tree
+					style="max-height: 65vh;overflow: auto;"
+					:nodes="plnodes"
+					@node-click="HandleNodeClick"
+			>
+			</project-tree>
         </el-tab-pane>
     </el-tabs>
 

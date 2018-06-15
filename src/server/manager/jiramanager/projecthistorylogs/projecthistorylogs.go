@@ -21,13 +21,13 @@ func Request(db *sql.DB, p *model.Project) (jplrs []*jsr.JiraProjectLogRecord, e
 
 	var numline int = 0
 	for qrows.Next() {
-		info, _, h, e := q.Scan(qrows)
+		info, th, h, e := q.Scan(qrows)
 		if e != nil {
 			err = fmt.Errorf("could not scan line %d: %s", numline, e.Error())
 			return
 		}
 
-		res = append(res, jsr.NewBEJiraProjectLogRecord(info, 0, h))
+		res = append(res, jsr.NewBEJiraProjectLogRecord(info, th, h))
 		numline++
 	}
 	err = qrows.Err()
@@ -44,13 +44,14 @@ func Request(db *sql.DB, p *model.Project) (jplrs []*jsr.JiraProjectLogRecord, e
 
 const sqlQuery string = `
 select 
-	team, actor, issue, summary, sum(logspent) as spent
+	team, actor, issue, summary, totalspent, sum(logspent) as spent
 from (
 select
  	COALESCE(team.NAME, "Others Actors") as Team,
 	wl.AUTHOR as Actor, 
 	concat(p.pkey,'-',ji.issuenum) as Issue, 
 	ji.SUMMARY as summary,
+	ji.TIMESPENT/3600 as totalspent,
 	wl.timeworked/3600 as LogSpent
 from customfieldvalue cfv
 inner join customfieldoption cfc on cfc.ID = cfv.PARENTKEY
@@ -93,13 +94,14 @@ func (q *query) Query(p *model.Project) (rows *sql.Rows, err error) {
 
 func (q *query) Scan(r *sql.Rows) (infos []string, totalHour float64, logHour float64, err error) {
 	var Team, Author, Issue, Summary string
-	var Hour float64
+	var totHour, Hour float64
 
 	err = r.Scan(
 		&Team,
 		&Author,
 		&Issue,
 		&Summary,
+		&totHour,
 		&Hour,
 	)
 	if err != nil {
@@ -110,5 +112,5 @@ func (q *query) Scan(r *sql.Rows) (infos []string, totalHour float64, logHour fl
 		Author,
 		Issue,
 		Summary,
-	}, 0, Hour, nil
+	}, totHour, Hour, nil
 }

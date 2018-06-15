@@ -29,7 +29,7 @@ const template = `
 					:nodes="plnodes"
 					@node-click="HandleNodeClick"
 			>
-			</hours-tree>
+			</project-tree>
 		</el-tab-pane>
 	</el-tabs>
 
