@@ -6,6 +6,7 @@ import (
 	"github.com/gopherjs/gopherjs/js"
 	"github.com/huckridgesw/hvue"
 	"github.com/lpuig/prjptf/src/client/tools"
+	"github.com/lpuig/prjptf/src/client/tools/dates"
 )
 
 const template string = `
@@ -17,13 +18,13 @@ const template string = `
     <span class="custom-tree-node" slot-scope="{ node, data }">
 		<el-tooltip v-if="data.href" :content="data.summary" placement="right" effect="light">
 			<span><a :href="data.href" target="_blank" class="custom-node-name">{{node.label}}</a>
-			&nbsp({{data.tothour | FormatFloat(1)}} h)</span>
+			&nbsp({{data.tothour | FormatDHM}})</span>
 		</el-tooltip>
 		<span v-else class="custom-node-name">{{node.label}}</span>
 
 		<span class="custom-hours-row reduce">
 			<span class="hours-table">
-				<span class="hours-cell right">{{data.lhour + data.nlhour | FormatFloat(1)}} h</span>
+				<span class="hours-cell right">{{data.lhour + data.nlhour | FormatDHM}}</span>
 				<span class="hours-cell"></span>
 				<el-progress 
 						v-if="data.level==0"	
@@ -68,6 +69,15 @@ func ComponentOptions() []hvue.ComponentOption {
 				prec = args[0].Int()
 			}
 			return strconv.FormatFloat(h, 'f', prec, 64)
+		}),
+		hvue.Filter("FormatDHM", func(vm *hvue.VM, value *js.Object, args ...*js.Object) interface{} {
+			h := value.Float()/8.0
+			//prec := 0
+			//if len(args) > 0 {
+			//	prec = args[0].Int()
+			//}
+			return date.FormatHour(h)
+			//return strconv.FormatFloat(h, 'f', prec, 64)
 		}),
 	}
 }

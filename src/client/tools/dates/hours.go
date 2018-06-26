@@ -11,7 +11,7 @@ func FormatHour(v float64) string {
 	if d>0 {
 		res += strconv.Itoa(d)+"d"
 	}
-	res += strconv.Itoa(h+100)[1:]+"h"
+	res += strconv.Itoa(h)+"h"
 	res += strconv.Itoa(m+100)[1:]
 	return res
 }
