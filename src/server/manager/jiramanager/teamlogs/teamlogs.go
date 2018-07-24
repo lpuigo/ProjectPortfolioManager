@@ -126,7 +126,7 @@ from (
 	inner join project p on p.ID = ji.PROJECT
 	where 
 		t.ID in (25, 26, 27, 28, 33)
-		and wl.STARTDATE >= STR_TO_DATE('01,01,2018','%d,%m,%Y')
+    and date_format(wl.STARTDATE, "%Y-%v") >= date_format(CURDATE() - interval 182 day, "%Y-%v")  
 		and date_format(wl.STARTDATE, "%Y-%v") <= date_format(CURDATE(), "%Y-%v")
 ) tmp
 group by Team, Author, StartWeek, Issue, Summary
